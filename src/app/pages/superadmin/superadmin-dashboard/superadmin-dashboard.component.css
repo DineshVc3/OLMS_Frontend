@@ -1,0 +1,283 @@
+/* Dashboard Layout Structure */
+.dashboard-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dashboard Content - Properly positioned to account for sidebar and navbar */
+.dashboard-content {
+    margin-left: 250px; /* Account for sidebar width */
+    margin-top: 130px; /* Account for header (70px) + navbar (60px) */
+    margin-bottom: 0; /* Remove bottom margin to prevent scrolling issues */
+    padding: 30px;
+    min-height: calc(100vh - 130px); /* Account for header and navbar only */
+    background: transparent;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative; /* Ensure proper positioning context */
+    z-index: 1; /* Below navbar and sidebar */
+}
+
+/* Profile Section Integration */
+.profile-section {
+    width: 100%;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* User Management Section */
+.user-management-section {
+    width: 100%;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Main Content Area */
+.main-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(74, 144, 226, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+/* Dashboard Welcome Section */
+.dashboard-welcome {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.dashboard-welcome h2 {
+    color: #2c3e50;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.dashboard-welcome h2 i {
+    color: #e74c3c; /* Different color for SuperAdmin */
+    font-size: 2rem;
+}
+
+.dashboard-welcome p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Quick Stats Grid */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(231, 76, 60, 0.1); /* SuperAdmin theme */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b); /* SuperAdmin theme */
+    border-radius: 15px 15px 0 0;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.15);
+    background: rgba(255, 255, 255, 1);
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b); /* SuperAdmin theme */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-icon i {
+    display: block;
+    line-height: 1;
+    font-style: normal;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+    z-index: 2;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-info h3 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.stat-info p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Collapsed sidebar state */
+.dashboard-layout.sidebar-collapsed .dashboard-content {
+    margin-left: 80px; /* Adjust for collapsed sidebar */
+}
+
+/* Ensure content doesn't interfere with fixed elements */
+.dashboard-content * {
+    position: relative;
+    z-index: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .dashboard-content {
+        margin-left: 220px;
+        padding: 25px;
+    }
+
+    .dashboard-layout.sidebar-collapsed .dashboard-content {
+        margin-left: 70px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+    .quick-stats {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .dashboard-welcome h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-content {
+        margin-left: 0;
+        margin-top: 130px; /* Keep same top margin for mobile */
+        padding: 20px 15px;
+    }
+
+    .dashboard-layout.sidebar-collapsed .dashboard-content {
+        margin-left: 0; /* On mobile, always full width */
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .quick-stats {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .dashboard-welcome h2 {
+        font-size: 1.8rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .dashboard-welcome p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-content {
+        margin-top: 130px; /* Consistent top margin */
+        padding: 15px 10px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+        font-size: 1.1rem;
+    }
+
+    .stat-info p {
+        font-size: 0.9rem;
+    }
+
+    .dashboard-welcome h2 {
+        font-size: 1.6rem;
+    }
+}
+
+/* Smooth transition for all layout changes */
+* {
+    transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}

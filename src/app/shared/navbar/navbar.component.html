@@ -1,0 +1,51 @@
+<nav class="navbar" [class.sidebar-collapsed]="isCollapsed">
+    <!-- Sidebar Toggle Button -->
+    <div class="navbar-toggle">
+      <button class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Toggle Sidebar">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Navbar Items -->
+    <div class="navbar-content">
+      <!-- Left Scroll Indicator -->
+      <div class="scroll-indicator left" 
+           *ngIf="canScrollLeft" 
+           (click)="scrollNavbar('left')"
+           title="Scroll Left">
+        <i class="fa fa-chevron-left"></i>
+      </div>
+      
+      <ul class="navbar-items" 
+          (scroll)="onNavbarScroll()"
+          (window:resize)="updateScrollIndicators()"
+          #navbarItems>
+        <!-- Profile Link -->
+        <li>
+          <a (click)="openProfile()" class="profile-link">
+            <i class="fa fa-user"></i> Profile
+          </a>
+        </li>
+        
+        <!-- All Submenu Items -->
+        <li *ngFor="let submenu of getSubmenuItems(); trackBy: trackSubmenuItem">
+          <a (click)="selectSubmenu(submenu)" class="submenu-link">{{ submenu }}</a>
+        </li>
+        
+        <!-- Logout Button -->
+        <li>
+          <a (click)="logout()" class="logout-link">
+            <i class="fa fa-sign-out-alt"></i> Logout
+          </a>
+        </li>
+      </ul>
+      
+      <!-- Right Scroll Indicator -->
+      <div class="scroll-indicator right" 
+           *ngIf="canScrollRight" 
+           (click)="scrollNavbar('right')"
+           title="Scroll Right">
+        <i class="fa fa-chevron-right"></i>
+      </div>
+    </div>
+</nav>

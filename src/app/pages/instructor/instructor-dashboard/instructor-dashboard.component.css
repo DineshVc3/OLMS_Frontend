@@ -1,0 +1,111 @@
+/* Dashboard Layout Structure */
+.dashboard-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dashboard Content - Properly positioned to account for sidebar and navbar */
+.dashboard-content {
+    margin-left: 250px; /* Account for sidebar width */
+    margin-top: 130px; /* Account for header (70px) + navbar (60px) */
+    margin-bottom: 0; /* Remove bottom margin to prevent scrolling issues */
+    padding: 30px;
+    min-height: calc(100vh - 130px); /* Account for header and navbar only */
+    background: transparent;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative; /* Ensure proper positioning context */
+    z-index: 1; /* Below navbar and sidebar */
+}
+
+/* Profile Section Integration */
+.profile-section {
+    width: 100%;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Main Content Area */
+.main-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(74, 144, 226, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+/* Collapsed sidebar state */
+.dashboard-layout.sidebar-collapsed .dashboard-content {
+    margin-left: 80px; /* Adjust for collapsed sidebar */
+}
+
+/* Ensure content doesn't interfere with fixed elements */
+.dashboard-content * {
+    position: relative;
+    z-index: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .dashboard-content {
+        margin-left: 220px;
+        padding: 25px;
+    }
+
+    .dashboard-layout.sidebar-collapsed .dashboard-content {
+        margin-left: 70px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-content {
+        margin-left: 0;
+        margin-top: 130px; /* Keep same top margin for mobile */
+        padding: 20px 15px;
+    }
+
+    .dashboard-layout.sidebar-collapsed .dashboard-content {
+        margin-left: 0; /* On mobile, always full width */
+    }
+
+    .main-content {
+          padding: 20px;
+    }
+}
+
+/* Home Section */
+.home-section {
+  width: 100%;
+  background: transparent;
+}
+
+@media (max-width: 480px) {
+    .dashboard-content {
+        margin-top: 130px; /* Consistent top margin */
+        padding: 15px 10px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+}
+
+/* Smooth transition for all layout changes */
+* {
+    transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}

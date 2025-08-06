@@ -1,0 +1,531 @@
+<div class="learner-course-container">
+  <!-- Header Section -->
+  <div class="header">
+    <div class="header-content">
+      <h2>My Learning Portal</h2>
+      <p>Access your courses, take quizzes, and track your progress</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.enrolledCourses }}</span>
+        <span class="stat-label">Enrolled Courses</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.completedQuizzes }}</span>
+        <span class="stat-label">Completed Quizzes</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.totalScore }}</span>
+        <span class="stat-label">Total Score</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.avgProgress }}%</span>
+        <span class="stat-label">Avg Progress</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Display -->
+  <div *ngIf="message" class="message" [class.success]="messageType === 'success'" [class.error]="messageType === 'error'">
+    <i class="fa" [class.fa-check-circle]="messageType === 'success'" [class.fa-exclamation-circle]="messageType === 'error'"></i>
+    {{ message }}
+    <button class="close-btn" (click)="clearMessage()">×</button>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="tab-navigation">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'my-courses'"
+      (click)="setActiveTab('my-courses')">
+      <i class="fa fa-book"></i>
+      My Courses
+    </button>
+    
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'browse-courses'"
+      (click)="setActiveTab('browse-courses')">
+      <i class="fa fa-search"></i>
+      Browse Courses
+    </button>
+    
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'course-content'"
+      [disabled]="!selectedCourse"
+      (click)="setActiveTab('course-content')">
+      <i class="fa fa-folder-open"></i>
+      Course Content
+    </button>
+    
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'take-quiz'"
+      [disabled]="!selectedQuiz"
+      (click)="setActiveTab('take-quiz')">
+      <i class="fa fa-question-circle"></i>
+      Take Quiz
+    </button>
+    
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'my-progress'"
+      (click)="setActiveTab('my-progress')">
+      <i class="fa fa-chart-line"></i>
+      My Progress
+    </button>
+  </div>
+
+  <!-- Selected Course/Quiz Info -->
+  <div *ngIf="selectedCourse && activeTab !== 'my-courses' && activeTab !== 'browse-courses'" class="selected-item-info">
+    <div class="item-info">
+      <h3>{{ selectedCourse.title }}</h3>
+      <p>{{ selectedCourse.description }}</p>
+      <span *ngIf="selectedQuiz" class="quiz-info">
+        <i class="fa fa-question-circle"></i>
+        Current Quiz: {{ selectedQuiz.title }}
+      </span>
+    </div>
+    <button class="btn btn-secondary" (click)="selectedCourse = null; selectedQuiz = null; setActiveTab('my-courses')">
+      <i class="fa fa-arrow-left"></i>
+      Back to Courses
+    </button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <i class="fa fa-spinner fa-spin"></i>
+    <span>Loading...</span>
+  </div>
+
+  <!-- Tab Content -->
+  <div *ngIf="!isLoading" class="tab-content">
+    
+    <!-- My Courses Tab -->
+    <div *ngIf="activeTab === 'my-courses'" class="courses-tab">
+      <div class="tab-header">
+        <h3>My Enrolled Courses</h3>
+        <p>Continue your learning journey</p>
+      </div>
+      
+      <div *ngIf="myCourses.length === 0" class="no-data">
+        <i class="fa fa-graduation-cap"></i>
+        <h4>No Courses Enrolled</h4>
+        <p>Browse available courses to start learning</p>
+        <button class="btn btn-primary" (click)="setActiveTab('browse-courses')">
+          <i class="fa fa-search"></i>
+          Browse Courses
+        </button>
+      </div>
+      
+      <div *ngIf="myCourses.length > 0" class="courses-grid">
+        <div *ngFor="let course of myCourses; trackBy: trackByCourseId" 
+             class="course-card enrolled" 
+             (click)="selectCourse(course)">
+          <div class="course-header">
+            <h4>{{ course.title }}</h4>
+            <span class="enrollment-badge">Enrolled</span>
+          </div>
+          <div class="course-content">
+            <p>{{ truncateText(course.description, 100) }}</p>
+            <div class="course-meta">
+              <span class="meta-item">
+                <i class="fa fa-calendar"></i>
+                Started: {{ formatDate(course.createdAt) }}
+              </span>
+            </div>
+          </div>
+          <div class="course-actions">
+            <span class="action-hint">
+              <i class="fa fa-play"></i>
+              Continue Learning
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Browse Courses Tab -->
+    <div *ngIf="activeTab === 'browse-courses'" class="browse-tab">
+      <div class="tab-header">
+        <h3>Browse Available Courses</h3>
+        <div class="search-section">
+          <div class="search-input">
+            <i class="fa fa-search"></i>
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (input)="onSearchChange()"
+              placeholder="Search courses..."
+              class="form-control">
+          </div>
+        </div>
+      </div>
+      
+      <div class="search-results">
+        <p>{{ filteredCourses.length }} course(s) found</p>
+      </div>
+      
+      <div *ngIf="filteredCourses.length === 0" class="no-data">
+        <i class="fa fa-search"></i>
+        <h4>No Courses Found</h4>
+        <p>Try adjusting your search criteria</p>
+      </div>
+      
+      <div *ngIf="filteredCourses.length > 0" class="courses-grid">
+        <div *ngFor="let course of filteredCourses; trackBy: trackByCourseId" class="course-card">
+          <div class="course-header">
+            <h4>{{ course.title }}</h4>
+            <span class="course-date">{{ formatDate(course.createdAt) }}</span>
+          </div>
+          <div class="course-content">
+            <p>{{ truncateText(course.description, 120) }}</p>
+            <div class="course-meta">
+              <span class="meta-item">
+                <i class="fa fa-user"></i>
+                Instructor Available
+              </span>
+              <span class="meta-item" *ngIf="course.prerequisites">
+                <i class="fa fa-list"></i>
+                Prerequisites Required
+              </span>
+            </div>
+          </div>
+          <div class="course-actions">
+            <button class="btn btn-outline" (click)="selectCourse(course)">
+              <i class="fa fa-eye"></i>
+              View Content
+            </button>
+            <button class="btn btn-primary" (click)="enrollInCourse(course)">
+              <i class="fa fa-plus"></i>
+              Enroll
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Content Tab -->
+    <div *ngIf="activeTab === 'course-content'" class="content-tab">
+      <div class="tab-header">
+        <h3>Course Materials & Quizzes</h3>
+        <p>Access learning materials and assessments</p>
+      </div>
+
+      <div *ngIf="!courseContent" class="no-data">
+        <i class="fa fa-folder-open"></i>
+        <h4>Loading Course Content</h4>
+        <p>Please wait while we load the course materials</p>
+      </div>
+
+      <div *ngIf="courseContent" class="content-sections">
+        <!-- Course Materials -->
+        <div class="content-section">
+          <h4>
+            <i class="fa fa-folder"></i>
+            Learning Materials
+          </h4>
+          
+          <div *ngIf="courseContent.materials.length === 0" class="no-content">
+            <p>No materials available yet</p>
+          </div>
+          
+          <div *ngIf="courseContent.materials.length > 0" class="materials-list">
+            <div *ngFor="let material of courseContent.materials" class="material-item">
+              <div class="material-icon">
+                <i class="fa" [class]="getFileIcon(material.type)"></i>
+              </div>
+              <div class="material-info">
+                <h5>{{ material.title }}</h5>
+                <span class="material-type">{{ material.type }}</span>
+              </div>
+              <div class="material-actions">
+                <button class="btn btn-primary" (click)="downloadMaterial(material)">
+                  <i class="fa fa-download"></i>
+                  Access
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Quizzes -->
+        <div class="content-section">
+          <h4>
+            <i class="fa fa-question-circle"></i>
+            Quizzes & Assessments
+          </h4>
+          
+          <div *ngIf="courseContent.quizzes.length === 0" class="no-content">
+            <p>No quizzes available yet</p>
+          </div>
+          
+          <div *ngIf="courseContent.quizzes.length > 0" class="quizzes-list">
+            <div *ngFor="let quiz of courseContent.quizzes; trackBy: trackByQuizId" class="quiz-item">
+              <div class="quiz-info">
+                <h5>{{ quiz.title }}</h5>
+                <div class="quiz-meta">
+                  <span class="meta-item">
+                    <i class="fa fa-star"></i>
+                    {{ quiz.totalMarks }} marks
+                  </span>
+                  <span class="meta-item">
+                    <i class="fa fa-clock"></i>
+                    30 minutes
+                  </span>
+                </div>
+              </div>
+              <div class="quiz-actions">
+                <button class="btn btn-primary" (click)="selectQuiz(quiz)">
+                  <i class="fa fa-play"></i>
+                  Start Quiz
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Take Quiz Tab -->
+    <div *ngIf="activeTab === 'take-quiz'" class="quiz-tab">
+      <!-- Quiz Not Started -->
+      <div *ngIf="!currentQuizQuestions.length && !isQuizSubmitted" class="quiz-intro">
+        <div class="quiz-header">
+          <h3>{{ selectedQuiz?.title }}</h3>
+          <p>You're about to start this quiz. Make sure you have enough time to complete it.</p>
+        </div>
+        
+        <div class="quiz-instructions">
+          <h4>Instructions:</h4>
+          <ul>
+            <li>Total Questions: {{ currentQuizQuestions.length }}</li>
+            <li>Total Marks: {{ selectedQuiz?.totalMarks }}</li>
+            <li>Time Limit: 30 minutes</li>
+            <li>You can change your answers before submitting</li>
+            <li>Make sure you have a stable internet connection</li>
+          </ul>
+        </div>
+        
+        <div class="quiz-start-actions">
+          <button class="btn btn-secondary" (click)="setActiveTab('course-content')">
+            <i class="fa fa-arrow-left"></i>
+            Back to Course
+          </button>
+          <button class="btn btn-primary" (click)="loadQuizForTaking()">
+            <i class="fa fa-play"></i>
+            Start Quiz
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz In Progress -->
+      <div *ngIf="currentQuizQuestions.length > 0 && !isQuizSubmitted" class="quiz-taking">
+        <!-- Quiz Timer -->
+        <div class="quiz-timer" [style.color]="getTimerColor()">
+          <i class="fa fa-clock"></i>
+          Time Remaining: {{ formatTime(quizTimeRemaining) }}
+        </div>
+        
+        <!-- Quiz Progress -->
+        <div class="quiz-progress">
+          <div class="progress-info">
+            <span>Question Progress</span>
+            <span>{{ getAnsweredCount() }} / {{ currentQuizQuestions.length }} answered</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" 
+                 [style.width.%]="getProgressPercentage()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz Questions -->
+        <div class="quiz-questions">
+          <div *ngFor="let question of currentQuizQuestions; let i = index; trackBy: trackByQuestionId" 
+               class="question-container">
+            <div class="question-header">
+              <span class="question-number">Question {{ i + 1 }}</span>
+              <span class="question-marks">{{ question.marks }} marks</span>
+            </div>
+            
+            <div class="question-content">
+              <p class="question-text">{{ question.questionText }}</p>
+              
+              <div class="options-container">
+                <div *ngFor="let option of ['A', 'B', 'C', 'D']" 
+                     class="option" 
+                     [class.selected]="quizAnswers[question.questionId] === option"
+                     (click)="selectAnswer(question.questionId, option)">
+                  <div class="option-radio">
+                    <input type="radio" 
+                           [name]="'question_' + question.questionId"
+                           [value]="option"
+                           [(ngModel)]="quizAnswers[question.questionId]">
+                  </div>
+                  <div class="option-content">
+                    <span class="option-letter">{{ option }}</span>
+                    <span class="option-text">{{ question['option' + option] }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Quiz -->
+        <div class="quiz-submit">
+          <button class="btn btn-secondary" (click)="setActiveTab('course-content')">
+            <i class="fa fa-save"></i>
+            Save & Exit
+          </button>
+          <button class="btn btn-primary" (click)="submitQuiz()" [disabled]="isSubmitting">
+            <i *ngIf="isSubmitting" class="fa fa-spinner fa-spin"></i>
+            <i *ngIf="!isSubmitting" class="fa fa-check"></i>
+            {{ isSubmitting ? 'Submitting...' : 'Submit Quiz' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz Results -->
+      <div *ngIf="isQuizSubmitted && showQuizResults" class="quiz-results">
+        <div class="results-header">
+          <h3>Quiz Completed!</h3>
+          <div class="score-display">
+            <div class="score-circle" [style.border-color]="getProgressColor((quizScore / totalMarks) * 100)">
+              <span class="score-value">{{ quizScore }}</span>
+              <span class="score-total">/ {{ totalMarks }}</span>
+            </div>
+            <div class="score-percentage" [style.color]="getProgressColor((quizScore / totalMarks) * 100)">
+              {{ ((quizScore / totalMarks) * 100).toFixed(1) }}%
+            </div>
+          </div>
+        </div>
+
+        <div class="results-summary">
+          <div class="summary-item">
+            <i class="fa fa-check-circle"></i>
+            <span>Correct Answers: {{ getCorrectAnswersCount() }}</span>
+          </div>
+          <div class="summary-item">
+            <i class="fa fa-times-circle"></i>
+            <span>Incorrect Answers: {{ getIncorrectAnswersCount() }}</span>
+          </div>
+          <div class="summary-item">
+            <i class="fa fa-question-circle"></i>
+            <span>Unanswered: {{ getUnansweredCount() }}</span>
+          </div>
+        </div>
+
+        <div class="results-actions">
+          <button class="btn btn-secondary" (click)="backToCourse()">
+            <i class="fa fa-arrow-left"></i>
+            Back to Course
+          </button>
+          <button class="btn btn-primary" (click)="retakeQuiz()">
+            <i class="fa fa-redo"></i>
+            Retake Quiz
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Progress Tab -->
+    <div *ngIf="activeTab === 'my-progress'" class="progress-tab">
+      <div class="tab-header">
+        <h3>Learning Progress</h3>
+        <p>Track your performance across all courses</p>
+      </div>
+
+      <div *ngIf="myProgress.length === 0" class="no-data">
+        <i class="fa fa-chart-line"></i>
+        <h4>No Progress Data</h4>
+        <p>Start taking quizzes to see your progress here</p>
+      </div>
+
+      <div *ngIf="myProgress.length > 0" class="progress-overview">
+        <!-- Overall Stats -->
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-graduation-cap"></i>
+            </div>
+            <div class="stat-content">
+              <h4>{{ stats.enrolledCourses }}</h4>
+              <p>Enrolled Courses</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <h4>{{ stats.completedQuizzes }}</h4>
+              <p>Completed Quizzes</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-trophy"></i>
+            </div>
+            <div class="stat-content">
+              <h4>{{ stats.totalScore }}</h4>
+              <p>Total Score</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-percent"></i>
+            </div>
+            <div class="stat-content">
+              <h4>{{ stats.avgProgress }}%</h4>
+              <p>Average Performance</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Progress -->
+        <div class="detailed-progress">
+          <h4>Course-wise Progress</h4>
+          
+          <div class="progress-list">
+            <div *ngFor="let course of myProgress" class="progress-item">
+              <div class="course-progress-header">
+                <h5>{{ course.courseTitle }}</h5>
+                <span class="last-activity">Last activity: {{ formatDate(course.lastActivity) }}</span>
+              </div>
+              
+              <div class="progress-details">
+                <div class="progress-stats">
+                  <div class="stat">
+                    <span class="stat-value">{{ course.completedQuizzes }}/{{ course.totalQuizzes }}</span>
+                    <span class="stat-label">Quizzes</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-value">{{ course.totalScore }}/{{ course.maxScore }}</span>
+                    <span class="stat-label">Score</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-value">{{ course.percentage }}%</span>
+                    <span class="stat-label">Performance</span>
+                  </div>
+                </div>
+                
+                <div class="progress-bar">
+                  <div class="progress-fill" 
+                       [style.width.%]="course.percentage"
+                       [style.background-color]="getProgressColor(course.percentage)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

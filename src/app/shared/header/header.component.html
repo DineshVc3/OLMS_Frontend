@@ -1,0 +1,102 @@
+<header class="main-header">
+  <nav class="navbar">
+    <div class="nav-container">
+      <!-- Logo Section -->
+      <div class="nav-logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">
+          <span class="logo-primary">OLMS</span>
+          <span class="logo-subtitle">Learning Hub</span>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <div class="nav-menu">
+        <!-- Empty for now, can add other navigation items here -->
+      </div>
+
+      <!-- User Actions -->
+      <div class="nav-actions">
+        <!-- Show user info and logout when logged in -->
+        <div class="user-section" *ngIf="isLoggedIn()">
+          <span class="user-role">{{ getCurrentRole() }}</span>
+          <button class="logout-btn" (click)="logout()">
+            <i class="logout-icon">🚪</i>
+            <span>Logout</span>
+          </button>
+        </div>
+
+        <!-- Show login when not logged in -->
+        <div class="login-section" *ngIf="!isLoggedIn()">
+          <button class="login-btn" (click)="toggleLogin()" [class.active]="isLoginOpen">
+            <i class="login-icon">🔐</i>
+            <span class="login-text">{{ isLoginOpen ? 'Close' : 'Login' }}</span>
+            <div class="login-ripple"></div>
+          </button>
+          
+          <!-- Login Panel -->
+          <div class="login-panel" [class.show]="isLoginOpen">
+            <div class="login-content">
+              <h3>Welcome Back!</h3>
+              <form class="login-form" (ngSubmit)="login()" #loginForm="ngForm">
+                <div class="error-message" *ngIf="errorMessage">
+                  {{ errorMessage }}
+                </div>
+                <div class="input-group">
+                  <input 
+                    type="email" 
+                    placeholder="Email" 
+                    required 
+                    [(ngModel)]="email"
+                    name="email"
+                    #emailInput="ngModel">
+                  <i class="input-icon">📧</i>
+                </div>
+                <div class="input-group">
+                  <input 
+                    type="password" 
+                    placeholder="Password" 
+                    required 
+                    [(ngModel)]="password"
+                    name="password"
+                    #passwordInput="ngModel">
+                  <i class="input-icon">🔒</i>
+                </div>
+                <button type="submit" class="submit-btn" [disabled]="!loginForm.form.valid">
+                  <span>Sign In</span>
+                  <i class="arrow">→</i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slideshow Animation Corner -->
+        <div class="slideshow-corner">
+          <div class="slideshow-content">
+            <div class="slide active">
+              <span class="slide-text">✨ Hover to Login</span>
+            </div>
+            <div class="slide">
+              <span class="slide-text">🚀 Start Learning</span>
+            </div>
+            <div class="slide">
+              <span class="slide-text">📚 Explore Courses</span>
+            </div>
+            <div class="slide">
+              <span class="slide-text">🎯 Achieve Goals</span>
+            </div>
+          </div>
+          <div class="slideshow-glow"></div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-toggle" (click)="toggleMobileMenu()">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </nav>
+</header>

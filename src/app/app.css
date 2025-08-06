@@ -1,0 +1,64 @@
+/* Global App Container Styles */
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Main content area */
+.main-content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure body and html have proper styling */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Global scrollbar styling */
+* {
+    box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #4a90e2, #357abd);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #357abd, #2c5aa0);
+}
+
+/* Prevent horizontal overflow on all elements */
+* {
+    max-width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .app-container {
+        overflow-x: hidden;
+    }
+    
+    .main-content {
+        overflow-x: hidden;
+    }
+}

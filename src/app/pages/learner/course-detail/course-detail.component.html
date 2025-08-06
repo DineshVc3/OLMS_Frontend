@@ -1,0 +1,260 @@
+<div class="course-detail">
+  <!-- Header Section -->
+  <div class="course-header">
+    <div class="header-actions">
+      <button class="back-btn" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+      </button>
+      <button class="refresh-btn" (click)="refresh()" [disabled]="loading">
+        <i class="fas fa-refresh" [class.spinning]="loading"></i>
+        Refresh
+      </button>
+    </div>
+    
+    <div *ngIf="courseContent" class="course-info">
+      <h1><i class="fas fa-book"></i> {{ courseContent.courseTitle }}</h1>
+      <div class="course-stats-summary">
+        <div class="stat-item">
+          <i class="fas fa-file-alt"></i>
+          <span>{{ courseStats.totalMaterials }} Materials</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-question-circle"></i>
+          <span>{{ courseStats.totalQuizzes }} Quizzes</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-trophy"></i>
+          <span>{{ courseStats.passedQuizzes }} Passed</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-chart-line"></i>
+          <span>{{ courseStats.overallProgress }}% Complete</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading course content...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="refresh()">
+      <i class="fas fa-retry"></i>
+      Try Again
+    </button>
+  </div>
+
+  <!-- Course Content -->
+  <div *ngIf="!loading && !error && courseContent" class="course-content">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'overview'"
+        (click)="setActiveTab('overview')">
+        <i class="fas fa-info-circle"></i>
+        Overview
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'materials'"
+        (click)="setActiveTab('materials')">
+        <i class="fas fa-file-alt"></i>
+        Materials ({{ courseStats.totalMaterials }})
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'quizzes'"
+        (click)="setActiveTab('quizzes')">
+        <i class="fas fa-question-circle"></i>
+        Quizzes ({{ courseStats.totalQuizzes }})
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      
+      <!-- Overview Tab -->
+      <div *ngIf="activeTab === 'overview'" class="overview-tab">
+        <div class="overview-grid">
+          <!-- Progress Overview with Donut Chart -->
+          <div class="overview-card progress-card">
+            <h3><i class="fas fa-chart-pie"></i> Your Progress</h3>
+            <div class="donut-chart-wrapper">
+              <app-donut-chart
+                [progress]="courseStats.overallProgress"
+                [label]="'Course Progress'"
+                [totalQuizzes]="courseStats.totalQuizzes"
+                [completedQuizzes]="courseStats.attemptedQuizzes"
+                [passedQuizzes]="courseStats.passedQuizzes"
+                [showStats]="true">
+              </app-donut-chart>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="overview-card">
+            <h3><i class="fas fa-tachometer-alt"></i> Quick Stats</h3>
+            <div class="quick-stats">
+              <div class="quick-stat-item materials">
+                <i class="fas fa-file-alt"></i>
+                <div class="stat-info">
+                  <span class="stat-number">{{ courseStats.totalMaterials }}</span>
+                  <span class="stat-label">Course Materials</span>
+                </div>
+              </div>
+              <div class="quick-stat-item quizzes">
+                <i class="fas fa-question-circle"></i>
+                <div class="stat-info">
+                  <span class="stat-number">{{ courseStats.totalQuizzes }}</span>
+                  <span class="stat-label">Available Quizzes</span>
+                </div>
+              </div>
+              <div class="quick-stat-item passed">
+                <i class="fas fa-trophy"></i>
+                <div class="stat-info">
+                  <span class="stat-number">{{ courseStats.passedQuizzes }}</span>
+                  <span class="stat-label">Passed Quizzes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div class="overview-card full-width">
+            <h3><i class="fas fa-tasks"></i> What's Next?</h3>
+            <div class="next-steps">
+              <div *ngIf="courseStats.totalMaterials > 0" class="step-item">
+                <i class="fas fa-file-alt"></i>
+                <div class="step-content">
+                  <h4>Review Course Materials</h4>
+                  <p>Study the {{ courseStats.totalMaterials }} available materials to prepare for quizzes.</p>
+                  <button class="step-btn" (click)="setActiveTab('materials')">
+                    View Materials
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="courseStats.totalQuizzes > courseStats.attemptedQuizzes" class="step-item">
+                <i class="fas fa-play-circle"></i>
+                <div class="step-content">
+                  <h4>Take Remaining Quizzes</h4>
+                  <p>You have {{ courseStats.totalQuizzes - courseStats.attemptedQuizzes }} quiz(s) remaining.</p>
+                  <button class="step-btn" (click)="setActiveTab('quizzes')">
+                    View Quizzes
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="courseStats.attemptedQuizzes > courseStats.passedQuizzes" class="step-item">
+                <i class="fas fa-redo"></i>
+                <div class="step-content">
+                  <h4>Retake Failed Quizzes</h4>
+                  <p>Improve your score by retaking quizzes you didn't pass.</p>
+                  <button class="step-btn" (click)="setActiveTab('quizzes')">
+                    Retake Quizzes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Materials Tab -->
+      <div *ngIf="activeTab === 'materials'" class="materials-tab">
+        <div class="section-header">
+          <h3><i class="fas fa-file-alt"></i> Course Materials</h3>
+          <span class="material-count">{{ courseContent.materials.length }} item(s)</span>
+        </div>
+
+        <div *ngIf="courseContent.materials.length === 0" class="no-content">
+          <i class="fas fa-folder-open"></i>
+          <h4>No Materials Available</h4>
+          <p>No course materials have been uploaded yet.</p>
+        </div>
+
+        <div *ngIf="courseContent.materials.length > 0" class="materials-list">
+          <div 
+            class="material-item" 
+            *ngFor="let material of courseContent.materials; let i = index">
+            <div class="material-number">{{ i + 1 }}</div>
+            <div class="material-icon">
+              <i [class]="getFileIcon(material.type)"></i>
+            </div>
+            <div class="material-info">
+              <h4>{{ material.title }}</h4>
+              <p>Type: {{ material.type }}</p>
+            </div>
+            <div class="material-actions">
+              <button class="action-btn view-btn" (click)="viewMaterial(material)" title="View">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn download-btn" (click)="downloadMaterial(material)" title="Download">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quizzes Tab -->
+      <div *ngIf="activeTab === 'quizzes'" class="quizzes-tab">
+        <div class="section-header">
+          <h3><i class="fas fa-question-circle"></i> Course Quizzes</h3>
+          <span class="quiz-count">{{ courseContent.quizzes.length }} quiz(zes)</span>
+        </div>
+
+        <div *ngIf="courseContent.quizzes.length === 0" class="no-content">
+          <i class="fas fa-question-circle"></i>
+          <h4>No Quizzes Available</h4>
+          <p>No quizzes have been created for this course yet.</p>
+        </div>
+
+        <div *ngIf="courseContent.quizzes.length > 0" class="quizzes-list">
+          <div 
+            class="quiz-item" 
+            *ngFor="let quiz of courseContent.quizzes; let i = index">
+            <div class="quiz-number">{{ i + 1 }}</div>
+            <div class="quiz-icon">
+              <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="quiz-info">
+              <h4>{{ quiz.title }}</h4>
+              <p>Total Marks: {{ quiz.totalMarks }}</p>
+              <div *ngIf="quiz.attempted" class="quiz-result">
+                <span class="score">Score: {{ quiz.score }}/{{ quiz.totalMarks }} ({{ quiz.percentage }}%)</span>
+              </div>
+            </div>
+            <div class="quiz-status">
+              <span class="status-badge" [ngClass]="getQuizStatusClass(quiz.status || 'Not Attempted')">
+                {{ quiz.status || 'Not Attempted' }}
+              </span>
+            </div>
+            <div class="quiz-actions">
+              <button 
+                *ngIf="canAttemptQuiz(quiz)" 
+                class="action-btn attempt-btn" 
+                (click)="attemptQuiz(quiz)">
+                <i class="fas fa-play"></i>
+                {{ quiz.attempted ? 'Retake' : 'Attempt' }}
+              </button>
+              <button 
+                *ngIf="quiz.attempted" 
+                class="action-btn result-btn" 
+                (click)="viewQuizResult(quiz)">
+                <i class="fas fa-chart-bar"></i>
+                View Result
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

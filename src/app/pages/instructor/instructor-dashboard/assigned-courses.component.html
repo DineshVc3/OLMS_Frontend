@@ -1,0 +1,1010 @@
+<div class="assigned-courses-container">
+  <!-- Header -->
+  <div class="courses-header">
+    <div class="header-content">
+      <h2><i class="fas fa-book"></i> My Assigned Courses</h2>
+      <p>Manage your assigned courses, upload content, and create quizzes</p>
+    </div>
+    <div class="header-actions">
+      <button class="refresh-btn" (click)="loadAssignedCourses()" [disabled]="isLoading">
+        <i class="fas fa-refresh" [class.fa-spin]="isLoading"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading your assigned courses...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && courses.length === 0" class="no-courses">
+    <i class="fas fa-book"></i>
+    <h3>No Courses Assigned</h3>
+    <p>You don't have any courses assigned yet. Contact your administrator for course assignments.</p>
+  </div>
+
+  <!-- Courses Grid -->
+  <div *ngIf="!isLoading && courses.length > 0" class="courses-grid">
+    <div class="course-card" *ngFor="let course of courses; trackBy: trackByCourseId">
+      <div class="course-header">
+        <div class="course-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="course-info">
+          <h3 class="course-title">{{ course.title }}</h3>
+          <p class="course-description">{{ course.description }}</p>
+        </div>
+        <div class="course-actions">
+          <div class="dropdown">
+            <button class="dropdown-btn" (click)="toggleDropdown(course.courseId)">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+                         <div class="dropdown-menu" [class.active]="activeDropdown === course.courseId">
+               <button (click)="viewCourseStudents(course.courseId)">
+                 <i class="fas fa-users"></i>
+                 View Students
+               </button>
+               <button (click)="viewCourseContent(course.courseId)">
+                 <i class="fas fa-eye"></i>
+                 View Content
+               </button>
+               <button (click)="uploadContent(course.courseId)">
+                 <i class="fas fa-upload"></i>
+                 Upload Content
+               </button>
+               <button (click)="createQuiz(course.courseId)">
+                 <i class="fas fa-plus-circle"></i>
+                 Create Quiz
+               </button>
+               <button (click)="viewQuizzes(course.courseId)">
+                 <i class="fas fa-list"></i>
+                 View Quizzes
+               </button>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-body">
+        <div class="course-details">
+          <div class="detail-item">
+            <label>Prerequisites:</label>
+            <span>{{ course.prerequisites || 'None' }}</span>
+          </div>
+          <div class="detail-item" *ngIf="course.syllabus">
+            <label>Syllabus:</label>
+            <span class="syllabus-text">{{ course.syllabus }}</span>
+          </div>
+        </div>
+
+        <div class="course-stats">
+          <div class="stat-item">
+            <i class="fas fa-file-alt"></i>
+            <span>{{ getCourseContentCount(course.courseId) }} Materials</span>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-question-circle"></i>
+            <span>{{ getCourseQuizCount(course.courseId) }} Quizzes</span>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-users"></i>
+            <span>{{ getCourseStudentCount(course.courseId) }} Students</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-footer">
+        <div class="action-buttons">
+          <button class="btn-primary" (click)="uploadContent(course.courseId)">
+            <i class="fas fa-upload"></i>
+            Upload Content
+          </button>
+          <button class="btn-secondary" (click)="createQuiz(course.courseId)">
+            <i class="fas fa-plus"></i>
+            Create Quiz
+          </button>
+          <button class="btn-outline" (click)="viewCourseDetails(course.courseId)">
+            <i class="fas fa-eye"></i>
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Course Details Modal (Combined Content & Quizzes) -->
+<div class="modal-overlay" [class.active]="showDetailsModal" (click)="closeDetailsModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-info-circle"></i> Course Details: {{ selectedCourse?.title }}</h3>
+      <button class="close-btn" (click)="closeDetailsModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div *ngIf="detailsLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading course details...</p>
+      </div>
+
+      <!-- Course Info Section -->
+      <div *ngIf="!detailsLoading && selectedCourse" class="details-section">
+        <div class="section-header">
+          <h4><i class="fas fa-info-circle"></i> Course Information</h4>
+        </div>
+        <div class="course-overview">
+          <div class="info-item">
+            <label>Description:</label>
+            <span>{{ selectedCourse.description || 'No description available' }}</span>
+          </div>
+          <div class="info-item" *ngIf="selectedCourse.prerequisites">
+            <label>Prerequisites:</label>
+            <span>{{ selectedCourse.prerequisites }}</span>
+          </div>
+          <div class="info-item" *ngIf="selectedCourse.syllabus">
+            <label>Syllabus:</label>
+            <span>{{ selectedCourse.syllabus }}</span>
+          </div>
+          <div class="info-item">
+            <label>Created:</label>
+            <span>{{ formatDate(selectedCourse.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Materials Section -->
+      <div *ngIf="!detailsLoading" class="details-section">
+        <div class="section-header">
+          <h4><i class="fas fa-file-alt"></i> Course Materials ({{ courseContent.length }})</h4>
+          <button class="btn-sm btn-primary" (click)="selectedCourse && uploadContent(selectedCourse.courseId)">
+            <i class="fas fa-plus"></i> Add Material
+          </button>
+        </div>
+        
+        <div *ngIf="courseContent.length === 0" class="no-content-section">
+          <i class="fas fa-folder-open"></i>
+          <p>No materials uploaded yet.</p>
+        </div>
+
+        <div *ngIf="courseContent.length > 0" class="materials-list">
+          <div class="material-item" *ngFor="let content of courseContent; let i = index">
+            <div class="item-number">{{ i + 1 }}</div>
+            <div class="content-icon">
+              <i class="fas" [class]="getFileIcon(content.type)"></i>
+            </div>
+            <div class="content-info">
+              <h5>{{ content.title || 'Untitled Content' }}</h5>
+              <p>Type: {{ content.type || 'Unknown' }}</p>
+              <small>Uploaded: {{ formatDate(content.createdAt) }}</small>
+            </div>
+            <div class="content-actions">
+              <!-- Debug: Always show preview button to test -->
+              <button 
+                class="action-btn preview-btn" 
+                (click)="previewContent(content)" 
+                title="Preview (Debug)">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button 
+                *ngIf="canPreviewContent(content)" 
+                class="action-btn preview-btn" 
+                (click)="previewContent(content)" 
+                title="Preview"
+                style="margin-left: 5px;">
+                <i class="fas fa-eye"></i> Smart
+              </button>
+              <button class="action-btn download-btn" (click)="downloadContent(content)" title="Download">
+                <i class="fas fa-download"></i>
+              </button>
+              <button 
+                *ngIf="canEditContent(content)"
+                class="action-btn edit-btn" 
+                (click)="editContent(content)" 
+                title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quizzes Section -->
+      <div *ngIf="!detailsLoading" class="details-section">
+        <div class="section-header">
+          <h4><i class="fas fa-question-circle"></i> Quizzes ({{ quizzes.length }})</h4>
+          <button class="btn-sm btn-primary" (click)="selectedCourse && createQuiz(selectedCourse.courseId)">
+            <i class="fas fa-plus"></i> Create Quiz
+          </button>
+        </div>
+        
+        <div *ngIf="quizzes.length === 0" class="no-content-section">
+          <i class="fas fa-question-circle"></i>
+          <p>No quizzes created yet.</p>
+        </div>
+
+        <div *ngIf="quizzes.length > 0" class="quizzes-list">
+          <div class="quiz-item" *ngFor="let quiz of quizzes; let i = index">
+            <div class="item-number">{{ courseContent.length + i + 1 }}</div>
+            <div class="quiz-icon">
+              <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="quiz-info">
+              <h5>{{ quiz.title }}</h5>
+              <p>Total Marks: {{ quiz.totalMarks }}</p>
+              <small>Created: {{ formatDate(quiz.createdAt) }}</small>
+            </div>
+            <div class="quiz-actions">
+              <button class="action-btn view-btn" (click)="viewQuiz(quiz)" title="View Quiz">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn edit-btn" (click)="editQuiz(quiz)" title="Edit Quiz">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Students Section -->
+      <div *ngIf="!detailsLoading" class="details-section">
+        <div class="section-header">
+          <h4><i class="fas fa-users"></i> Enrolled Students ({{ courseStudents.length }})</h4>
+          <button class="btn-sm btn-outline" (click)="selectedCourse && viewCourseStudents(selectedCourse.courseId)">
+            <i class="fas fa-users"></i> Manage Students
+          </button>
+        </div>
+        
+        <div *ngIf="courseStudents.length === 0" class="no-content-section">
+          <i class="fas fa-users"></i>
+          <p>No students enrolled yet.</p>
+        </div>
+
+        <div *ngIf="courseStudents.length > 0" class="students-summary">
+          <div class="student-summary-item" *ngFor="let student of courseStudents.slice(0, 3)">
+            <i class="fas fa-user-graduate"></i>
+            <span>{{ student.userEmail }}</span>
+            <span class="status-badge" [class.active]="student.isActive">
+              {{ student.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          <div *ngIf="courseStudents.length > 3" class="more-students">
+            <i class="fas fa-plus-circle"></i>
+            <span>{{ courseStudents.length - 3 }} more students...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Course Content Modal -->
+<div class="modal-overlay" [class.active]="showContentModal" (click)="closeContentModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-file-alt"></i> Course Content</h3>
+      <button class="close-btn" (click)="closeContentModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="courseContentLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading course content...</p>
+      </div>
+      
+      <div *ngIf="!courseContentLoading && courseContent.length === 0" class="no-content">
+        <i class="fas fa-folder-open"></i>
+        <h4>No Content Available</h4>
+        <p>No content has been uploaded for this course yet.</p>
+                 <button class="btn-primary" (click)="selectedCourse && uploadContent(selectedCourse.courseId)">
+           <i class="fas fa-upload"></i>
+           Upload First Content
+         </button>
+      </div>
+
+      <div *ngIf="!courseContentLoading && courseContent.length > 0" class="content-list">
+        <div class="content-item" *ngFor="let content of courseContent">
+          <div class="content-icon">
+            <i class="fas" [class]="getFileIcon(content.type)"></i>
+          </div>
+          <div class="content-info">
+            <h4>{{ content.title || 'Untitled Content' }}</h4>
+            <p>Type: {{ content.type || 'Unknown' }}</p>
+            <small>Uploaded: {{ formatDate(content.createdAt) }}</small>
+            <small *ngIf="content.modifiedAt" class="d-block">
+              <i class="fas fa-edit me-1"></i>Modified: {{ formatDate(content.modifiedAt) }}
+            </small>
+            <small *ngIf="content.instructorId" class="d-block content-owner">
+              <i class="fas fa-user me-1"></i>Created by Instructor ID: {{ content.instructorId }}
+            </small>
+          </div>
+          <div class="content-actions">
+            <button class="action-btn download-btn" (click)="downloadContent(content)" title="Download">
+              <i class="fas fa-download"></i>
+            </button>
+            <button 
+              *ngIf="canEditContent(content)"
+              class="action-btn edit-btn" 
+              (click)="editContent(content)" 
+              title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button 
+              *ngIf="!canEditContent(content)"
+              class="action-btn edit-btn disabled" 
+              disabled
+              title="You can only edit content you created">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteContent(content)" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Students Modal -->
+<div class="modal-overlay" [class.active]="showStudentsModal" (click)="closeStudentsModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-users"></i> Course Students</h3>
+      <button class="close-btn" (click)="closeStudentsModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="studentsLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading students...</p>
+      </div>
+      
+      <div *ngIf="!studentsLoading && courseStudents.length === 0" class="no-content">
+        <i class="fas fa-users"></i>
+        <h4>No Students Enrolled</h4>
+        <p>No students are currently enrolled in this course.</p>
+      </div>
+
+      <div *ngIf="!studentsLoading && courseStudents.length > 0" class="students-list">
+        <div class="student-header">
+          <h4>{{ courseStudents.length }} Student(s) Enrolled</h4>
+        </div>
+        <div class="student-item" *ngFor="let student of courseStudents">
+          <div class="student-icon">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <div class="student-info">
+            <h4>{{ student.userEmail }}</h4>
+            <p>Enrolled: {{ formatDate(student.assignedDate) }}</p>
+            <span class="status-badge" [class.active]="student.isActive" [class.inactive]="!student.isActive">
+              {{ student.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          <div class="student-actions">
+            <button class="action-btn contact-btn" (click)="contactStudent(student.userEmail)">
+              <i class="fas fa-envelope"></i>
+            </button>
+            <button class="action-btn view-btn" (click)="viewStudentProgress(student)">
+              <i class="fas fa-chart-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz Modal -->
+<div class="modal-overlay" [class.active]="showQuizModal" (click)="closeQuizModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-question-circle"></i> Course Quizzes</h3>
+      <button class="close-btn" (click)="closeQuizModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="quizzesLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading quizzes...</p>
+      </div>
+      
+      <div *ngIf="!quizzesLoading && quizzes.length === 0" class="no-content">
+        <i class="fas fa-question-circle"></i>
+        <h4>No Quizzes Available</h4>
+        <p>No quizzes have been created for this course yet.</p>
+        <button class="btn-primary" (click)="selectedCourse && createQuiz(selectedCourse.courseId)">
+          <i class="fas fa-plus"></i>
+          Create First Quiz
+        </button>
+      </div>
+
+      <div *ngIf="!quizzesLoading && quizzes.length > 0" class="quiz-list">
+        <div class="quiz-item" *ngFor="let quiz of quizzes">
+          <div class="quiz-icon">
+            <i class="fas fa-question-circle"></i>
+          </div>
+          <div class="quiz-info">
+            <h4>{{ quiz.title }}</h4>
+            <p>Total Marks: {{ quiz.totalMarks }}</p>
+            <small>Created: {{ formatDate(quiz.createdAt) }}</small>
+          </div>
+          <div class="quiz-actions">
+            <button class="action-btn view-btn" (click)="viewQuiz(quiz)">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit-btn" (click)="editQuiz(quiz)">
+              <i class="fas fa-edit"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
+
+<!-- Comprehensive Edit Quiz Modal -->
+<div class="modal-overlay" [class.active]="showEditQuizModal" (click)="closeEditQuizModal()">
+  <div class="modal-content extra-large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-edit"></i> Edit Quiz: {{ selectedQuizForEdit?.title || 'Loading...' }}</h3>
+      <button class="close-btn" (click)="closeEditQuizModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div *ngIf="uploading && !selectedQuizForEdit" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading quiz data...</p>
+      </div>
+
+      <!-- Quiz Edit Form -->
+      <div *ngIf="selectedQuizForEdit" class="quiz-edit-container">
+        <!-- Quiz Metadata Section -->
+        <div class="edit-section">
+          <div class="section-header">
+            <h4><i class="fas fa-info-circle"></i> Quiz Information</h4>
+          </div>
+          
+          <form [formGroup]="editQuizForm" class="quiz-info-form">
+            <div class="row">
+              <div class="col-md-8">
+                <label for="editQuizTitle" class="form-label required">
+                  <i class="fas fa-heading me-1"></i>Quiz Title
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="editQuizTitle"
+                  formControlName="title"
+                  placeholder="Enter quiz title..."
+                  [class.is-invalid]="isQuizFieldInvalid('title')"
+                >
+                <div *ngIf="isQuizFieldInvalid('title')" class="invalid-feedback">
+                  <small *ngIf="editQuizForm.get('title')?.errors?.['required']">
+                    Quiz title is required
+                  </small>
+                  <small *ngIf="editQuizForm.get('title')?.errors?.['minlength']">
+                    Title must be at least 3 characters long
+                  </small>
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <label class="form-label">
+                  <i class="fas fa-calculator me-1"></i>Total Marks
+                </label>
+                <div class="total-marks-display">
+                  <span class="marks-value">{{ calculateTotalMarks() }}</span>
+                  <small class="text-muted d-block">Auto-calculated from questions</small>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="edit-section">
+          <div class="section-header">
+            <h4><i class="fas fa-question-circle"></i> Questions ({{ getVisibleQuestions().length }})</h4>
+            <div class="section-actions">
+              <button type="button" class="btn btn-sm btn-success" (click)="addQuestion()">
+                <i class="fas fa-plus"></i> Add Question
+              </button>
+            </div>
+          </div>
+
+          <!-- Questions List -->
+          <div class="questions-list" *ngIf="getVisibleQuestions().length > 0">
+            <div 
+              class="question-card" 
+              *ngFor="let question of getVisibleQuestions(); let i = index; trackBy: trackByQuestionIndex"
+              [class]="getQuestionValidationClass(question)"
+            >
+              <div class="question-header">
+                <div class="question-number">
+                  <span class="number">{{ i + 1 }}</span>
+                  <span class="status-badge" [class.new]="!question.questionId" [class.existing]="question.questionId">
+                    {{ question.questionId ? 'Existing' : 'New' }}
+                  </span>
+                </div>
+                <div class="question-actions">
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-primary" 
+                    (click)="duplicateQuestion(editingQuestions.indexOf(question))"
+                    title="Duplicate Question"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-danger" 
+                    (click)="removeQuestion(editingQuestions.indexOf(question))"
+                    [disabled]="getVisibleQuestions().length <= 1"
+                    title="Remove Question"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="question-content">
+                <!-- Question Text -->
+                <div class="mb-3">
+                  <label class="form-label required">
+                    <i class="fas fa-question me-1"></i>Question Text
+                  </label>
+                  <textarea 
+                    class="form-control" 
+                    [(ngModel)]="question.questionText"
+                    placeholder="Enter your question here..."
+                    rows="2"
+                    [class.is-invalid]="!question.questionText.trim() && question.questionText !== ''"
+                  ></textarea>
+                  <div *ngIf="!question.questionText.trim() && question.questionText !== ''" class="invalid-feedback">
+                    Question text is required
+                  </div>
+                </div>
+
+                <!-- Answer Options -->
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label required">
+                      <i class="fas fa-a me-1"></i>Option A
+                    </label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      [(ngModel)]="question.optionA"
+                      placeholder="Enter option A..."
+                      [class.is-invalid]="!question.optionA.trim() && question.optionA !== ''"
+                    >
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label required">
+                      <i class="fas fa-b me-1"></i>Option B
+                    </label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      [(ngModel)]="question.optionB"
+                      placeholder="Enter option B..."
+                      [class.is-invalid]="!question.optionB.trim() && question.optionB !== ''"
+                    >
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label required">
+                      <i class="fas fa-c me-1"></i>Option C
+                    </label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      [(ngModel)]="question.optionC"
+                      placeholder="Enter option C..."
+                      [class.is-invalid]="!question.optionC.trim() && question.optionC !== ''"
+                    >
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label required">
+                      <i class="fas fa-d me-1"></i>Option D
+                    </label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      [(ngModel)]="question.optionD"
+                      placeholder="Enter option D..."
+                      [class.is-invalid]="!question.optionD.trim() && question.optionD !== ''"
+                    >
+                  </div>
+                </div>
+
+                <!-- Correct Answer and Marks -->
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label required">
+                      <i class="fas fa-check-circle me-1"></i>Correct Answer
+                    </label>
+                    <select 
+                      class="form-select" 
+                      [(ngModel)]="question.correctOption"
+                      [class.is-invalid]="!question.correctOption"
+                    >
+                      <option value="">Select correct option...</option>
+                      <option value="A">A - {{ question.optionA || 'Option A' }}</option>
+                      <option value="B">B - {{ question.optionB || 'Option B' }}</option>
+                      <option value="C">C - {{ question.optionC || 'Option C' }}</option>
+                      <option value="D">D - {{ question.optionD || 'Option D' }}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label required">
+                      <i class="fas fa-star me-1"></i>Marks
+                    </label>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      [(ngModel)]="question.marks"
+                      placeholder="Enter marks..."
+                      min="1"
+                      max="100"
+                      [class.is-invalid]="!question.marks || question.marks < 1"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Questions State -->
+          <div *ngIf="getVisibleQuestions().length === 0" class="no-questions">
+            <i class="fas fa-question-circle"></i>
+            <h5>No Questions Added</h5>
+            <p>Click "Add Question" to start creating quiz questions.</p>
+            <button type="button" class="btn btn-primary" (click)="addQuestion()">
+              <i class="fas fa-plus"></i> Add First Question
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="modal-actions">
+          <div class="quiz-summary">
+            <div class="summary-item">
+              <i class="fas fa-question-circle"></i>
+              <span>{{ getVisibleQuestions().length }} Question(s)</span>
+            </div>
+            <div class="summary-item">
+              <i class="fas fa-calculator"></i>
+              <span>{{ calculateTotalMarks() }} Total Marks</span>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="closeEditQuizModal()"
+              [disabled]="uploading"
+            >
+              <i class="fas fa-times me-1"></i>Cancel
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-primary"
+              (click)="onUpdateQuiz()"
+              [disabled]="!editQuizForm.valid || uploading || getVisibleQuestions().length === 0"
+            >
+              <span *ngIf="uploading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <i *ngIf="!uploading" class="fas fa-save me-1"></i>
+              {{ uploading ? 'Updating Quiz...' : 'Update Quiz' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div *ngIf="message" class="alert mt-3" [class]="'alert-' + messageType" role="alert">
+          <i [class]="messageType === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'" class="me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" (click)="clearMessage()"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
+
+<!-- Edit Content Modal -->
+<div class="modal-overlay" [class.active]="showEditContentModal" (click)="closeEditContentModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-edit"></i> Edit Content</h3>
+      <button class="close-btn" (click)="closeEditContentModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Permission Warning -->
+      <div *ngIf="selectedContent && !canEditContent(selectedContent)" class="alert alert-warning mb-3" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Limited Edit Access:</strong> You can only edit content you created. This content was created by Instructor ID: {{ selectedContent.instructorId }}.
+      </div>
+
+      <form [formGroup]="editContentForm" (ngSubmit)="onUpdateContent()" #editForm="ngForm">
+        
+        <!-- Content Title -->
+        <div class="mb-3">
+          <label for="editContentTitle" class="form-label required">
+            <i class="fas fa-heading me-1"></i>Content Title
+          </label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="editContentTitle"
+            formControlName="title"
+            placeholder="Enter content title..."
+            [class.is-invalid]="isFieldInvalid('title')"
+          >
+          <div *ngIf="isFieldInvalid('title')" class="invalid-feedback">
+            <small *ngIf="editContentForm.get('title')?.errors?.['required']">
+              Content title is required
+            </small>
+            <small *ngIf="editContentForm.get('title')?.errors?.['minlength']">
+              Title must be at least 3 characters long
+            </small>
+          </div>
+        </div>
+
+        <!-- File Type Selection -->
+        <div class="mb-3">
+          <label for="editFileType" class="form-label required">
+            <i class="fas fa-file-alt me-1"></i>Content Type
+          </label>
+          <select 
+            class="form-select" 
+            id="editFileType"
+            formControlName="type"
+            [class.is-invalid]="isFieldInvalid('type')"
+          >
+            <option value="">Select content type...</option>
+            <option value="Video">Video Content</option>
+            <option value="Document">Document Content</option>
+          </select>
+          <div *ngIf="isFieldInvalid('type')" class="invalid-feedback">
+            <small>Please select a content type</small>
+          </div>
+        </div>
+
+        <!-- File Upload (Optional for Update) -->
+        <div class="mb-3">
+          <label for="editFileUpload" class="form-label">
+            <i class="fas fa-cloud-upload-alt me-1"></i>Replace File (Optional)
+          </label>
+          <div class="file-upload-container">
+            <input 
+              type="file" 
+              class="form-control" 
+              id="editFileUpload"
+              (change)="onEditFileSelected($event)"
+              [accept]="getAcceptedFileTypes()"
+            >
+            <div class="file-upload-info mt-2">
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Leave empty to keep current file. Maximum file size: 50MB. Accepted formats: {{ getFileTypeDescription() }}
+              </small>
+            </div>
+          </div>
+          
+          <!-- Selected File Display -->
+          <div *ngIf="selectedFile" class="selected-file mt-2">
+            <div class="alert alert-info d-flex align-items-center">
+              <i [class]="getEditFileIcon()" class="me-2"></i>
+              <div class="flex-grow-1">
+                <strong>{{ selectedFile.name }}</strong>
+                <br>
+                <small>{{ formatFileSize(selectedFile.size) }} • {{ selectedFile.type || 'Unknown type' }}</small>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeEditFile()">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description (Optional) -->
+        <div class="mb-4">
+          <label for="editDescription" class="form-label">
+            <i class="fas fa-align-left me-1"></i>Description (Optional)
+          </label>
+          <textarea 
+            class="form-control" 
+            id="editDescription"
+            formControlName="description"
+            rows="3"
+            placeholder="Enter content description..."
+          ></textarea>
+          <div class="form-text">
+            <small class="text-muted">Provide additional details about this content</small>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-2">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="closeEditContentModal()"
+            [disabled]="uploading"
+          >
+            <i class="fas fa-times me-1"></i>Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="!editContentForm.valid || uploading"
+          >
+            <span *ngIf="uploading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <i *ngIf="!uploading" class="fas fa-save me-1"></i>
+            {{ uploading ? 'Updating...' : 'Update Content' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Success/Error Messages -->
+      <div *ngIf="message" class="alert mt-3" [class]="'alert-' + messageType" role="alert">
+        <i [class]="messageType === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'" class="me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" (click)="clearMessage()"></button>
+      </div>
+    </div>
+  </div>
+</div> 
+
+<!-- ✅ NEW: Quiz View Modal -->
+<div class="modal-overlay" [class.active]="showQuizViewModal" (click)="closeQuizViewModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-eye"></i> View Quiz: {{ selectedQuizForView?.title }}</h3>
+      <button class="close-btn" (click)="closeQuizViewModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div *ngIf="uploading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading quiz details...</p>
+      </div>
+
+      <!-- Quiz Details -->
+      <div *ngIf="!uploading && selectedQuizForView" class="quiz-view-container">
+        <!-- Quiz Info -->
+        <div class="quiz-info-section">
+          <div class="info-row">
+            <strong>Total Questions:</strong> {{ selectedQuizQuestions.length }}
+          </div>
+          <div class="info-row">
+            <strong>Total Marks:</strong> {{ selectedQuizForView.totalMarks }}
+          </div>
+          <div class="info-row">
+            <strong>Created:</strong> {{ formatDate(selectedQuizForView.createdAt) }}
+          </div>
+        </div>
+
+        <!-- Questions List -->
+        <div class="questions-view-section" *ngIf="selectedQuizQuestions.length > 0">
+          <h4><i class="fas fa-list"></i> Questions</h4>
+          <div class="question-item" *ngFor="let question of selectedQuizQuestions; let i = index">
+            <div class="question-header">
+              <span class="question-number">{{ i + 1 }}.</span>
+              <span class="question-marks">[{{ question.marks }} marks]</span>
+            </div>
+            <div class="question-text">{{ question.questionText }}</div>
+            <div class="options-list">
+              <div class="option-item" [class.correct]="question.correctOption === 'A'">
+                <span class="option-label">A)</span> {{ question.optionA }}
+                <i *ngIf="question.correctOption === 'A'" class="fas fa-check-circle correct-icon"></i>
+              </div>
+              <div class="option-item" [class.correct]="question.correctOption === 'B'">
+                <span class="option-label">B)</span> {{ question.optionB }}
+                <i *ngIf="question.correctOption === 'B'" class="fas fa-check-circle correct-icon"></i>
+              </div>
+              <div class="option-item" [class.correct]="question.correctOption === 'C'">
+                <span class="option-label">C)</span> {{ question.optionC }}
+                <i *ngIf="question.correctOption === 'C'" class="fas fa-check-circle correct-icon"></i>
+              </div>
+              <div class="option-item" [class.correct]="question.correctOption === 'D'">
+                <span class="option-label">D)</span> {{ question.optionD }}
+                <i *ngIf="question.correctOption === 'D'" class="fas fa-check-circle correct-icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedQuizQuestions.length === 0 && !uploading" class="no-questions">
+          <i class="fas fa-exclamation-circle"></i>
+          <p>No questions found in this quiz.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ NEW: Content Preview Modal -->
+<div class="modal-overlay" [class.active]="showContentPreviewModal" (click)="closeContentPreviewModal()">
+  <div class="modal-content extra-large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-eye"></i> Preview: {{ selectedContentForPreview?.title }}</h3>
+      <button class="close-btn" (click)="closeContentPreviewModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="selectedContentForPreview" class="content-preview-container">
+        <!-- Debug Information -->
+        <div class="debug-info" style="background: #f0f0f0; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+          <h5>Debug Info:</h5>
+          <p><strong>Type:</strong> {{ selectedContentForPreview.type }}</p>
+          <p><strong>FilePath:</strong> {{ selectedContentForPreview.filePath }}</p>
+          <p><strong>Title:</strong> {{ selectedContentForPreview.title }}</p>
+          <p><strong>Preview URL:</strong> {{ getContentPreviewUrl(selectedContentForPreview) }}</p>
+        </div>
+
+        <!-- Video Preview -->
+        <div *ngIf="isVideoContent(selectedContentForPreview)" class="video-preview">
+          <video controls class="preview-video">
+            <source [src]="getContentPreviewUrl(selectedContentForPreview)" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <!-- PDF/Document Preview -->
+        <div *ngIf="isDocumentContent(selectedContentForPreview)" class="document-preview">
+          <iframe 
+            [src]="getContentPreviewUrl(selectedContentForPreview)" 
+            class="preview-iframe"
+            frameborder="0">
+          </iframe>
+        </div>
+
+        <!-- Image Preview -->
+        <div *ngIf="isImageContent(selectedContentForPreview)" class="image-preview">
+          <img [src]="getContentPreviewUrl(selectedContentForPreview)" class="preview-image" alt="Preview">
+        </div>
+
+        <!-- Fallback: Show raw file link -->
+        <div *ngIf="selectedContentForPreview && !isVideoContent(selectedContentForPreview) && !isDocumentContent(selectedContentForPreview) && !isImageContent(selectedContentForPreview)" class="fallback-preview">
+          <p>Cannot preview this file type directly. <a [href]="getContentPreviewUrl(selectedContentForPreview)" target="_blank">Open in new tab</a></p>
+        </div>
+
+        <!-- Content Info -->
+        <div class="content-info-section">
+          <div class="info-row">
+            <strong>Type:</strong> {{ selectedContentForPreview.type }}
+          </div>
+          <div class="info-row">
+            <strong>Uploaded:</strong> {{ formatDate(selectedContentForPreview.createdAt) }}
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="preview-actions">
+          <button class="btn-primary" (click)="downloadContent(selectedContentForPreview)">
+            <i class="fas fa-download"></i> Download
+          </button>
+          <button class="btn-secondary" (click)="closeContentPreviewModal()">
+            <i class="fas fa-times"></i> Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

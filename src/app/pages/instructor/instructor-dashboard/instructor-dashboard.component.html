@@ -1,0 +1,51 @@
+<div class="dashboard-layout" [class.sidebar-collapsed]="isCollapsed">
+  <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
+  <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)"></app-navbar>
+  
+  <div class="dashboard-content">
+    <!-- Profile Section -->
+    <div *ngIf="showProfile" class="profile-section">
+      <app-profile></app-profile>
+    </div>
+    
+    <!-- Main dashboard content -->
+    <div *ngIf="!showProfile" class="main-content">
+      <!-- My Students -->
+      <div *ngIf="currentSection === 'my-students'" class="my-students-section">
+        <app-my-students></app-my-students>
+      </div>
+      
+      <!-- Assigned Courses -->
+      <div *ngIf="currentSection === 'assigned-courses'" class="assigned-courses-section">
+        <app-assigned-courses (sectionChange)="onSectionChange($event)"></app-assigned-courses>
+      </div>
+      
+      <!-- Add Content -->
+      <div *ngIf="currentSection === 'add-content'" class="add-content-section">
+        <app-add-content 
+          (contentAdded)="onContentAdded($event)"
+          (cancel)="onSectionChange('assigned-courses')">
+        </app-add-content>
+      </div>
+      
+      <!-- Create Quiz -->
+      <div *ngIf="currentSection === 'create-quiz'" class="create-quiz-section">
+        <app-create-quiz 
+          (quizCreated)="onQuizCreated($event)"
+          (backToDashboard)="onSectionChange('assigned-courses')">
+        </app-create-quiz>
+      </div>
+      
+      <!-- Reports Section -->
+      <div *ngIf="showReports" class="reports-section">
+        <app-instructor-reports></app-instructor-reports>
+      </div>
+
+      <!-- Instructor Dashboard Home -->
+      <div *ngIf="!showReports && (!currentSection || currentSection === 'home')" class="home-section">
+        <app-instructor-dashboard-home (sectionChange)="onSectionChange($event)"></app-instructor-dashboard-home>
+      </div>
+    </div>
+  </div>
+</div>
+

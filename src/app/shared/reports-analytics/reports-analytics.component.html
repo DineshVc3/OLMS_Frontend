@@ -1,0 +1,341 @@
+<div class="reports-container">
+  <!-- Header -->
+  <div class="reports-header">
+    <h2 class="reports-title">
+      <i class="fa fa-bar-chart"></i>
+      {{ currentRole | titlecase }} Reports & Analytics
+    </h2>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">
+      <i class="fa fa-refresh" [class.fa-spin]="isLoading"></i>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <i class="fa fa-spinner fa-spin"></i>
+      <p>Loading reports...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <div class="error-message">
+      <i class="fa fa-exclamation-triangle"></i>
+      <h3>Error Loading Reports</h3>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="refresh()">
+        <i class="fa fa-refresh"></i>
+        Retry
+      </button>
+    </div>
+  </div>
+
+  <!-- SuperAdmin Reports -->
+  <div *ngIf="currentRole === 'superadmin' && superAdminReports && !isLoading && !error" class="role-reports">
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <i class="fa fa-graduation-cap"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ superAdminReports.totalStudents }}</h3>
+          <p>Total Students</p>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">
+          <i class="fa fa-book"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ superAdminReports.totalCourses }}</h3>
+          <p>Total Courses</p>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">
+          <i class="fa fa-chalkboard-teacher"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ superAdminReports.totalInstructors }}</h3>
+          <p>Total Instructors</p>
+        </div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">
+          <i class="fa fa-user-shield"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ superAdminReports.totalAdmins }}</h3>
+          <p>Total Admins</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="enrollment-stats">
+      <h3>Course Enrollment Statistics</h3>
+      <div class="table-container">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Instructor</th>
+              <th>Total Enrollments</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let course of superAdminReports.courseEnrollmentStats">
+              <td>{{ course.courseTitle }}</td>
+              <td>{{ course.instructorName }}</td>
+              <td>
+                <span class="enrollment-count">{{ course.totalEnrollments }}</span>
+              </td>
+              <td>
+                <span class="status-badge" [class]="course.totalEnrollments > 10 ? 'status-active' : 'status-low'">
+                  {{ course.totalEnrollments > 10 ? 'Active' : 'Low Enrollment' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Reports -->
+  <div *ngIf="currentRole === 'admin' && adminReports && !isLoading && !error" class="role-reports">
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <i class="fa fa-graduation-cap"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ adminReports.totalStudents }}</h3>
+          <p>Total Students</p>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">
+          <i class="fa fa-book"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ adminReports.totalCourses }}</h3>
+          <p>Total Courses</p>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">
+          <i class="fa fa-chalkboard-teacher"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ adminReports.totalInstructors }}</h3>
+          <p>Total Instructors</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="completion-stats">
+      <h3>Course Completion Statistics</h3>
+      <div class="table-container">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Instructor</th>
+              <th>Total Enrollments</th>
+              <th>Completed Students</th>
+              <th>Completion Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let course of adminReports.courseCompletionStats">
+              <td>{{ course.courseTitle }}</td>
+              <td>{{ course.instructorName }}</td>
+              <td>{{ course.totalEnrollments }}</td>
+              <td>{{ course.completedStudents }}</td>
+              <td>
+                <span class="completion-rate" [class]="getCompletionRateClass(course.completionRate)">
+                  {{ course.completionRate }}%
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instructor Reports -->
+  <div *ngIf="currentRole === 'instructor' && instructorReports && !isLoading && !error" class="role-reports">
+    <h3>My Assigned Courses</h3>
+    
+    <div *ngFor="let course of instructorReports.assignedCourses" class="course-section">
+      <div class="course-header">
+        <h4>{{ course.courseTitle }}</h4>
+        <span class="student-count">{{ course.totalStudents }} Students</span>
+      </div>
+
+      <!-- Quiz Statistics -->
+      <div class="quiz-stats-section">
+        <h5>Quiz Performance</h5>
+        <div class="quiz-cards">
+          <div *ngFor="let quiz of course.quizStats" class="quiz-card">
+            <div class="quiz-header">
+              <h6>{{ quiz.quizTitle }}</h6>
+              <span class="total-marks">{{ quiz.totalMarks }} marks</span>
+            </div>
+            <div class="quiz-metrics">
+              <div class="metric">
+                <span class="label">Attempted:</span>
+                <span class="value">{{ quiz.studentsAttempted }}</span>
+              </div>
+              <div class="metric">
+                <span class="label">Completed:</span>
+                <span class="value">{{ quiz.studentsCompleted }}</span>
+              </div>
+              <div class="metric">
+                <span class="label">Average Score:</span>
+                <span class="value">{{ quiz.averageScore }}</span>
+              </div>
+            </div>
+            
+            <div class="student-results">
+              <h6>Student Results</h6>
+              <div class="results-table">
+                <div *ngFor="let result of quiz.studentResults" class="result-row">
+                  <span class="student-name">{{ result.studentName }}</span>
+                  <span class="score">{{ result.score }}/{{ result.totalMarks }}</span>
+                  <span class="percentage" [class]="result.percentage >= 60 ? 'pass' : 'fail'">
+                    {{ result.percentage }}%
+                  </span>
+                  <span class="status-badge" [class]="getProgressStatusClass(result.status)">
+                    {{ result.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Progress Summary -->
+      <div class="student-progress-section">
+        <h5>Student Progress Summary</h5>
+        <div class="progress-table">
+          <div *ngFor="let student of course.studentProgress" class="progress-row">
+            <div class="student-info">
+              <span class="name">{{ student.studentName }}</span>
+            </div>
+            <div class="progress-metrics">
+              <span class="quizzes">{{ student.quizzesCompleted }}/{{ student.totalQuizzes }} Quizzes</span>
+              <span class="score">{{ student.overallScore }} pts</span>
+              <span class="percentage" [class]="student.overallPercentage >= 60 ? 'pass' : 'fail'">
+                {{ student.overallPercentage }}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learner Reports -->
+  <div *ngIf="currentRole === 'learner' && learnerReports && !isLoading && !error" class="role-reports">
+    <!-- Overall Statistics -->
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <i class="fa fa-book-open"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ learnerReports.overallStats.totalCoursesEnrolled }}</h3>
+          <p>Enrolled Courses</p>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">
+          <i class="fa fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ learnerReports.overallStats.totalQuizzesCompleted }}</h3>
+          <p>Completed Quizzes</p>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">
+          <i class="fa fa-clock"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ learnerReports.overallStats.totalQuizzesPending }}</h3>
+          <p>Pending Quizzes</p>
+        </div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">
+          <i class="fa fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ learnerReports.overallStats.overallAverageScore }}%</h3>
+          <p>Average Score</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Progress -->
+    <div class="course-progress-section">
+      <h3>My Course Progress</h3>
+      
+      <div *ngFor="let course of learnerReports.courseProgress" class="course-progress-card">
+        <div class="course-header">
+          <h4>{{ course.courseTitle }}</h4>
+          <span class="progress-status" [class]="getProgressStatusClass(course.progressStatus)">
+            {{ course.progressStatus }}
+          </span>
+        </div>
+        
+        <div class="course-metrics">
+          <div class="metric">
+            <span class="label">Progress:</span>
+            <span class="value">{{ course.quizzesCompleted }}/{{ course.totalQuizzes }} Quizzes</span>
+          </div>
+          <div class="metric">
+            <span class="label">Overall Score:</span>
+            <span class="value">{{ course.overallScore }} points</span>
+          </div>
+          <div class="metric">
+            <span class="label">Percentage:</span>
+            <span class="value" [class]="course.overallPercentage >= 60 ? 'pass' : 'fail'">
+              {{ course.overallPercentage }}%
+            </span>
+          </div>
+        </div>
+
+        <!-- Quiz Details -->
+        <div class="quiz-progress-details">
+          <h5>Quiz Progress</h5>
+          <div class="quiz-list">
+            <div *ngFor="let quiz of course.quizProgress" class="quiz-item">
+              <div class="quiz-info">
+                <span class="quiz-name">{{ quiz.quizTitle }}</span>
+                <span class="quiz-marks">{{ quiz.totalMarks }} marks</span>
+              </div>
+              <div class="quiz-result">
+                <span *ngIf="quiz.score !== null" class="score">
+                  {{ quiz.score }}/{{ quiz.totalMarks }} ({{ quiz.percentage }}%)
+                </span>
+                <span *ngIf="quiz.score === null" class="no-attempt">
+                  Not Attempted
+                </span>
+                <span class="status-badge" [class]="getProgressStatusClass(quiz.status)">
+                  {{ quiz.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,374 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Create Quiz</h2>
+    <button type="button" class="btn btn-secondary" (click)="goBack()">
+      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </button>
+  </div>
+
+  <form (ngSubmit)="saveQuiz()" #quizForm="ngForm">
+    <!-- Quiz Details -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5><i class="fas fa-info-circle me-2"></i>Quiz Details</h5>
+      </div>
+      <div class="card-body">
+        
+        <!-- Course Selection -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label required">Course</label>
+            <select 
+              class="form-select" 
+              [(ngModel)]="quiz.courseId"
+              name="courseId"
+              (change)="onCourseSelectionChange()"
+              required>
+              <option value="">Select a course...</option>
+              <option *ngFor="let course of courses" [value]="course.courseId">
+                {{ course.title }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">
+              <i class="fas fa-database me-1"></i>Course Material (Optional)
+            </label>
+            <select 
+              class="form-select" 
+              [(ngModel)]="quiz.dataId"
+              name="dataId"
+              [disabled]="!quiz.courseId || isLoadingCourseData || courseDataItems.length === 0">
+              <option value="">
+                <span *ngIf="!quiz.courseId">Select a course first...</span>
+                <span *ngIf="quiz.courseId && isLoadingCourseData">Loading materials...</span>
+                <span *ngIf="quiz.courseId && !isLoadingCourseData && courseDataItems.length === 0">No materials available</span>
+                <span *ngIf="quiz.courseId && !isLoadingCourseData && courseDataItems.length > 0">Select course material...</span>
+              </option>
+              <option *ngFor="let courseData of courseDataItems" [value]="courseData.dataId">
+                {{ getDataIdDisplayText(courseData) }}
+              </option>
+            </select>
+            <small class="form-text text-muted d-flex align-items-center mt-1">
+              <i class="fas fa-info-circle me-1"></i>
+              <span *ngIf="!quiz.courseId">Select a course to see available materials</span>
+              <span *ngIf="quiz.courseId && isLoadingCourseData">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Loading course materials...
+              </span>
+              <span *ngIf="quiz.courseId && !isLoadingCourseData && courseDataItems.length === 0">
+                No materials uploaded for this course yet
+              </span>
+              <span *ngIf="quiz.courseId && !isLoadingCourseData && courseDataItems.length > 0">
+                {{ courseDataItems.length }} material(s) available for this course
+              </span>
+            </small>
+          </div>
+        </div>
+
+        <!-- Quiz Title -->
+        <div class="mb-3">
+          <label class="form-label required">Quiz Title</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="quiz.title"
+            name="quizTitle"
+            placeholder="Enter a descriptive title for your quiz..."
+            required>
+        </div>
+
+        <!-- Total Marks Display -->
+        <div class="mb-3">
+          <label class="form-label">Total Marks</label>
+          <div class="input-group">
+            <input 
+              type="number" 
+              class="form-control" 
+              [value]="calculateTotalMarks()"
+              readonly>
+            <span class="input-group-text">
+              <i class="fas fa-calculator"></i>
+            </span>
+          </div>
+          <small class="form-text text-muted">
+            Automatically calculated based on question marks
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="fas fa-question-circle me-2"></i>Questions ({{ quiz.questions.length }})</h5>
+        <button 
+          type="button" 
+          class="btn btn-success btn-sm"
+          (click)="addQuestion()">
+          <i class="fas fa-plus me-1"></i>Add Question
+        </button>
+      </div>
+      <div class="card-body">
+        
+        <!-- Questions List -->
+        <div 
+          *ngFor="let question of quiz.questions; let i = index; trackBy: trackByQuestionIndex" 
+          class="question-form mb-4 p-3 border rounded">
+          
+          <!-- Question Header -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">
+              <i class="fas fa-list-ol me-2"></i>Question {{ i + 1 }}
+            </h6>
+            <div class="question-actions">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary btn-sm me-2"
+                (click)="duplicateQuestion(i)"
+                title="Duplicate Question">
+                <i class="fas fa-copy"></i>
+              </button>
+              <button 
+                *ngIf="quiz.questions.length > 1"
+                type="button" 
+                class="btn btn-outline-danger btn-sm"
+                (click)="removeQuestion(i)"
+                title="Remove Question">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Question Text -->
+          <div class="mb-3">
+            <label class="form-label required">Question Text</label>
+            <textarea 
+              class="form-control" 
+              rows="3"
+              [(ngModel)]="question.questionText"
+              [name]="'questionText' + i"
+              placeholder="Enter your question text here..."
+              required></textarea>
+          </div>
+
+          <!-- Options -->
+          <div class="mb-3">
+            <label class="form-label required">Answer Options</label>
+            
+            <!-- Option A -->
+            <div class="option-input mb-2">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <input 
+                    type="radio" 
+                    [name]="'correctAnswer' + i" 
+                    value="A"
+                    [(ngModel)]="question.correctOption"
+                    class="form-check-input">
+                  <span class="ms-2 fw-bold">A</span>
+                </span>
+                <input 
+                  type="text" 
+                  class="form-control"
+                  [(ngModel)]="question.optionA"
+                  [name]="'optionA' + i"
+                  placeholder="Option A"
+                  required>
+              </div>
+            </div>
+            
+            <!-- Option B -->
+            <div class="option-input mb-2">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <input 
+                    type="radio" 
+                    [name]="'correctAnswer' + i" 
+                    value="B"
+                    [(ngModel)]="question.correctOption"
+                    class="form-check-input">
+                  <span class="ms-2 fw-bold">B</span>
+                </span>
+                <input 
+                  type="text" 
+                  class="form-control"
+                  [(ngModel)]="question.optionB"
+                  [name]="'optionB' + i"
+                  placeholder="Option B"
+                  required>
+              </div>
+            </div>
+            
+            <!-- Option C -->
+            <div class="option-input mb-2">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <input 
+                    type="radio" 
+                    [name]="'correctAnswer' + i" 
+                    value="C"
+                    [(ngModel)]="question.correctOption"
+                    class="form-check-input">
+                  <span class="ms-2 fw-bold">C</span>
+                </span>
+                <input 
+                  type="text" 
+                  class="form-control"
+                  [(ngModel)]="question.optionC"
+                  [name]="'optionC' + i"
+                  placeholder="Option C"
+                  required>
+              </div>
+            </div>
+            
+            <!-- Option D -->
+            <div class="option-input mb-2">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <input 
+                    type="radio" 
+                    [name]="'correctAnswer' + i" 
+                    value="D"
+                    [(ngModel)]="question.correctOption"
+                    class="form-check-input">
+                  <span class="ms-2 fw-bold">D</span>
+                </span>
+                <input 
+                  type="text" 
+                  class="form-control"
+                  [(ngModel)]="question.optionD"
+                  [name]="'optionD' + i"
+                  placeholder="Option D"
+                  required>
+              </div>
+            </div>
+            
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle me-1"></i>
+              Select the radio button next to the correct answer
+            </small>
+          </div>
+
+          <!-- Marks -->
+          <div class="row">
+            <div class="col-md-3">
+              <label class="form-label">Marks</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                [(ngModel)]="question.marks"
+                [name]="'marks' + i"
+                min="1"
+                max="100"
+                placeholder="Points">
+            </div>
+            <div class="col-md-9 d-flex align-items-end">
+              <div class="form-text">
+                <i class="fas fa-lightbulb me-1"></i>
+                Tip: Assign higher marks to more difficult questions
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Questions Message -->
+        <div *ngIf="quiz.questions.length === 0" class="text-center py-4">
+          <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No questions added yet</h5>
+          <p class="text-muted">Click "Add Question" to start creating your quiz</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mb-4">
+      <div class="d-flex gap-2 justify-content-center">
+        <button 
+          type="button" 
+          class="btn btn-outline-secondary"
+          (click)="previewQuiz()"
+          [disabled]="quiz.questions.length === 0">
+          <i class="fas fa-eye me-1"></i>Preview Quiz
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-lg"
+          [disabled]="quizForm.invalid || quiz.questions.length === 0 || isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!isLoading" class="fas fa-save me-1"></i>
+          {{ isLoading ? 'Creating Quiz...' : 'Create Quiz' }}
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-outline-warning"
+          (click)="saveDraft()"
+          [disabled]="isLoading">
+          <i class="fas fa-file-alt me-1"></i>Save as Draft
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="message" class="alert mt-3" [class]="'alert-' + messageType" role="alert">
+    <i [class]="messageType === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'" class="me-2"></i>
+    {{ message }}
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-eye me-2"></i>Quiz Preview - {{ quiz.title }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="quiz-preview">
+          <div class="quiz-info mb-4">
+            <h6><strong>Total Questions:</strong> {{ quiz.questions.length }}</h6>
+            <h6><strong>Total Marks:</strong> {{ calculateTotalMarks() }}</h6>
+          </div>
+          
+          <div *ngFor="let question of quiz.questions; let i = index" class="preview-question mb-4">
+            <h6 class="fw-bold">{{ i + 1 }}. {{ question.questionText }}</h6>
+            <div class="ms-3">
+              <div class="mb-1">
+                <span [class]="question.correctOption === 'A' ? 'text-success fw-bold' : ''">
+                  A) {{ question.optionA }}
+                  <i *ngIf="question.correctOption === 'A'" class="fas fa-check text-success ms-2"></i>
+                </span>
+              </div>
+              <div class="mb-1">
+                <span [class]="question.correctOption === 'B' ? 'text-success fw-bold' : ''">
+                  B) {{ question.optionB }}
+                  <i *ngIf="question.correctOption === 'B'" class="fas fa-check text-success ms-2"></i>
+                </span>
+              </div>
+              <div class="mb-1">
+                <span [class]="question.correctOption === 'C' ? 'text-success fw-bold' : ''">
+                  C) {{ question.optionC }}
+                  <i *ngIf="question.correctOption === 'C'" class="fas fa-check text-success ms-2"></i>
+                </span>
+              </div>
+              <div class="mb-1">
+                <span [class]="question.correctOption === 'D' ? 'text-success fw-bold' : ''">
+                  D) {{ question.optionD }}
+                  <i *ngIf="question.correctOption === 'D'" class="fas fa-check text-success ms-2"></i>
+                </span>
+              </div>
+              <small class="text-muted">{{ question.marks }} marks</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <!-- Footer content if needed -->
+      </div>
+    </div>
+  </div>
+</div> 

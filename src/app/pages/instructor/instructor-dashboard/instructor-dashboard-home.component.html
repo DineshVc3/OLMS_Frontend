@@ -1,0 +1,71 @@
+<div class="instructor-dashboard-home">
+  <!-- Welcome Header -->
+  <div class="welcome-header">
+    <div class="header-content">
+      <h1><i class="fas fa-chalkboard-teacher"></i> Instructor Dashboard</h1>
+      <p>Manage your courses, students, and content from one central location</p>
+    </div>
+  </div>
+
+
+
+  <!-- Quick Actions Section -->
+  <div class="quick-actions-section">
+    <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+    <div class="actions-grid">
+      <div class="action-card" (click)="navigateToSection('assigned-courses')">
+        <div class="action-icon primary">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div class="action-content">
+          <h3>My Courses</h3>
+          <p>View and manage your assigned courses</p>
+        </div>
+        <div class="action-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+
+      <div class="action-card" (click)="navigateToSection('add-content')">
+        <div class="action-icon success">
+          <i class="fas fa-plus-circle"></i>
+        </div>
+        <div class="action-content">
+          <h3>Add Content</h3>
+          <p>Upload materials and resources</p>
+        </div>
+        <div class="action-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+
+      <div class="action-card" (click)="navigateToSection('create-quiz')">
+        <div class="action-icon info">
+          <i class="fas fa-question-circle"></i>
+        </div>
+        <div class="action-content">
+          <h3>Create Quiz</h3>
+          <p>Design new quizzes for your students</p>
+        </div>
+        <div class="action-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+
+      <div class="action-card" (click)="navigateToSection('my-students')">
+        <div class="action-icon warning">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="action-content">
+          <h3>My Students</h3>
+          <p>Monitor student progress and performance</p>
+        </div>
+        <div class="action-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div> 

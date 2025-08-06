@@ -1,0 +1,172 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <i class="fa fa-user-circle"></i>
+    </div>
+    <div class="profile-title">
+      <h2>My Profile</h2>
+      <p>Manage your account information</p>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Updating profile...</p>
+  </div>
+
+  <!-- Message Display -->
+  <div *ngIf="message" class="message-container" [class]="'message-' + messageType">
+    <i class="fa" [class.fa-check-circle]="messageType === 'success'" [class.fa-exclamation-triangle]="messageType === 'error'"></i>
+    <span>{{ message }}</span>
+    <button class="message-close" (click)="clearMessage()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="user && !isLoading" class="profile-content">
+    
+    <!-- View Mode -->
+    <div *ngIf="!isEditing" class="profile-view">
+      <div class="profile-section">
+        <h3>Personal Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Full Name</label>
+            <p>{{ user.name || 'Not provided' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Email Address</label>
+            <p>{{ user.email }}</p>
+          </div>
+          <div class="info-item">
+            <label>Phone Number</label>
+            <p>{{ user.phoneNumber || 'Not provided' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Role</label>
+            <p>
+              <span class="role-badge" [class]="getRoleColor(user.role)">
+                {{ getRoleDisplayName(user.role) }}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>Account Details</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>User ID</label>
+            <p>#{{ getUserId() || 'N/A' }}</p>
+          </div>
+          <div class="info-item">
+            <label>Account Created</label>
+            <p>{{ formatDate(user.createdAt) }}</p>
+          </div>
+          <div class="info-item" *ngIf="user.modifiedAt">
+            <label>Last Modified</label>
+            <p>{{ formatDate(user.modifiedAt) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn btn-primary" (click)="toggleEdit()">
+          <i class="fa fa-edit"></i>
+          Edit Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit Mode -->
+    <div *ngIf="isEditing" class="profile-edit">
+      <form class="edit-form" (ngSubmit)="saveProfile()">
+        <div class="profile-section">
+          <h3>Edit Personal Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input
+                type="text"
+                id="name"
+                [(ngModel)]="editForm.name"
+                name="name"
+                required
+                placeholder="Enter your full name"
+                class="form-control"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                [value]="editForm.email"
+                readonly
+                class="form-control readonly"
+                title="Email cannot be changed"
+              >
+              <small class="form-help">Email address cannot be modified</small>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number *</label>
+              <input
+                type="tel"
+                id="phone"
+                [(ngModel)]="editForm.phoneNumber"
+                name="phone"
+                required
+                placeholder="Enter your phone number"
+                class="form-control"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Role</label>
+              <div class="readonly-field">
+                <span class="role-badge" [class]="getRoleColor(user.role)">
+                  {{ getRoleDisplayName(user.role) }}
+                </span>
+                <small class="form-help">Role cannot be modified</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <button 
+            type="submit" 
+            class="btn btn-success"
+            [disabled]="!isValidForm() || isLoading"
+          >
+            <i class="fa fa-save"></i>
+            Save Changes
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="cancelEdit()"
+            [disabled]="isLoading"
+          >
+            <i class="fa fa-arrow-left"></i>
+            Back to Profile
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- No User Data -->
+  <div *ngIf="!user && !isLoading" class="no-user-container">
+    <div class="no-user-content">
+      <i class="fa fa-user-times"></i>
+      <h3>No Profile Data</h3>
+      <p>Unable to load your profile information. Please try logging in again.</p>
+    </div>
+  </div>
+</div> 

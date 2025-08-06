@@ -1,0 +1,182 @@
+<div class="add-content-form">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="fas fa-plus-circle me-2"></i>Add New Content
+      </h5>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="onCancel()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="card-body">
+      <form [formGroup]="contentForm" (ngSubmit)="onSubmit()" #form="ngForm">
+        
+        <!-- Course Selection -->
+        <div class="mb-3">
+          <label for="courseId" class="form-label required">
+            <i class="fas fa-book me-1"></i>Select Course
+          </label>
+          <select 
+            class="form-select" 
+            id="courseId"
+            formControlName="courseId"
+            [class.is-invalid]="isFieldInvalid('courseId')"
+          >
+            <option value="">Select a course...</option>
+            <option *ngFor="let course of courses" [value]="course.courseId">
+              {{ course.title }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('courseId')" class="invalid-feedback">
+            <small>Please select a course</small>
+          </div>
+        </div>
+
+        <!-- Content Title -->
+        <div class="mb-3">
+          <label for="contentTitle" class="form-label required">
+            <i class="fas fa-heading me-1"></i>Content Title
+          </label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="contentTitle"
+            formControlName="title"
+            placeholder="Enter content title..."
+            [class.is-invalid]="isFieldInvalid('title')"
+          >
+          <div *ngIf="isFieldInvalid('title')" class="invalid-feedback">
+            <small *ngIf="contentForm.get('title')?.errors?.['required']">
+              Content title is required
+            </small>
+            <small *ngIf="contentForm.get('title')?.errors?.['minlength']">
+              Title must be at least 3 characters long
+            </small>
+          </div>
+        </div>
+
+        <!-- File Type Selection -->
+        <div class="mb-3">
+          <label for="fileType" class="form-label required">
+            <i class="fas fa-file-alt me-1"></i>Content Type
+          </label>
+          <select 
+            class="form-select" 
+            id="fileType"
+            formControlName="fileType"
+            [class.is-invalid]="isFieldInvalid('fileType')"
+            (change)="onFileTypeChange()"
+          >
+            <option value="">Select content type...</option>
+            <option value="Video">Video Content</option>
+            <option value="Document">Document Content</option>
+          </select>
+          <div *ngIf="isFieldInvalid('fileType')" class="invalid-feedback">
+            <small>Please select a content type</small>
+          </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="mb-3">
+          <label for="fileUpload" class="form-label required">
+            <i class="fas fa-cloud-upload-alt me-1"></i>Upload File
+          </label>
+          <div class="file-upload-container">
+            <input 
+              type="file" 
+              class="form-control" 
+              id="fileUpload"
+              (change)="onFileSelected($event)"
+              [accept]="getAcceptedFileTypes()"
+              [class.is-invalid]="!selectedFile && form.submitted"
+            >
+            <div class="file-upload-info mt-2">
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Maximum file size: 50MB. Accepted formats: {{ getFileTypeDescription() }}
+              </small>
+            </div>
+          </div>
+          
+          <!-- Selected File Display -->
+          <div *ngIf="selectedFile" class="selected-file mt-2">
+            <div class="alert alert-info d-flex align-items-center">
+              <i [class]="getFileIcon(selectedFile.type)" class="me-2"></i>
+              <div class="flex-grow-1">
+                <strong>{{ selectedFile.name }}</strong>
+                <br>
+                <small>{{ formatFileSize(selectedFile.size) }} • {{ selectedFile.type || 'Unknown type' }}</small>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeFile()">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- File Error -->
+          <div *ngIf="!selectedFile && form.submitted" class="invalid-feedback d-block">
+            <small>Please select a file to upload</small>
+          </div>
+          
+          <!-- Upload Progress -->
+          <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="mt-2">
+            <div class="progress">
+              <div 
+                class="progress-bar progress-bar-striped progress-bar-animated" 
+                role="progressbar" 
+                [style.width.%]="uploadProgress">
+                {{ uploadProgress }}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description (Optional) -->
+        <div class="mb-4">
+          <label for="description" class="form-label">
+            <i class="fas fa-align-left me-1"></i>Description (Optional)
+          </label>
+          <textarea 
+            class="form-control" 
+            id="description"
+            formControlName="description"
+            rows="3"
+            placeholder="Enter content description..."
+          ></textarea>
+          <div class="form-text">
+            <small class="text-muted">Provide additional details about this content</small>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-2">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="onCancel()"
+            [disabled]="uploading"
+          >
+            <i class="fas fa-times me-1"></i>Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="!contentForm.valid || !selectedFile || uploading"
+          >
+            <span *ngIf="uploading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+            <i *ngIf="!uploading" class="fas fa-plus me-1"></i>
+            {{ uploading ? 'Uploading...' : 'Add Content' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="message" class="alert mt-3" [class]="'alert-' + messageType" role="alert">
+    <i [class]="messageType === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'" class="me-2"></i>
+    {{ message }}
+    <button type="button" class="btn-close" (click)="clearMessage()"></button>
+  </div>
+</div> 

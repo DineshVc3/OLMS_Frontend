@@ -1,0 +1,82 @@
+<div class="dashboard-layout" [class.sidebar-collapsed]="isCollapsed">
+  <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
+  <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
+  
+  <div class="dashboard-content">
+    <!-- Profile Section -->
+    <div *ngIf="showProfile" class="profile-section">
+      <app-profile></app-profile>
+    </div>
+    
+    <!-- User Management Section -->
+    <div *ngIf="showUserManagement" class="user-management-section">
+      <app-user-management></app-user-management>
+    </div>
+    
+    <!-- Enrollments Section -->
+    <div *ngIf="showEnrollments" class="enrollments-section">
+      <app-enrollments></app-enrollments>
+    </div>
+    
+    <!-- Course Management Section -->
+    <div *ngIf="showCourseManagement" class="course-management-section">
+      <app-course-management></app-course-management>
+    </div>
+    
+    <!-- Reports Section -->
+    <div *ngIf="showReports" class="reports-section">
+      <app-admin-reports></app-admin-reports>
+    </div>
+    
+    <!-- Main dashboard content will be added here based on selected menu -->
+    <div *ngIf="!showProfile && !showUserManagement && !showEnrollments && !showCourseManagement && !showReports" class="main-content">
+      <div class="dashboard-welcome">
+        <h2><i class="fa fa-tachometer"></i> Admin Dashboard</h2>
+        <p>Welcome to the admin control panel. Select a menu item from the sidebar to get started.</p>
+        
+        <div class="quick-stats">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-users"></i>
+            </div>
+            <div class="stat-info">
+              <h3>User Management</h3>
+              <p>Manage instructors and learners</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-book"></i>
+            </div>
+            <div class="stat-info">
+              <h3>Course Management</h3>
+              <p>Manage courses and content</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-graduation-cap"></i>
+            </div>
+            <div class="stat-info">
+              <h3>Enrollment</h3>
+              <p>Manage student enrollments</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa fa-chart-bar"></i>
+            </div>
+            <div class="stat-info">
+              <h3>Reports</h3>
+              <p>View analytics and reports</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

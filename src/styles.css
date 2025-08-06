@@ -1,0 +1,42 @@
+/* Global FontAwesome Icon Fixes */
+.fa, .fas, .far, .fal, .fab {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 900 !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  text-rendering: auto !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Ensure icons are visible in all contexts */
+i[class*="fa-"]::before {
+  display: inline-block !important;
+  font-style: normal !important;
+  font-variant: normal !important;
+  text-rendering: auto !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Fix for chart icons specifically */
+.fa-chart-bar::before,
+.fa-chart-line::before,
+.fa-analytics::before {
+  content: "\f080" !important; /* chart-bar */
+}
+
+/* Backup icon content for common dashboard icons */
+.fa-users::before { content: "\f0c0" !important; }
+.fa-book::before { content: "\f02d" !important; }
+.fa-graduation-cap::before { content: "\f19d" !important; }
+.fa-cogs::before { content: "\f085" !important; }
+.fa-users-cog::before { content: "\f509" !important; }
+.fa-shield::before { content: "\f132" !important; }
+
+/* Fix potential z-index issues */
+.stat-icon, .navbar-items i, .sidebar i {
+  position: relative;
+  z-index: 1;
+}
+
+/* You can add other global styles here */

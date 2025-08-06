@@ -1,0 +1,394 @@
+/* Enhanced Navbar - Fixed positioning and proper alignment */
+.navbar {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 50%, #2c5aa0 100%);
+    padding: 8px 20px;
+    border-bottom: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(15px);
+    position: fixed;
+    top: 70px; /* Below the header */
+    left: 250px; /* Account for sidebar */
+    right: 0;
+    z-index: 1100; /* Higher z-index to stay above content and prevent scrolling */
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    min-width: 0; /* Prevent overflow issues */
+}
+
+/* Navbar when sidebar is collapsed */
+.navbar.sidebar-collapsed {
+    left: 80px; /* Adjust for collapsed sidebar */
+}
+
+/* Navbar Content Container */
+.navbar-content {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  min-width: 0; /* Allow shrinking */
+  overflow: hidden; /* Hide overflow for smooth scrolling */
+}
+
+/* Scroll Indicators */
+.scroll-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  font-size: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.scroll-indicator:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-indicator.left {
+  left: 10px;
+}
+
+.scroll-indicator.right {
+  right: 10px;
+}
+
+.scroll-indicator i {
+  font-size: 10px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.scroll-indicator:hover i {
+  transform: scale(1.2);
+}
+
+/* Scrollable navbar items container */
+.navbar-items {
+  display: flex;
+  justify-content: flex-start; /* Changed from flex-end to flex-start to prevent left cutting */
+  gap: 15px;
+  list-style: none;
+  margin: 0;
+  padding: 0 40px 0 40px; /* Equal padding on both sides for scroll indicators */
+  position: relative;
+  z-index: 1;
+  flex-wrap: nowrap;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+  width: 100%; /* Ensure full width for proper scrolling */
+}
+
+/* Hide scrollbar for Chrome/Safari */
+.navbar-items::-webkit-scrollbar {
+  display: none;
+}
+
+.navbar-items li {
+  position: relative;
+  flex-shrink: 0; /* Prevent items from shrinking */
+  min-width: 0;
+}
+
+/* Ensure proper spacing and visibility */
+.navbar-items li:first-child {
+  margin-left: 0;
+}
+
+.navbar-items li:last-child {
+  margin-right: auto; /* Push the last item to create proper spacing */
+}
+
+/* Sidebar Toggle Button in Navbar */
+.navbar-toggle {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; /* Don't shrink the toggle button */
+}
+
+.sidebar-toggle-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.sidebar-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-toggle-btn i {
+    transition: all 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover i {
+    transform: scale(1.1);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+/* Enhanced navbar links */
+.navbar-items li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Profile link special styling */
+.profile-link {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.profile-link:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Enhanced icon styling */
+.navbar-items li a i {
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Enhanced hover effects */
+.navbar-items li a:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-items li a:hover i {
+    transform: scale(1.2);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+/* Submenu link styles */
+.submenu-link {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.submenu-link:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.submenu-link:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Enhanced responsive design */
+@media (max-width: 1024px) {
+    .navbar {
+        left: 220px;
+        padding: 12px 25px;
+    }
+
+    .navbar.sidebar-collapsed {
+        left: 70px;
+    }
+    
+    .navbar-items {
+        gap: 12px;
+        padding: 0 45px;
+    }
+    
+    .navbar-items li a {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+
+    .sidebar-toggle-btn {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+    
+    .scroll-indicator {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .scroll-indicator.left {
+        left: 8px;
+    }
+    
+    .scroll-indicator.right {
+        right: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        left: 0;
+        padding: 10px 20px;
+        height: 50px;
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    }
+
+    .navbar.sidebar-collapsed {
+        left: 0; /* On mobile, always full width */
+    }
+    
+    .navbar-items {
+        gap: 10px;
+        padding: 0 40px;
+    }
+    
+    .navbar-items li a {
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 20px;
+    }
+    
+    .navbar-items li a i {
+        font-size: 14px;
+    }
+
+    .sidebar-toggle-btn {
+        padding: 6px 8px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+    
+    .scroll-indicator {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .scroll-indicator i {
+        font-size: 10px;
+    }
+    
+    .scroll-indicator.left {
+        left: 5px;
+    }
+    
+    .scroll-indicator.right {
+        right: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 8px 15px;
+        height: 45px;
+    }
+    
+    .navbar-items {
+        gap: 8px;
+        padding: 0 35px;
+    }
+    
+    .navbar-items li a {
+        padding: 5px 10px;
+        font-size: 12px;
+        gap: 6px;
+    }
+    
+    .navbar-items li a i {
+        font-size: 13px;
+    }
+
+    .sidebar-toggle-btn {
+        padding: 5px 7px;
+        font-size: 13px;
+    }
+    
+    .scroll-indicator {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .scroll-indicator i {
+        font-size: 9px;
+    }
+    
+    .scroll-indicator.left {
+        left: 3px;
+    }
+    
+    .scroll-indicator.right {
+        right: 3px;
+    }
+}
+
+/* Logout Button Styling */
+.logout-link {
+    background: rgba(231, 76, 60, 0.1) !important;
+    border: 1px solid rgba(231, 76, 60, 0.3) !important;
+    color: #e74c3c !important;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.logout-link:hover {
+    background: rgba(231, 76, 60, 0.2) !important;
+    border-color: #e74c3c !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.logout-link i {
+    margin-right: 5px;
+    color: #e74c3c;
+}
+  

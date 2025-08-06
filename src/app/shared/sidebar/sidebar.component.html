@@ -1,0 +1,15 @@
+<div id="sidebar-wrapper" [class.collapsed]="isCollapsed">
+    <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
+      <li *ngFor="let item of menuItems" class="nav-item">
+        <a (click)="selectItem(item.label)" [title]="item.label">
+          <span class="fa-stack fa-lg pull-left">
+            <i class="fa fa-circle-thin fa-stack-2x"></i>
+            <i class="fa {{ item.icon }} fa-stack-1x"></i>
+          </span>
+          <span class="menu-label" [class.hidden]="isCollapsed">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+  
