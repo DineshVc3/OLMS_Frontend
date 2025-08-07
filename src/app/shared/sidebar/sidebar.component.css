@@ -1,6 +1,4 @@
-/* Bootstrap sidebar overrides for OLMS */
-
-/* Sidebar wrapper */
+/* Simplified Bootstrap 5 sidebar styles */
 .sidebar-wrapper {
   position: fixed;
   left: 0;
@@ -8,75 +6,11 @@
   width: 250px;
   height: 100vh;
   z-index: 1040;
-  transition: all 0.3s ease;
+  transition: width 0.3s ease;
 }
 
 .sidebar-wrapper.collapsed {
   width: 80px;
-}
-
-/* Sidebar styling */
-.sidebar {
-  background: linear-gradient(180deg, #343a40 0%, #212529 100%) !important;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-/* Sidebar header */
-.sidebar-header {
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Sidebar link styling */
-.sidebar-link {
-  transition: all 0.3s ease;
-  border-radius: 0;
-  cursor: pointer;
-}
-
-.sidebar-link:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-  transform: translateX(5px);
-}
-
-/* Icon container */
-.sidebar-icon {
-  width: 2rem;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-/* Collapsed state adjustments */
-.sidebar-wrapper.collapsed .sidebar-icon {
-  margin-right: 0 !important;
-}
-
-.sidebar-wrapper.collapsed .sidebar-link {
-  justify-content: center;
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
-}
-
-/* Tooltip for collapsed state */
-.sidebar-wrapper.collapsed .sidebar-link:hover::after {
-  content: attr(title);
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  white-space: nowrap;
-  z-index: 1050;
-  margin-left: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive design */
@@ -90,21 +24,13 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - simplified */
 .sidebar::-webkit-scrollbar {
   width: 6px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
 }
   
