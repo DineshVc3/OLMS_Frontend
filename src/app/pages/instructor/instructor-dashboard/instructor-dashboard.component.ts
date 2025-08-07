@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
-import { NavbarComponent } from '../../../shared/navbar/navbar.component';
+import { HeaderComponent } from '../../../shared/header/header.component';
 import { ProfileComponent } from '../../../shared/profile/profile.component';
 
 import { MyStudentsComponent } from './my-students.component';
@@ -20,7 +20,7 @@ import { HttpClientModule } from '@angular/common/http';
     CommonModule, 
     HttpClientModule,
     SidebarComponent, 
-    NavbarComponent, 
+    HeaderComponent, 
     ProfileComponent, 
     MyStudentsComponent,
     AssignedCoursesComponent,

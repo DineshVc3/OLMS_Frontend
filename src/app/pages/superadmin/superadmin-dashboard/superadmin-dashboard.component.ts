@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
-import { NavbarComponent } from '../../../shared/navbar/navbar.component';
+import { HeaderComponent } from '../../../shared/header/header.component';
 import { ProfileComponent } from '../../../shared/profile/profile.component';
 import { UserManagementComponent } from '../../../shared/user-management/user-management.component';
 import { EnrollmentsComponent } from '../../../shared/enrollments/enrollments.component';
@@ -11,7 +11,7 @@ import { SidebarService } from '../../../services/sidebar.service';
 
 @Component({
   selector: 'app-superadmin-dashboard',
-  imports: [CommonModule, SidebarComponent, NavbarComponent, ProfileComponent, UserManagementComponent, EnrollmentsComponent, CourseManagementComponent, SuperAdminReportsComponent],
+  imports: [CommonModule, SidebarComponent, HeaderComponent, ProfileComponent, UserManagementComponent, EnrollmentsComponent, CourseManagementComponent, SuperAdminReportsComponent],
   templateUrl: './superadmin-dashboard.component.html',
   styleUrl: './superadmin-dashboard.component.css'
 })
