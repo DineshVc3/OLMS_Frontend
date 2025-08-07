@@ -1,82 +1,86 @@
-<div class="dashboard-layout" [class.sidebar-collapsed]="isCollapsed">
+<div class="d-flex flex-column min-vh-100" [class.sidebar-collapsed]="isCollapsed">
   <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
   <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
   
-  <div class="dashboard-content">
-    <!-- Profile Section -->
-    <div *ngIf="showProfile" class="profile-section">
-      <app-profile></app-profile>
-    </div>
+  <main class="flex-grow-1 p-4">
+    <app-profile *ngIf="showProfile"></app-profile>
+    <app-user-management *ngIf="showUserManagement"></app-user-management>
+    <app-enrollments *ngIf="showEnrollments"></app-enrollments>
+    <app-course-management *ngIf="showCourseManagement"></app-course-management>
+    <app-superadmin-reports *ngIf="showReports"></app-superadmin-reports>
     
-    <!-- User Management Section -->
-    <div *ngIf="showUserManagement" class="user-management-section">
-      <app-user-management></app-user-management>
-    </div>
-    
-    <!-- Enrollments Section -->
-    <div *ngIf="showEnrollments" class="enrollments-section">
-      <app-enrollments></app-enrollments>
-    </div>
-    
-    <!-- Course Management Section -->
-    <div *ngIf="showCourseManagement" class="course-management-section">
-      <app-course-management></app-course-management>
-    </div>
-    
-    <!-- Reports Section -->
-    <div *ngIf="showReports" class="reports-section">
-      <app-superadmin-reports></app-superadmin-reports>
-    </div>
-    
-    <!-- Main dashboard content will be added here based on selected menu -->
-    <div *ngIf="!showProfile && !showUserManagement && !showEnrollments && !showCourseManagement && !showReports" class="main-content">
-      <div class="dashboard-welcome">
-        <h2><i class="fa fa-shield"></i> Super Admin Dashboard</h2>
-        <p>Welcome to the super admin control panel. You have full access to all system features.</p>
+    <div *ngIf="!showProfile && !showUserManagement && !showEnrollments && !showCourseManagement && !showReports" 
+         class="container-fluid">
+      <div class="text-center mb-5">
+        <h2 class="d-flex align-items-center justify-content-center gap-3 mb-3">
+          <i class="fa fa-shield text-danger fs-1"></i>
+          Super Admin Dashboard
+        </h2>
+        <p class="text-muted lead">Welcome to the super admin control panel. You have full access to all system features.</p>
+      </div>
+      
+      <div class="row g-4">
+        <div class="col-lg-3 col-md-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+              <div class="bg-danger rounded-3 d-flex align-items-center justify-content-center me-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fa fa-users text-white fs-3"></i>
+              </div>
+              <div>
+                <h5 class="card-title mb-1">User Management</h5>
+                <p class="card-text text-muted mb-0">Manage all system users</p>
+              </div>
+            </div>
+          </div>
+        </div>
         
-        <div class="quick-stats">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fa fa-users"></i>
-            </div>
-            <div class="stat-info">
-              <h3>User Management</h3>
-              <p>Manage all system users</p>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fa fa-book"></i>
-            </div>
-            <div class="stat-info">
-              <h3>Course Management</h3>
-              <p>Manage courses and content</p>
+        <div class="col-lg-3 col-md-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+              <div class="bg-danger rounded-3 d-flex align-items-center justify-content-center me-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fa fa-book text-white fs-3"></i>
+              </div>
+              <div>
+                <h5 class="card-title mb-1">Course Management</h5>
+                <p class="card-text text-muted mb-0">Manage courses and content</p>
+              </div>
             </div>
           </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fa fa-graduation-cap"></i>
-            </div>
-            <div class="stat-info">
-              <h3>Enrollment</h3>
-              <p>Manage student enrollments</p>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+              <div class="bg-danger rounded-3 d-flex align-items-center justify-content-center me-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fa fa-graduation-cap text-white fs-3"></i>
+              </div>
+              <div>
+                <h5 class="card-title mb-1">Enrollment</h5>
+                <p class="card-text text-muted mb-0">Manage student enrollments</p>
+              </div>
             </div>
           </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fa fa-chart-line"></i>
-            </div>
-            <div class="stat-info">
-              <h3>Analytics</h3>
-              <p>System-wide analytics</p>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex align-items-center">
+              <div class="bg-danger rounded-3 d-flex align-items-center justify-content-center me-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fa fa-chart-line text-white fs-3"></i>
+              </div>
+              <div>
+                <h5 class="card-title mb-1">Analytics</h5>
+                <p class="card-text text-muted mb-0">System-wide analytics</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>
     

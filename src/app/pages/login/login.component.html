@@ -1,138 +1,142 @@
-<div class="login-container">
-  <!-- Animated Background -->
-  <div class="background-animation">
-    <div class="floating-shape shape-1"></div>
-    <div class="floating-shape shape-2"></div>
-    <div class="floating-shape shape-3"></div>
-    <div class="floating-shape shape-4"></div>
-    <div class="floating-shape shape-5"></div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="login-content">
+<div class="container-fluid min-vh-100">
+  <div class="row g-0 min-vh-100">
     <!-- Left Side - Hero Section -->
-    <div class="hero-section">
-      <div class="hero-content">
-        <div class="logo-section">
-          <div class="logo-icon">🎓</div>
-          <h1 class="logo-title">OLMS</h1>
-          <p class="logo-subtitle">Online Learning Management System</p>
+    <div class="col-lg-6 d-flex align-items-center justify-content-center bg-primary text-white p-4">
+      <div class="text-center">
+        <div class="mb-4">
+          <div class="display-1 mb-3">🎓</div>
+          <h1 class="display-4 fw-bold mb-2">OLMS</h1>
+          <p class="lead">Online Learning Management System</p>
         </div>
         
-        <div class="hero-text">
-          <h2>Welcome Back!</h2>
-          <p>Sign in to continue your learning journey with thousands of courses and expert instructors.</p>
+        <div class="mb-4">
+          <h2 class="h3 mb-3">Welcome Back!</h2>
+          <p class="mb-4">Sign in to continue your learning journey with thousands of courses and expert instructors.</p>
           
-          <div class="features-list">
-            <div class="feature-item">
-              <i class="feature-icon">✨</i>
-              <span>Quality Education</span>
+          <div class="row text-start">
+            <div class="col-12 mb-2">
+              <div class="d-flex align-items-center">
+                <span class="me-2">✨</span>
+                <span>Quality Education</span>
+              </div>
             </div>
-            <div class="feature-item">
-              <i class="feature-icon">🚀</i>
-              <span>Expert Instructors</span>
+            <div class="col-12 mb-2">
+              <div class="d-flex align-items-center">
+                <span class="me-2">🚀</span>
+                <span>Expert Instructors</span>
+              </div>
             </div>
-            <div class="feature-item">
-              <i class="feature-icon">📚</i>
-              <span>Diverse Courses</span>
+            <div class="col-12 mb-2">
+              <div class="d-flex align-items-center">
+                <span class="me-2">📚</span>
+                <span>Diverse Courses</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="hero-stats">
-          <div class="stat">
-            <span class="stat-number">50K+</span>
-            <span class="stat-label">Students</span>
+        <div class="row text-center">
+          <div class="col-4">
+            <div class="h4 fw-bold text-warning">50K+</div>
+            <small>Students</small>
           </div>
-          <div class="stat">
-            <span class="stat-number">500+</span>
-            <span class="stat-label">Courses</span>
+          <div class="col-4">
+            <div class="h4 fw-bold text-warning">500+</div>
+            <small>Courses</small>
           </div>
-          <div class="stat">
-            <span class="stat-number">100+</span>
-            <span class="stat-label">Instructors</span>
+          <div class="col-4">
+            <div class="h4 fw-bold text-warning">100+</div>
+            <small>Instructors</small>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Right Side - Login Form -->
-    <div class="form-section">
-      <div class="form-container">
-        <div class="form-header">
-          <h3>Sign In</h3>
-          <p>Access your account to continue learning</p>
+    <div class="col-lg-6 d-flex align-items-center justify-content-center p-4 bg-light">
+      <div class="w-100" style="max-width: 420px;">
+        <div class="card border-0 shadow">
+          <div class="card-body p-4">
+            <div class="text-center mb-4">
+              <h3 class="card-title h4 fw-bold">Sign In</h3>
+              <p class="text-muted">Access your account to continue learning</p>
+            </div>
+
+            <form (ngSubmit)="login()" #loginForm="ngForm">
+              <!-- Error Message -->
+              <div class="alert alert-danger d-flex align-items-center" *ngIf="errorMessage" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ errorMessage }}
+              </div>
+
+              <!-- Email Input -->
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Email Address</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                  <input 
+                    id="email"
+                    type="email" 
+                    class="form-control"
+                    placeholder="Enter your email"
+                    [(ngModel)]="email"
+                    name="email"
+                    required
+                    #emailInput="ngModel">
+                </div>
+              </div>
+
+              <!-- Password Input -->
+              <div class="mb-3">
+                <label for="password" class="form-label fw-semibold">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                  <input 
+                    id="password"
+                    type="password" 
+                    class="form-control"
+                    placeholder="Enter your password"
+                    [(ngModel)]="password"
+                    name="password"
+                    required
+                    #passwordInput="ngModel">
+                </div>
+              </div>
+
+              <!-- Additional Options -->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="rememberMe">
+                  <label class="form-check-label" for="rememberMe">
+                    Remember me
+                  </label>
+                </div>
+                <a (click)="goToForgotPassword()" class="text-decoration-none" style="cursor: pointer;">Forgot Password?</a>
+              </div>
+
+              <!-- Submit Button -->
+              <button 
+                type="submit" 
+                class="btn btn-primary w-100 py-2 mb-3" 
+                [disabled]="!loginForm.form.valid">
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right ms-1"></i>
+              </button>
+
+              <!-- Divider -->
+              <div class="text-center mb-3">
+                <hr class="my-3">
+                <span class="text-muted bg-white px-2" style="position: relative; top: -12px;">or</span>
+              </div>
+
+              <!-- Alternative Actions -->
+              <div class="text-center">
+                <p class="mb-2 small">Don't have an account? <a href="#" class="text-decoration-none">Sign up</a></p>
+                <p class="mb-0 small">Are you an instructor? <a href="#" class="text-decoration-none">Join as Instructor</a></p>
+              </div>
+            </form>
+          </div>
         </div>
-
-        <form class="login-form" (ngSubmit)="login()" #loginForm="ngForm">
-          <!-- Error Message -->
-          <div class="error-message" *ngIf="errorMessage">
-            <i class="error-icon">⚠️</i>
-            {{ errorMessage }}
-          </div>
-
-          <!-- Email Input -->
-          <div class="input-group">
-            <label for="email">Email Address</label>
-            <div class="input-wrapper">
-              <input 
-                id="email"
-                type="email" 
-                placeholder="Enter your email"
-                [(ngModel)]="email"
-                name="email"
-                required
-                #emailInput="ngModel">
-              <i class="input-icon">📧</i>
-            </div>
-          </div>
-
-          <!-- Password Input -->
-          <div class="input-group">
-            <label for="password">Password</label>
-            <div class="input-wrapper">
-              <input 
-                id="password"
-                type="password" 
-                placeholder="Enter your password"
-                [(ngModel)]="password"
-                name="password"
-                required
-                #passwordInput="ngModel">
-              <i class="input-icon">🔒</i>
-            </div>
-          </div>
-
-          <!-- Additional Options -->
-          <div class="form-options">
-            <label class="checkbox-container">
-              <input type="checkbox">
-              <span class="checkmark"></span>
-              Remember me
-            </label>
-            <a (click)="goToForgotPassword()" class="forgot-password">Forgot Password?</a>
-          </div>
-
-          <!-- Submit Button -->
-          <button 
-            type="submit" 
-            class="login-btn" 
-            [disabled]="!loginForm.form.valid">
-            <span>Sign In</span>
-            <i class="btn-icon">→</i>
-          </button>
-
-          <!-- Divider -->
-          <div class="divider">
-            <span>or</span>
-          </div>
-
-          <!-- Alternative Actions -->
-          <div class="alt-actions">
-            <p>Don't have an account? <a href="#" class="signup-link">Sign up</a></p>
-            <p>Are you an instructor? <a href="#" class="instructor-link">Join as Instructor</a></p>
-          </div>
-        </form>
       </div>
     </div>
   </div>

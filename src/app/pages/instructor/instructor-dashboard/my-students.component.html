@@ -1,217 +1,171 @@
-<div class="my-students-container">
-  <!-- Header -->
-  <div class="students-header">
-    <div class="header-content">
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
       <h2><i class="fa fa-users"></i> My Students</h2>
-      <p>Students enrolled in your assigned courses</p>
+      <p class="text-muted">Students enrolled in your assigned courses</p>
     </div>
-    <div class="header-actions">
-      <div class="search-box">
-        <i class="fa fa-search"></i>
-        <input 
-          type="text" 
-          placeholder="Search students..." 
-          [(ngModel)]="searchTerm" 
-          (input)="filterStudents()"
-          class="search-input">
+    <div class="d-flex align-items-center gap-2">
+      <div class="input-group" style="width: 250px;">
+        <span class="input-group-text"><i class="fa fa-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search students..." 
+               [(ngModel)]="searchTerm" (input)="filterStudents()">
       </div>
-      <button class="refresh-btn" (click)="loadStudents()" [disabled]="isLoading">
+      <button class="btn btn-outline-primary" (click)="loadStudents()" [disabled]="isLoading">
         <i class="fa fa-refresh" [class.fa-spin]="isLoading"></i>
         Refresh
       </button>
     </div>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-icon total">
-        <i class="fa fa-users"></i>
-      </div>
-      <div class="stat-info">
-        <h3>{{ filteredStudents.length }}</h3>
-        <p>Total Students</p>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon active">
-        <i class="fa fa-user-check"></i>
-      </div>
-      <div class="stat-info">
-        <h3>{{ getActiveStudentsCount() }}</h3>
-        <p>Active Students</p>
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fa fa-users fs-1 text-primary"></i>
+          <h3>{{ filteredStudents.length }}</h3>
+          <p>Total Students</p>
+        </div>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon courses">
-        <i class="fa fa-book"></i>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fa fa-user-check fs-1 text-success"></i>
+          <h3>{{ getActiveStudentsCount() }}</h3>
+          <p>Active Students</p>
+        </div>
       </div>
-      <div class="stat-info">
-        <h3>{{ getUniqueCourseCount() }}</h3>
-        <p>Courses</p>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fa fa-book fs-1 text-warning"></i>
+          <h3>{{ getUniqueCourseCount() }}</h3>
+          <p>Courses</p>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="spinner"></div>
+  <div *ngIf="isLoading" class="text-center p-5">
+    <div class="spinner-border"></div>
     <p>Loading students...</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="error && !isLoading" class="error-container">
-    <i class="fa fa-exclamation-triangle"></i>
-    <h3>Error Loading Students</h3>
+  <div *ngIf="error && !isLoading" class="alert alert-danger">
+    <h5>Error Loading Students</h5>
     <p>{{ error }}</p>
-    <button class="retry-btn" (click)="loadStudents()">
-      <i class="fa fa-refresh"></i>
-      Try Again
-    </button>
+    <button class="btn btn-outline-danger" (click)="loadStudents()">Try Again</button>
   </div>
 
-  <!-- Students List -->
-  <div *ngIf="!isLoading && !error" class="students-content">
-    
-    <!-- No Students State -->
-    <div *ngIf="filteredStudents.length === 0" class="no-students">
-      <i class="fa fa-user-graduate"></i>
+  <div *ngIf="!isLoading && !error">
+    <div *ngIf="filteredStudents.length === 0" class="text-center p-5">
+      <i class="fa fa-user-graduate fs-1 text-muted"></i>
       <h3>No Students Found</h3>
       <p *ngIf="searchTerm">No students match your search criteria.</p>
       <p *ngIf="!searchTerm">No students are currently enrolled in your courses.</p>
     </div>
 
-    <!-- Students Table -->
-    <div *ngIf="filteredStudents.length > 0" class="students-table-container">
-      <table class="students-table">
-        <thead>
-          <tr>
-            <th (click)="sortBy('userEmail')" class="sortable">
-              Student Email
-              <i class="fa fa-sort" [class.fa-sort-up]="sortField === 'userEmail' && sortDirection === 'asc'" 
-                 [class.fa-sort-down]="sortField === 'userEmail' && sortDirection === 'desc'"></i>
-            </th>
-            <th (click)="sortBy('courseTitle')" class="sortable">
-              Course
-              <i class="fa fa-sort" [class.fa-sort-up]="sortField === 'courseTitle' && sortDirection === 'asc'" 
-                 [class.fa-sort-down]="sortField === 'courseTitle' && sortDirection === 'desc'"></i>
-            </th>
-            <th (click)="sortBy('assignedDate')" class="sortable">
-              Enrolled Date
-              <i class="fa fa-sort" [class.fa-sort-up]="sortField === 'assignedDate' && sortDirection === 'asc'" 
-                 [class.fa-sort-down]="sortField === 'assignedDate' && sortDirection === 'desc'"></i>
-            </th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let student of paginatedStudents; trackBy: trackByStudentId" class="student-row">
-            <td class="student-email">
-              <div class="student-info">
-                <div class="avatar">
-                  <i class="fa fa-user"></i>
+    <div *ngIf="filteredStudents.length > 0">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th class="sortable" (click)="sortBy('userEmail')">
+                Student Email
+                <i class="fa fa-sort ms-1" [class.fa-sort-up]="sortField === 'userEmail' && sortDirection === 'asc'" 
+                   [class.fa-sort-down]="sortField === 'userEmail' && sortDirection === 'desc'"></i>
+              </th>
+              <th class="sortable" (click)="sortBy('courseTitle')">
+                Course
+                <i class="fa fa-sort ms-1" [class.fa-sort-up]="sortField === 'courseTitle' && sortDirection === 'asc'" 
+                   [class.fa-sort-down]="sortField === 'courseTitle' && sortDirection === 'desc'"></i>
+              </th>
+              <th class="sortable" (click)="sortBy('assignedDate')">
+                Enrolled Date
+                <i class="fa fa-sort ms-1" [class.fa-sort-up]="sortField === 'assignedDate' && sortDirection === 'asc'" 
+                   [class.fa-sort-down]="sortField === 'assignedDate' && sortDirection === 'desc'"></i>
+              </th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of paginatedStudents; trackBy: trackByStudentId">
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                    <i class="fa fa-user"></i>
+                  </div>
+                  <div>
+                    <div>{{ student.userEmail }}</div>
+                    <small class="text-muted">ID: {{ student.id }}</small>
+                  </div>
                 </div>
-                <div class="email-info">
-                  <span class="email">{{ student.userEmail }}</span>
-                  <small class="student-id">ID: {{ student.id }}</small>
+              </td>
+              <td>{{ student.courseTitle }}</td>
+              <td>{{ formatDate(student.assignedDate) }}</td>
+              <td>
+                <span class="badge" [class.bg-success]="student.isActive" [class.bg-secondary]="!student.isActive">
+                  {{ student.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" (click)="viewStudentProgress(student)" title="View Progress">
+                    <i class="fa fa-chart-line"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="contactStudent(student)" title="Contact Student">
+                    <i class="fa fa-envelope"></i>
+                  </button>
                 </div>
-              </div>
-            </td>
-            <td class="course-info">
-              <span class="course-title">{{ student.courseTitle }}</span>
-            </td>
-            <td class="date-info">
-              <span class="date">{{ formatDate(student.assignedDate) }}</span>
-            </td>
-            <td class="status-info">
-              <span class="status-badge" [class.active]="student.isActive" [class.inactive]="!student.isActive">
-                {{ student.isActive ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
-            <td class="actions">
-              <button 
-                class="action-btn view-btn" 
-                (click)="viewStudentProgress(student)"
-                title="View Progress">
-                <i class="fa fa-chart-line"></i>
-              </button>
-              <button 
-                class="action-btn contact-btn" 
-                (click)="contactStudent(student)"
-                title="Contact Student">
-                <i class="fa fa-envelope"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Pagination -->
-      <div *ngIf="totalPages > 1" class="pagination-container">
-        <div class="pagination-info">
-          Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, filteredStudents.length) }} of {{ filteredStudents.length }} students
-        </div>
-        <div class="pagination-controls">
-          <button 
-            class="page-btn" 
-            (click)="goToPage(1)" 
-            [disabled]="currentPage === 1">
-            <i class="fa fa-angle-double-left"></i>
-          </button>
-          <button 
-            class="page-btn" 
-            (click)="goToPage(currentPage - 1)" 
-            [disabled]="currentPage === 1">
-            <i class="fa fa-angle-left"></i>
-          </button>
-          
-          <span class="page-numbers">
-            <button 
-              *ngFor="let page of getVisiblePages()" 
-              class="page-btn" 
-              [class.active]="page === currentPage"
-              (click)="goToPage(page)">
-              {{ page }}
-            </button>
-          </span>
-          
-          <button 
-            class="page-btn" 
-            (click)="goToPage(currentPage + 1)" 
-            [disabled]="currentPage === totalPages">
-            <i class="fa fa-angle-right"></i>
-          </button>
-          <button 
-            class="page-btn" 
-            (click)="goToPage(totalPages)" 
-            [disabled]="currentPage === totalPages">
-            <i class="fa fa-angle-double-right"></i>
-          </button>
-        </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+      <nav *ngIf="totalPages > 1" class="d-flex justify-content-between align-items-center mt-3">
+        <span class="text-muted">
+          Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, filteredStudents.length) }} of {{ filteredStudents.length }} students
+        </span>
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="goToPage(1)"><i class="fa fa-angle-double-left"></i></a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="goToPage(currentPage - 1)"><i class="fa fa-angle-left"></i></a>
+          </li>
+          <li class="page-item" *ngFor="let page of getVisiblePages()" [class.active]="page === currentPage">
+            <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="goToPage(currentPage + 1)"><i class="fa fa-angle-right"></i></a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="goToPage(totalPages)"><i class="fa fa-angle-double-right"></i></a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </div>
 
 <!-- Student Progress Modal -->
-<div class="modal-overlay" [class.active]="showProgressModal" (click)="closeProgressModal()">
-  <div class="modal-content progress-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa fa-chart-line"></i> Student Progress</h3>
-      <button class="close-btn" (click)="closeProgressModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body" *ngIf="selectedStudent">
-      <div class="student-details">
-        <h4>{{ selectedStudent.userEmail }}</h4>
-        <p>Course: {{ selectedStudent.courseTitle }}</p>
-        <p>Enrolled: {{ formatDate(selectedStudent.assignedDate) }}</p>
+<div class="modal" [style.display]="showProgressModal ? 'block' : 'none'" *ngIf="showProgressModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa fa-chart-line"></i> Student Progress</h5>
+        <button type="button" class="btn-close" (click)="closeProgressModal()"></button>
       </div>
-      <!-- Progress details would go here -->
-      <div class="progress-placeholder">
-        <p>Progress tracking details will be implemented here.</p>
+      <div class="modal-body" *ngIf="selectedStudent">
+        <h6>{{ selectedStudent.userEmail }}</h6>
+        <p><strong>Course:</strong> {{ selectedStudent.courseTitle }}</p>
+        <p><strong>Enrolled:</strong> {{ formatDate(selectedStudent.assignedDate) }}</p>
+        <div class="text-center p-3 bg-light rounded">
+          <p class="mb-0">Progress tracking details will be implemented here.</p>
+        </div>
       </div>
     </div>
   </div>
