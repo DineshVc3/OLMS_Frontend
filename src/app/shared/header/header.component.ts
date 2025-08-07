@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { SidebarService } from '../../services/sidebar.service';
 
 @Component({
   selector: 'app-header',
@@ -11,8 +12,11 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  @Output() profileToggle = new EventEmitter<boolean>();
+  
   isMenuOpen = false;
   isLoginOpen = false;
+  isProfileOpen = false;
   private slideshowInterval: any;
   currentSlide = 0;
 
@@ -21,7 +25,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   password = '';
   errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private sidebarService: SidebarService
+  ) {}
 
   ngOnInit() {
     this.startSlideshow();
@@ -31,6 +39,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.slideshowInterval) {
       clearInterval(this.slideshowInterval);
     }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarService.toggleSidebar();
+  }
+
+  openProfile(): void {
+    this.isProfileOpen = !this.isProfileOpen;
+    this.profileToggle.emit(this.isProfileOpen);
   }
 
   toggleMobileMenu() {

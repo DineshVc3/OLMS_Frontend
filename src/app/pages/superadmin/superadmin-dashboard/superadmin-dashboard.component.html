@@ -1,6 +1,6 @@
 <div class="d-flex flex-column min-vh-100" [class.sidebar-collapsed]="isCollapsed">
   <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
-  <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
+  <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
   
   <main class="flex-grow-1 p-4">
     <app-profile *ngIf="showProfile"></app-profile>
@@ -76,6 +76,18 @@
                 <h5 class="card-title mb-1">Analytics</h5>
                 <p class="card-text text-muted mb-0">System-wide analytics</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row mt-5">
+        <div class="col-12">
+          <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="fa fa-info-circle me-3 fs-4"></i>
+            <div>
+              <h6 class="alert-heading mb-1">System Information</h6>
+              <p class="mb-0">All systems are operational. Use the sidebar to navigate to different management sections.</p>
             </div>
           </div>
         </div>

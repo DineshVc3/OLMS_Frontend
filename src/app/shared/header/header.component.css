@@ -1,4 +1,12 @@
-/* Simplified Bootstrap 5 header styles */
+/* Fixed header styles */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  height: 60px; /* Set explicit height for consistency */
+}
 
 /* Override navbar toggler for mobile */
 .navbar-toggler {

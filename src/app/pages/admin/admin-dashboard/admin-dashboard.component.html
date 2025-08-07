@@ -8,7 +8,7 @@
     <!-- Main Content -->
     <div class="col d-flex flex-column">
       <!-- Navbar -->
-      <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
+      <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
       
       <!-- Dashboard Content -->
       <main class="flex-grow-1 p-4 bg-light overflow-auto">
@@ -16,7 +16,7 @@
         <div *ngIf="showProfile" class="mb-4">
           <app-profile></app-profile>
         </div>
-        
+
         <!-- User Management Section -->
         <div *ngIf="showUserManagement" class="mb-4">
           <app-user-management></app-user-management>

@@ -12,10 +12,8 @@ import { AuthService } from '../../services/auth.service';
 export class NavbarComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() selectedMenu: string = '';
   @Input() role: string = '';
-  @Output() profileToggle = new EventEmitter<boolean>();
   @Output() submenuSelect = new EventEmitter<string>();
   isCollapsed: boolean = false;
-  isProfileOpen: boolean = false;
   
   // Scroll indicators
   canScrollLeft: boolean = false;
@@ -55,11 +53,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnChanges, OnDest
     this.sidebarService.toggleSidebar();
     // Update scroll indicators after sidebar toggle
     setTimeout(() => this.updateScrollIndicators(), 500);
-  }
-
-  openProfile(): void {
-    this.isProfileOpen = !this.isProfileOpen;
-    this.profileToggle.emit(this.isProfileOpen);
   }
 
   selectSubmenu(item: string): void {

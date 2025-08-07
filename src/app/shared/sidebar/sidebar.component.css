@@ -1,16 +1,16 @@
-/* Simplified Bootstrap 5 sidebar styles */
+/* Fixed sidebar below header */
 .sidebar-wrapper {
   position: fixed;
   left: 0;
-  top: 0;
+  top: 60px; /* Position below fixed header */
   width: 250px;
-  height: 100vh;
+  height: calc(100vh - 60px); /* Full height minus header height */
   z-index: 1040;
   transition: width 0.3s ease;
 }
 
 .sidebar-wrapper.collapsed {
-  width: 80px;
+  width: 60px;
 }
 
 /* Responsive design */

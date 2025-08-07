@@ -7,11 +7,22 @@
     overflow-x: hidden;
 }
 
-/* Main content area */
+/* Main content area - account for fixed header */
 .main-content {
     flex: 1;
     position: relative;
     z-index: 1;
+    margin-top: 60px; /* Account for fixed header height */
+    padding-left: 0; /* Default - no sidebar margin */
+}
+
+/* When sidebar is present (add this class to main-content when sidebar is shown) */
+.main-content.with-sidebar {
+    margin-left: 250px; /* Account for sidebar width */
+}
+
+.main-content.with-sidebar.sidebar-collapsed {
+    margin-left: 60px; /* Account for collapsed sidebar width */
 }
 
 /* Ensure body and html have proper styling */
@@ -60,5 +71,11 @@ html, body {
     
     .main-content {
         overflow-x: hidden;
+        margin-left: 0 !important; /* No sidebar margin on mobile */
+    }
+    
+    .main-content.with-sidebar,
+    .main-content.with-sidebar.sidebar-collapsed {
+        margin-left: 0 !important; /* Override sidebar margins on mobile */
     }
 }

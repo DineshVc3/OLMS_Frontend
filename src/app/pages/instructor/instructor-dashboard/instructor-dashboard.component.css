@@ -10,14 +10,14 @@
 /* Dashboard content */
 .dashboard-content {
   margin-left: 250px;
-  margin-top: 130px;
+  margin-top: 80px; /* Adjusted for header height (60px) + some padding */
   padding: 30px;
-  min-height: calc(100vh - 130px);
+  min-height: calc(100vh - 80px);
 }
 
 /* Collapsed sidebar state */
 .dashboard-layout.sidebar-collapsed .dashboard-content {
-  margin-left: 80px;
+  margin-left: 60px;
 }
 
 /* Responsive design */
@@ -25,6 +25,7 @@
   .dashboard-content {
     margin-left: 0;
     padding: 20px 15px;
+    margin-top: 80px;
   }
 
   .dashboard-layout.sidebar-collapsed .dashboard-content {

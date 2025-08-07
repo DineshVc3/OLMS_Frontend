@@ -1,5 +1,15 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container-fluid">
+    <!-- Sidebar Toggle Button -->
+    <button class="btn btn-outline-light me-3" 
+            type="button" 
+            (click)="toggleSidebar()" 
+            title="Toggle Sidebar"
+            aria-label="Toggle sidebar"
+            *ngIf="isLoggedIn()">
+      <i class="fas fa-bars"></i>
+    </button>
+
     <a class="navbar-brand" href="#">
       <span class="me-2">🎓</span>
       <strong>OLMS</strong>
@@ -14,6 +24,12 @@
       <div class="navbar-nav ms-auto">
         <div *ngIf="isLoggedIn()" class="d-flex align-items-center">
           <span class="me-3 text-light">{{ getCurrentRole() }}</span>
+          <button class="btn btn-outline-light btn-sm me-2" 
+                  (click)="openProfile()" 
+                  title="Profile">
+            <i class="fas fa-user me-1"></i>
+            Profile
+          </button>
           <button class="btn btn-outline-light btn-sm" (click)="logout()">
             <i class="fas fa-sign-out-alt me-1"></i>
             Logout
