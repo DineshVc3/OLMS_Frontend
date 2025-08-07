@@ -1,102 +1,49 @@
-<header class="main-header">
-  <nav class="navbar">
-    <div class="nav-container">
-      <!-- Logo Section -->
-      <div class="nav-logo">
-        <div class="logo-icon">🎓</div>
-        <div class="logo-text">
-          <span class="logo-primary">OLMS</span>
-          <span class="logo-subtitle">Learning Hub</span>
-        </div>
-      </div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <span class="me-2">🎓</span>
+      <strong>OLMS</strong>
+      <small class="ms-1 opacity-75">Learning Hub</small>
+    </a>
 
-      <!-- Navigation Menu -->
-      <div class="nav-menu">
-        <!-- Empty for now, can add other navigation items here -->
-      </div>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <!-- User Actions -->
-      <div class="nav-actions">
-        <!-- Show user info and logout when logged in -->
-        <div class="user-section" *ngIf="isLoggedIn()">
-          <span class="user-role">{{ getCurrentRole() }}</span>
-          <button class="logout-btn" (click)="logout()">
-            <i class="logout-icon">🚪</i>
-            <span>Logout</span>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="navbar-nav ms-auto">
+        <div *ngIf="isLoggedIn()" class="d-flex align-items-center">
+          <span class="me-3 text-light">{{ getCurrentRole() }}</span>
+          <button class="btn btn-outline-light btn-sm" (click)="logout()">
+            <i class="fas fa-sign-out-alt me-1"></i>
+            Logout
           </button>
         </div>
 
-        <!-- Show login when not logged in -->
-        <div class="login-section" *ngIf="!isLoggedIn()">
-          <button class="login-btn" (click)="toggleLogin()" [class.active]="isLoginOpen">
-            <i class="login-icon">🔐</i>
-            <span class="login-text">{{ isLoginOpen ? 'Close' : 'Login' }}</span>
-            <div class="login-ripple"></div>
+        <div *ngIf="!isLoggedIn()" class="dropdown">
+          <button class="btn btn-outline-light" data-bs-toggle="dropdown">
+            <i class="fas fa-user me-1"></i>
+            Login
           </button>
-          
-          <!-- Login Panel -->
-          <div class="login-panel" [class.show]="isLoginOpen">
-            <div class="login-content">
-              <h3>Welcome Back!</h3>
-              <form class="login-form" (ngSubmit)="login()" #loginForm="ngForm">
-                <div class="error-message" *ngIf="errorMessage">
-                  {{ errorMessage }}
-                </div>
-                <div class="input-group">
-                  <input 
-                    type="email" 
-                    placeholder="Email" 
-                    required 
-                    [(ngModel)]="email"
-                    name="email"
-                    #emailInput="ngModel">
-                  <i class="input-icon">📧</i>
-                </div>
-                <div class="input-group">
-                  <input 
-                    type="password" 
-                    placeholder="Password" 
-                    required 
-                    [(ngModel)]="password"
-                    name="password"
-                    #passwordInput="ngModel">
-                  <i class="input-icon">🔒</i>
-                </div>
-                <button type="submit" class="submit-btn" [disabled]="!loginForm.form.valid">
-                  <span>Sign In</span>
-                  <i class="arrow">→</i>
-                </button>
-              </form>
-            </div>
+          <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 300px;">
+            <h6>Welcome Back!</h6>
+            <form (ngSubmit)="login()" #loginForm="ngForm">
+              <div *ngIf="errorMessage" class="alert alert-danger p-2 small">{{ errorMessage }}</div>
+              <div class="mb-2">
+                <input type="email" class="form-control" placeholder="Email" required 
+                       [(ngModel)]="email" name="email" #emailInput="ngModel">
+              </div>
+              <div class="mb-2">
+                <input type="password" class="form-control" placeholder="Password" required 
+                       [(ngModel)]="password" name="password" #passwordInput="ngModel">
+              </div>
+              <button type="submit" class="btn btn-primary w-100" [disabled]="!loginForm.form.valid">
+                Sign In
+              </button>
+            </form>
           </div>
-        </div>
-
-        <!-- Slideshow Animation Corner -->
-        <div class="slideshow-corner">
-          <div class="slideshow-content">
-            <div class="slide active">
-              <span class="slide-text">✨ Hover to Login</span>
-            </div>
-            <div class="slide">
-              <span class="slide-text">🚀 Start Learning</span>
-            </div>
-            <div class="slide">
-              <span class="slide-text">📚 Explore Courses</span>
-            </div>
-            <div class="slide">
-              <span class="slide-text">🎯 Achieve Goals</span>
-            </div>
-          </div>
-          <div class="slideshow-glow"></div>
         </div>
       </div>
-
-      <!-- Mobile Menu Toggle -->
-      <button class="mobile-toggle" (click)="toggleMobileMenu()">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
     </div>
-  </nav>
-</header>
+  </div>
+</nav>

@@ -1,158 +1,115 @@
-<div class="enrollments-container">
-  <!-- Header -->
-  <div class="enrollments-header">
-    <div class="header-title">
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
       <h2><i class="fa fa-graduation-cap"></i> Course Enrollments</h2>
-      <p *ngIf="activeView === 'enrollment-management' && selectedRole === 'Learner'">Enroll students in courses</p>
-      <p *ngIf="activeView === 'enrollment-management' && selectedRole === 'Instructor'">Assign instructors to courses</p>
-      <p *ngIf="activeView === 'view-enrollments'">View and manage student enrollments</p>
-      <p *ngIf="activeView === 'view-assignments'">View and manage instructor assignments</p>
+      <p class="text-muted" *ngIf="activeView === 'enrollment-management' && selectedRole === 'Learner'">Enroll students in courses</p>
+      <p class="text-muted" *ngIf="activeView === 'enrollment-management' && selectedRole === 'Instructor'">Assign instructors to courses</p>
+      <p class="text-muted" *ngIf="activeView === 'view-enrollments'">View and manage student enrollments</p>
+      <p class="text-muted" *ngIf="activeView === 'view-assignments'">View and manage instructor assignments</p>
     </div>
     
-    <div class="header-actions">
-      <button 
-        *ngIf="activeView === 'enrollment-management'" 
-        class="btn btn-primary" 
-        (click)="openAddModal()" 
-        [disabled]="isLoading">
-        <i class="fa fa-plus"></i>
-        {{ getActionDisplayName() }} {{ getRoleDisplayName() }}
+    <div class="btn-group" *ngIf="activeView === 'enrollment-management'">
+      <button class="btn btn-primary" (click)="openAddModal()" [disabled]="isLoading">
+        <i class="fa fa-plus"></i> {{ getActionDisplayName() }} {{ getRoleDisplayName() }}
       </button>
-      
-      <button 
-        *ngIf="activeView === 'enrollment-management'" 
-        class="btn btn-secondary" 
-        (click)="openBulkModal()" 
-        [disabled]="isLoading">
-        <i class="fa fa-upload"></i>
-        Bulk {{ getActionDisplayName() }}
+      <button class="btn btn-secondary" (click)="openBulkModal()" [disabled]="isLoading">
+        <i class="fa fa-upload"></i> Bulk {{ getActionDisplayName() }}
       </button>
     </div>
   </div>
 
-  <!-- Message Display -->
-  <div *ngIf="message" class="message-container" [class]="'message-' + messageType">
+  <div *ngIf="message" class="alert" [class.alert-success]="messageType === 'success'" [class.alert-danger]="messageType === 'error'">
     <i class="fa" [class.fa-check-circle]="messageType === 'success'" [class.fa-exclamation-triangle]="messageType === 'error'"></i>
-    <span>{{ message }}</span>
-    <button class="message-close" (click)="clearMessage()">
-      <i class="fa fa-times"></i>
-    </button>
+    {{ message }}
+    <button type="button" class="btn-close float-end" (click)="clearMessage()"></button>
   </div>
 
-  <!-- View Content -->
-  <div class="enrollments-content">
-    
-    <!-- Assignment Management (for enrollment-management view) -->
-    <div *ngIf="activeView === 'enrollment-management'" class="assignment-form-section">
-      <div class="form-instructions">
-        <h3>
-          <i class="fa" [class.fa-user-graduate]="selectedRole === 'Learner'" [class.fa-chalkboard-teacher]="selectedRole === 'Instructor'"></i>
-          {{ getActionDisplayName() }} {{ getRoleDisplayName() }} to Course
-        </h3>
-        <p>Use the buttons above to {{ getActionDisplayName().toLowerCase() }} individual {{ getRoleDisplayName().toLowerCase() }}s or upload multiple assignments at once.</p>
+  <div *ngIf="activeView === 'enrollment-management'">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5><i class="fa" [class.fa-user-graduate]="selectedRole === 'Learner'" [class.fa-chalkboard-teacher]="selectedRole === 'Instructor'"></i> 
+            {{ getActionDisplayName() }} {{ getRoleDisplayName() }} to Course</h5>
+        <p class="text-muted">Use the buttons above to {{ getActionDisplayName().toLowerCase() }} individual {{ getRoleDisplayName().toLowerCase() }}s or upload multiple assignments at once.</p>
       </div>
-      
-      <!-- Role Switcher -->
-      <div class="role-switcher">
-        <h4>Select Action:</h4>
-        <div class="role-buttons">
-          <button 
-            class="btn" 
-            [class.btn-primary]="selectedRole === 'Learner'" 
-            [class.btn-outline]="selectedRole !== 'Learner'"
-            (click)="selectedRole = 'Learner'; loadData(); loadAvailableUsers()">
-            <i class="fa fa-user-graduate"></i>
-            Enroll Students
+    </div>
+    
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6>Select Action:</h6>
+      </div>
+      <div class="card-body">
+        <div class="btn-group w-100 mb-3">
+          <button class="btn" [class.btn-primary]="selectedRole === 'Learner'" [class.btn-outline-primary]="selectedRole !== 'Learner'"
+                  (click)="selectedRole = 'Learner'; loadData(); loadAvailableUsers()">
+            <i class="fa fa-user-graduate"></i> Enroll Students
           </button>
-          <button 
-            class="btn" 
-            [class.btn-primary]="selectedRole === 'Instructor'" 
-            [class.btn-outline]="selectedRole !== 'Instructor'"
-            (click)="selectedRole = 'Instructor'; loadData(); loadAvailableUsers()">
-            <i class="fa fa-chalkboard-teacher"></i>
-            Assign Instructors
+          <button class="btn" [class.btn-primary]="selectedRole === 'Instructor'" [class.btn-outline-primary]="selectedRole !== 'Instructor'"
+                  (click)="selectedRole = 'Instructor'; loadData(); loadAvailableUsers()">
+            <i class="fa fa-chalkboard-teacher"></i> Assign Instructors
           </button>
         </div>
-      </div>
-      
-              <!-- Quick Stats -->
-        <div class="quick-stats">
-          <div class="stat-card" (click)="setActiveView('view-enrollments')">
-            <div class="stat-icon">
-              <i class="fa fa-user-graduate"></i>
-            </div>
-            <div class="stat-info">
-              <h4>{{ studentEnrollments.length || 0 }}</h4>
-              <p>Student Enrollments</p>
-              <small>Click to view list</small>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card text-center h-100" (click)="setActiveView('view-enrollments')" style="cursor: pointer;">
+              <div class="card-body">
+                <i class="fa fa-user-graduate fs-1 text-primary"></i>
+                <h4>{{ studentEnrollments.length || 0 }}</h4>
+                <p>Student Enrollments</p>
+                <small class="text-muted">Click to view list</small>
+              </div>
             </div>
           </div>
-          
-          <div class="stat-card" (click)="setActiveView('view-assignments')">
-            <div class="stat-icon">
-              <i class="fa fa-chalkboard-teacher"></i>
-            </div>
-            <div class="stat-info">
-              <h4>{{ instructorAssignments.length || 0 }}</h4>
-              <p>Instructor Assignments</p>
-              <small>Click to view list</small>
+          <div class="col-md-6">
+            <div class="card text-center h-100" (click)="setActiveView('view-assignments')" style="cursor: pointer;">
+              <div class="card-body">
+                <i class="fa fa-chalkboard-teacher fs-1 text-success"></i>
+                <h4>{{ instructorAssignments.length || 0 }}</h4>
+                <p>Instructor Assignments</p>
+                <small class="text-muted">Click to view list</small>
+              </div>
             </div>
           </div>
         </div>
         
-        <!-- Refresh Button -->
-        <div class="refresh-section">
+        <div class="text-center mt-3">
           <button class="btn btn-info" (click)="refreshData()" [disabled]="isLoading">
             <i class="fa fa-refresh" [class.fa-spin]="isLoading"></i>
             {{ isLoading ? 'Loading...' : 'Refresh Data' }}
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="activeView === 'view-enrollments' || activeView === 'view-assignments'">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <button class="btn btn-secondary" (click)="setActiveView('enrollment-management')">
+        <i class="fa fa-arrow-left"></i> Back to Enrollment Management
+      </button>
+      
+      <div class="input-group" style="width: 300px;">
+        <span class="input-group-text"><i class="fa fa-search"></i></span>
+        <input type="text" class="form-control" [(ngModel)]="searchTerm" (input)="onSearchChange()"
+               placeholder="Search by email or course...">
+      </div>
     </div>
 
-    <!-- Data Views (for view-enrollments and view-assignments) -->
-    <div *ngIf="activeView === 'view-enrollments' || activeView === 'view-assignments'" class="data-view-section">
-      
-      <!-- Back Button and Search -->
-      <div class="filters-section">
-        <div class="filter-header">
-          <button class="btn btn-secondary back-btn" (click)="setActiveView('enrollment-management')">
-            <i class="fa fa-arrow-left"></i>
-            Back to Enrollment Management
-          </button>
-          
-          <div class="search-group">
-            <label for="searchInput">Search:</label>
-            <div class="search-input-container">
-              <i class="fa fa-search search-icon"></i>
-              <input 
-                id="searchInput"
-                type="text" 
-                [(ngModel)]="searchTerm" 
-                (input)="onSearchChange()"
-                placeholder="Search by email or course..."
-                class="form-control"
-              >
-            </div>
-          </div>
-        </div>
+    <div *ngIf="isLoading" class="text-center p-5">
+      <div class="spinner-border"></div>
+      <p>Loading {{ getRoleDisplayName().toLowerCase() }} data...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <div *ngIf="filteredData.length === 0" class="text-center p-5">
+        <i class="fa fa-graduation-cap fs-1 text-muted"></i>
+        <h3>No {{ getRoleDisplayName() }}s Found</h3>
+        <p>{{ searchTerm ? 'No data matches your search criteria.' : 'No ' + getRoleDisplayName().toLowerCase() + 's have been assigned yet.' }}</p>
       </div>
 
-      <!-- Loading Spinner -->
-      <div *ngIf="isLoading" class="loading-container">
-        <div class="spinner"></div>
-        <p>Loading {{ getRoleDisplayName().toLowerCase() }} data...</p>
-      </div>
-
-      <!-- Data Table -->
-      <div *ngIf="!isLoading" class="table-container">
-        <div *ngIf="filteredData.length === 0" class="no-data">
-          <i class="fa fa-graduation-cap"></i>
-          <h3>No {{ getRoleDisplayName() }}s Found</h3>
-          <p>{{ searchTerm ? 'No data matches your search criteria.' : 'No ' + getRoleDisplayName().toLowerCase() + 's have been assigned yet.' }}</p>
-        </div>
-
-        <table *ngIf="filteredData.length > 0" class="data-table">
-          <thead>
+      <div *ngIf="filteredData.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
             <tr>
               <th>{{ getRoleDisplayName() }} Email</th>
               <th>Course Title</th>
@@ -162,35 +119,29 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let assignment of filteredData; trackBy: trackByEmail" class="data-row">
-              <td class="email-cell">
-                <div class="user-info">
-                  <i class="fa" [class.fa-user-graduate]="selectedRole === 'Learner'" [class.fa-chalkboard-teacher]="selectedRole === 'Instructor'"></i>
-                  <span>{{ assignment.userEmail }}</span>
+            <tr *ngFor="let assignment of filteredData; trackBy: trackByEmail">
+              <td>
+                <div class="d-flex align-items-center">
+                  <i class="fa me-2" [class.fa-user-graduate]="selectedRole === 'Learner'" [class.fa-chalkboard-teacher]="selectedRole === 'Instructor'"></i>
+                  {{ assignment.userEmail }}
                 </div>
               </td>
-              <td class="course-cell">
-                <span class="course-title">{{ assignment.courseTitle }}</span>
-              </td>
-              <td class="date-cell">{{ formatDate(assignment.assignedDate) }}</td>
-              <td class="status-cell">
-                <span class="status-badge" [class]="assignment.isActive ? 'status-active' : 'status-inactive'">
+              <td>{{ assignment.courseTitle }}</td>
+              <td>{{ formatDate(assignment.assignedDate) }}</td>
+              <td>
+                <span class="badge" [class.bg-success]="assignment.isActive" [class.bg-secondary]="!assignment.isActive">
                   {{ assignment.isActive ? 'Active' : 'Inactive' }}
                 </span>
               </td>
-              <td class="actions-cell">
-                <button 
-                  class="btn btn-small btn-info" 
-                  (click)="openEditModal(assignment)" 
-                  title="Edit Assignment">
-                  <i class="fa fa-edit"></i>
-                </button>
-                <button 
-                  class="btn btn-small btn-danger" 
-                  (click)="openDeleteModal(assignment)" 
-                  title="Delete Assignment">
-                  <i class="fa fa-trash"></i>
-                </button>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(assignment)" title="Edit Assignment">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(assignment)" title="Delete Assignment">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -200,223 +151,159 @@
   </div>
 </div>
 
-<!-- Single Assignment Modal -->
-<div class="modal-overlay" [class.active]="showAddModal" (click)="closeAddModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>
-        <i class="fa" [class.fa-user-graduate]="selectedRole === 'Learner'" [class.fa-chalkboard-teacher]="selectedRole === 'Instructor'"></i>
-        {{ getActionDisplayName() }} {{ getRoleDisplayName() }}
-      </h3>
-      <button class="close-btn" (click)="closeAddModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="addSingleAssignment()" class="assignment-form">
-        <div class="form-group">
-          <label for="userEmail">{{ getRoleDisplayName() }} Email *</label>
-          <select 
-            id="userEmail"
-            [(ngModel)]="singleAssignment.userEmail" 
-            name="userEmail"
-            class="form-control"
-            required>
-            <option value="">
-              {{ availableUsers.length > 0 ? 'Select ' + getRoleDisplayName().toLowerCase() + '...' : 'No ' + getRoleDisplayName().toLowerCase() + 's available' }}
-            </option>
-            <option *ngFor="let user of availableUsers" [value]="user.email">
-              {{ user.email }} {{ user.name ? '(' + user.name + ')' : '' }}
-            </option>
-          </select>
-          <small class="form-help" *ngIf="availableUsers.length > 0">
-            Select from {{ availableUsers.length }} available {{ getRoleDisplayName().toLowerCase() }}(s) in the system
-          </small>
-          <small class="form-help text-warning" *ngIf="availableUsers.length === 0">
-            ⚠️ No {{ getRoleDisplayName().toLowerCase() }}s found. Please check your database or contact administrator.
-          </small>
-        </div>
-        
-        <div class="form-group">
-          <label for="courseTitle">Course Title *</label>
-          <input 
-            id="courseTitle"
-            type="text" 
-            [(ngModel)]="singleAssignment.courseTitle" 
-            name="courseTitle"
-            class="form-control"
-            placeholder="Enter course title"
-            required
-          >
-        </div>
-        
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-success" [disabled]="isLoading">
-            <i class="fa fa-save"></i>
-            {{ isLoading ? (getActionDisplayName() + 'ing...') : (getActionDisplayName() + ' ' + getRoleDisplayName()) }}
-          </button>
-          <button type="button" class="btn btn-secondary" (click)="closeAddModal()" [disabled]="isLoading">
-            <i class="fa fa-times"></i>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Bulk Assignment Modal -->
-<div class="modal-overlay" [class.active]="showBulkModal" (click)="closeBulkModal()">
-  <div class="modal-content bulk-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>
-        <i class="fa fa-upload"></i>
-        Bulk {{ getActionDisplayName() }} {{ getRoleDisplayName() }}s
-      </h3>
-      <button class="close-btn" (click)="closeBulkModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <div class="bulk-instructions">
-        <h4>Instructions:</h4>
-        <p>Enter one assignment per line in the format: <strong>email, course title</strong></p>
-        <p>Example:</p>
-        <pre>student1@example.com, Introduction to Programming
-student2@example.com, Advanced Mathematics
-instructor@example.com, Web Development</pre>
+<!-- Modals using Bootstrap 5 structure -->
+<div class="modal" [style.display]="showAddModal ? 'block' : 'none'" *ngIf="showAddModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa" [class.fa-user-graduate]="selectedRole === 'Learner'" [class.fa-chalkboard-teacher]="selectedRole === 'Instructor'"></i>
+            {{ getActionDisplayName() }} {{ getRoleDisplayName() }}</h5>
+        <button type="button" class="btn-close" (click)="closeAddModal()"></button>
       </div>
-      
-      <form (ngSubmit)="addBulkAssignments()" class="bulk-form">
-        <div class="form-group">
-          <label for="bulkText">Assignments Data *</label>
-          <textarea 
-            id="bulkText"
-            [(ngModel)]="bulkText" 
-            name="bulkText"
-            class="form-control bulk-textarea"
-            placeholder="Enter assignments (email, course title) - one per line"
-            rows="8"
-            required
-          ></textarea>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-success" [disabled]="isLoading">
-            <i class="fa fa-upload"></i>
-            {{ isLoading ? 'Processing...' : ('Bulk ' + getActionDisplayName()) }}
-          </button>
-          <button type="button" class="btn btn-secondary" (click)="closeBulkModal()" [disabled]="isLoading">
-            <i class="fa fa-times"></i>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Edit Assignment Modal -->
-<div class="modal-overlay" [class.active]="showEditModal" (click)="closeEditModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa fa-edit"></i> Edit Assignment</h3>
-      <button class="close-btn" (click)="closeEditModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="updateAssignment()" class="edit-form">
-        <div class="form-group">
-          <label for="editEmail">{{ getRoleDisplayName() }} Email</label>
-          <input 
-            id="editEmail"
-            type="email" 
-            [value]="editForm.userEmail" 
-            class="form-control readonly"
-            readonly
-            title="Email cannot be changed"
-          >
-          <small class="form-help">Email address cannot be modified</small>
-        </div>
-        
-        <div class="form-group">
-          <label for="editCurrentCourse">Current Course</label>
-          <input 
-            id="editCurrentCourse"
-            type="text" 
-            [value]="editForm.courseTitle" 
-            class="form-control readonly"
-            readonly
-            title="Current course assignment"
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="editNewCourse">New Course Title *</label>
-          <input 
-            id="editNewCourse"
-            type="text" 
-            [(ngModel)]="editForm.newCourseTitle" 
-            name="newCourseTitle"
-            class="form-control"
-            placeholder="Enter new course title"
-            required
-          >
-        </div>
-        
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-success" [disabled]="isLoading">
-            <i class="fa fa-save"></i>
-            {{ isLoading ? 'Updating...' : 'Update Assignment' }}
-          </button>
-          <button type="button" class="btn btn-secondary" (click)="closeEditModal()" [disabled]="isLoading">
-            <i class="fa fa-times"></i>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Delete Assignment Modal -->
-<div class="modal-overlay" [class.active]="showDeleteModal" (click)="closeDeleteModal()">
-  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa fa-trash"></i> Delete Assignment</h3>
-      <button class="close-btn" (click)="closeDeleteModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <div class="delete-confirmation">
-        <div class="warning-icon">
-          <i class="fa fa-exclamation-triangle"></i>
-        </div>
-        <h4>Are you sure?</h4>
-        <p>You are about to delete this assignment:</p>
-        <div class="assignment-info" *ngIf="editAssignment">
-          <strong>{{ editAssignment.userEmail }}</strong><br>
-          <span>{{ editAssignment.courseTitle }}</span><br>
-          <span class="role-info">Role: {{ getRoleDisplayName() }}</span>
-        </div>
-        <p class="warning-text">This action cannot be undone.</p>
+      <div class="modal-body">
+        <form (ngSubmit)="addSingleAssignment()">
+          <div class="mb-3">
+            <label for="userEmail" class="form-label">{{ getRoleDisplayName() }} Email *</label>
+            <select id="userEmail" [(ngModel)]="singleAssignment.userEmail" name="userEmail" class="form-select" required>
+              <option value="">
+                {{ availableUsers.length > 0 ? 'Select ' + getRoleDisplayName().toLowerCase() + '...' : 'No ' + getRoleDisplayName().toLowerCase() + 's available' }}
+              </option>
+              <option *ngFor="let user of availableUsers" [value]="user.email">
+                {{ user.email }} {{ user.name ? '(' + user.name + ')' : '' }}
+              </option>
+            </select>
+            <div class="form-text" *ngIf="availableUsers.length > 0">
+              Select from {{ availableUsers.length }} available {{ getRoleDisplayName().toLowerCase() }}(s) in the system
+            </div>
+            <div class="text-warning" *ngIf="availableUsers.length === 0">
+              ⚠️ No {{ getRoleDisplayName().toLowerCase() }}s found. Please check your database or contact administrator.
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="courseTitle" class="form-label">Course Title *</label>
+            <input id="courseTitle" type="text" [(ngModel)]="singleAssignment.courseTitle" name="courseTitle"
+                   class="form-control" placeholder="Enter course title" required>
+          </div>
+          
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeAddModal()" [disabled]="isLoading">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? (getActionDisplayName() + 'ing...') : (getActionDisplayName() + ' ' + getRoleDisplayName()) }}
+            </button>
+          </div>
+        </form>
       </div>
-      
-      <div class="modal-actions">
-        <button class="btn btn-danger" (click)="deleteAssignment()" [disabled]="isLoading">
-          <i class="fa fa-trash"></i>
-          {{ isLoading ? 'Deleting...' : 'Delete Assignment' }}
-        </button>
-        <button class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="isLoading">
-          <i class="fa fa-times"></i>
-          Cancel
-        </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showBulkModal ? 'block' : 'none'" *ngIf="showBulkModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa fa-upload"></i> Bulk {{ getActionDisplayName() }} {{ getRoleDisplayName() }}s</h5>
+        <button type="button" class="btn-close" (click)="closeBulkModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <h6>Instructions:</h6>
+          <p>Enter one assignment per line in the format: <strong>email, course title</strong></p>
+          <p>Example:</p>
+          <pre class="mb-0">student1&#64;example.com, Introduction to Programming
+student2&#64;example.com, Advanced Mathematics
+instructor&#64;example.com, Web Development</pre>
+        </div>
+        
+        <form (ngSubmit)="addBulkAssignments()">
+          <div class="mb-3">
+            <label for="bulkText" class="form-label">Assignments Data *</label>
+            <textarea id="bulkText" [(ngModel)]="bulkText" name="bulkText" class="form-control"
+                      placeholder="Enter assignments (email, course title) - one per line" rows="8" required></textarea>
+          </div>
+          
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeBulkModal()" [disabled]="isLoading">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Processing...' : ('Bulk ' + getActionDisplayName()) }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showEditModal ? 'block' : 'none'" *ngIf="showEditModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa fa-edit"></i> Edit Assignment</h5>
+        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateAssignment()">
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">{{ getRoleDisplayName() }} Email</label>
+            <input id="editEmail" type="email" [value]="editForm.userEmail" class="form-control" 
+                   readonly title="Email cannot be changed">
+            <div class="form-text">Email address cannot be modified</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="editCurrentCourse" class="form-label">Current Course</label>
+            <input id="editCurrentCourse" type="text" [value]="editForm.courseTitle" class="form-control" 
+                   readonly title="Current course assignment">
+          </div>
+          
+          <div class="mb-3">
+            <label for="editNewCourse" class="form-label">New Course Title *</label>
+            <input id="editNewCourse" type="text" [(ngModel)]="editForm.newCourseTitle" name="newCourseTitle"
+                   class="form-control" placeholder="Enter new course title" required>
+          </div>
+          
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeEditModal()" [disabled]="isLoading">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Updating...' : 'Update Assignment' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showDeleteModal ? 'block' : 'none'" *ngIf="showDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa fa-trash"></i> Delete Assignment</h5>
+        <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <i class="fa fa-exclamation-triangle text-warning fs-1 mb-3"></i>
+          <h6>Are you sure?</h6>
+          <p>You are about to delete this assignment:</p>
+          <div class="alert alert-warning" *ngIf="editAssignment">
+            <strong>{{ editAssignment.userEmail }}</strong><br>
+            {{ editAssignment.courseTitle }}<br>
+            <span class="badge bg-info">Role: {{ getRoleDisplayName() }}</span>
+          </div>
+          <p class="text-muted">This action cannot be undone.</p>
+        </div>
+        
+        <div class="text-end">
+          <button type="button" class="btn btn-secondary me-2" (click)="closeDeleteModal()" [disabled]="isLoading">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="deleteAssignment()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'Deleting...' : 'Delete Assignment' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

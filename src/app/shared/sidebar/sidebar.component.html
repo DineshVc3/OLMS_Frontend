@@ -1,15 +1,42 @@
-<div id="sidebar-wrapper" [class.collapsed]="isCollapsed">
-    <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
-      <li *ngFor="let item of menuItems" class="nav-item">
-        <a (click)="selectItem(item.label)" [title]="item.label">
-          <span class="fa-stack fa-lg pull-left">
-            <i class="fa fa-circle-thin fa-stack-2x"></i>
-            <i class="fa {{ item.icon }} fa-stack-1x"></i>
-          </span>
-          <span class="menu-label" [class.hidden]="isCollapsed">{{ item.label }}</span>
+<div class="sidebar-wrapper" [class.collapsed]="isCollapsed">
+  <!-- Sidebar -->
+  <nav class="sidebar bg-dark text-white h-100 d-flex flex-column">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header p-3 border-bottom border-secondary">
+      <h5 class="mb-0" *ngIf="!isCollapsed">
+        <i class="fas fa-graduation-cap me-2"></i>
+        OLMS Menu
+      </h5>
+      <div class="text-center" *ngIf="isCollapsed">
+        <i class="fas fa-graduation-cap fs-4"></i>
+      </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <ul class="list-unstyled flex-grow-1 p-0">
+      <li class="nav-item" *ngFor="let item of menuItems">
+        <a class="nav-link d-flex align-items-center text-white py-3 px-3 border-0 sidebar-link" 
+           (click)="selectItem(item.label)" 
+           [title]="item.label"
+           role="button">
+          <!-- Icon -->
+          <div class="sidebar-icon me-3">
+            <i class="fas {{ item.icon }} fs-5"></i>
+          </div>
+          <!-- Label -->
+          <span class="sidebar-label" [class.d-none]="isCollapsed">{{ item.label }}</span>
         </a>
       </li>
     </ul>
-  </div>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer p-3 border-top border-secondary" *ngIf="!isCollapsed">
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        OLMS v1.0
+      </small>
+    </div>
+  </nav>
+</div>
   
   

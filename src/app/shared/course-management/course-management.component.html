@@ -1,142 +1,226 @@
-<div class="course-management-container">
-  <!-- Header Section -->
-  <div class="header">
-    <div class="header-content">
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
       <h2>Course Management</h2>
-      <p>Manage and organize your courses</p>
+      <p class="text-muted">Manage and organize your courses</p>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-primary" (click)="openCreateModal()">
-        <i class="fa fa-plus"></i>
-        Add New Course
-      </button>
-    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <i class="fa fa-plus"></i> Add New Course
+    </button>
   </div>
 
-  <!-- Message Display -->
-  <div *ngIf="message" class="message" [class.success]="messageType === 'success'" [class.error]="messageType === 'error'">
+  <div *ngIf="message" class="alert" [class.alert-success]="messageType === 'success'" [class.alert-danger]="messageType === 'error'">
     <i class="fa" [class.fa-check-circle]="messageType === 'success'" [class.fa-exclamation-circle]="messageType === 'error'"></i>
     {{ message }}
-    <button class="close-btn" (click)="clearMessage()">×</button>
+    <button type="button" class="btn-close float-end" (click)="clearMessage()"></button>
   </div>
 
-  <!-- Statistics Section -->
-  <div class="stats-section">
-    <div class="stat-card">
-      <div class="stat-icon">
-        <i class="fa fa-book"></i>
-      </div>
-      <div class="stat-content">
-        <h3>{{ stats.totalCourses }}</h3>
-        <p>Total Courses</p>
-      </div>
-    </div>
-    
-    <div class="stat-card">
-      <div class="stat-icon">
-        <i class="fa fa-calendar-plus"></i>
-      </div>
-      <div class="stat-content">
-        <h3>{{ stats.recentCourses }}</h3>
-        <p>Recent Courses</p>
-        <small>Last 30 days</small>
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fa fa-book fs-1 text-primary"></i>
+          <h3>{{ stats.totalCourses }}</h3>
+          <p>Total Courses</p>
+        </div>
       </div>
     </div>
-    
-    <div class="stat-card">
-      <div class="stat-icon">
-        <i class="fa fa-star"></i>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fa fa-calendar-plus fs-1 text-success"></i>
+          <h3>{{ stats.recentCourses }}</h3>
+          <p>Recent Courses</p>
+          <small class="text-muted">Last 30 days</small>
+        </div>
       </div>
-      <div class="stat-content">
-        <h3>{{ stats.popularCourses }}</h3>
-        <p>Popular Courses</p>
-        <small>High enrollment</small>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fa fa-star fs-1 text-warning"></i>
+          <h3>{{ stats.popularCourses }}</h3>
+          <p>Popular Courses</p>
+          <small class="text-muted">High enrollment</small>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Search and Filter Section -->
-  <div class="filter-section">
-    <div class="search-group">
-      <div class="search-input">
-        <i class="fa fa-search"></i>
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          (input)="onSearchChange()"
-          placeholder="Search courses by title, description, or prerequisites..."
-          class="form-control">
+  <div class="row mb-3">
+    <div class="col-md-8">
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa fa-search"></i></span>
+        <input type="text" class="form-control" [(ngModel)]="searchTerm" (input)="onSearchChange()"
+               placeholder="Search courses by title, description, or prerequisites...">
       </div>
     </div>
-    
-    <div class="filter-info">
-      <span>{{ filteredCourses.length }} of {{ courses.length }} courses</span>
+    <div class="col-md-4">
+      <span class="text-muted">{{ filteredCourses.length }} of {{ courses.length }} courses</span>
     </div>
   </div>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="isLoading" class="loading-spinner">
-    <i class="fa fa-spinner fa-spin"></i>
-    <span>Loading courses...</span>
+  <div *ngIf="isLoading" class="text-center p-5">
+    <i class="fa fa-spinner fa-spin fs-1"></i>
+    <p>Loading courses...</p>
   </div>
 
-  <!-- Courses List -->
-  <div *ngIf="!isLoading" class="courses-section">
-    <div *ngIf="filteredCourses.length === 0" class="no-data">
-      <i class="fa fa-inbox"></i>
+  <div *ngIf="!isLoading">
+    <div *ngIf="filteredCourses.length === 0" class="text-center p-5">
+      <i class="fa fa-inbox fs-1 text-muted"></i>
       <h3>No courses found</h3>
       <p>{{ searchTerm ? 'Try adjusting your search criteria' : 'Start by creating your first course' }}</p>
       <button *ngIf="!searchTerm" class="btn btn-primary" (click)="openCreateModal()">
-        <i class="fa fa-plus"></i>
-        Create Course
+        <i class="fa fa-plus"></i> Create Course
       </button>
     </div>
 
-    <div *ngIf="filteredCourses.length > 0" class="courses-grid">
-      <div *ngFor="let course of filteredCourses; trackBy: trackByCourseId" class="course-card">
-        <div class="course-header">
-          <h3>{{ course.title }}</h3>
-          <div class="course-actions">
-            <button class="btn-icon" (click)="openDetailsModal(course)" title="View Details">
-              <i class="fa fa-eye"></i>
+    <div *ngIf="filteredCourses.length > 0" class="row">
+      <div *ngFor="let course of filteredCourses; trackBy: trackByCourseId" class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-start">
+            <h5 class="mb-0">{{ course.title }}</h5>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                <i class="fa fa-ellipsis-v"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" (click)="openDetailsModal(course)"><i class="fa fa-eye me-2"></i>View Details</a></li>
+                <li><a class="dropdown-item" (click)="openEditModal(course)"><i class="fa fa-edit me-2"></i>Edit Course</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" (click)="openDeleteModal(course)"><i class="fa fa-trash me-2"></i>Delete Course</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-text">{{ truncateText(course.description, 120) }}</p>
+            <div class="row">
+              <div class="col-6">
+                <small class="text-muted"><i class="fa fa-calendar me-1"></i>Created: {{ formatDate(course.createdAt) }}</small>
+              </div>
+              <div class="col-6" *ngIf="course.modifiedAt">
+                <small class="text-muted"><i class="fa fa-edit me-1"></i>Updated: {{ formatDate(course.modifiedAt) }}</small>
+              </div>
+            </div>
+            <div *ngIf="course.prerequisites" class="mt-2">
+              <span class="badge bg-info"><i class="fa fa-list me-1"></i>Prerequisites Available</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="btn-group w-100">
+              <button class="btn btn-outline-primary" (click)="openDetailsModal(course)">View Details</button>
+              <button class="btn btn-primary" (click)="openEditModal(course)">Edit Course</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals using Bootstrap 5 structure -->
+<div class="modal" [style.display]="showCreateModal ? 'block' : 'none'" *ngIf="showCreateModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Create New Course</h5>
+        <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="createCourse()">
+          <div class="mb-3">
+            <label for="createTitle" class="form-label">Course Title *</label>
+            <input id="createTitle" type="text" [(ngModel)]="createForm.title" name="createTitle"
+                   class="form-control" placeholder="Enter course title" required maxlength="100">
+          </div>
+          <div class="mb-3">
+            <label for="createDescription" class="form-label">Description *</label>
+            <textarea id="createDescription" [(ngModel)]="createForm.description" name="createDescription"
+                      class="form-control" placeholder="Enter course description" rows="3" required maxlength="500"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="createSyllabus" class="form-label">Syllabus *</label>
+            <textarea id="createSyllabus" [(ngModel)]="createForm.syllabus" name="createSyllabus"
+                      class="form-control" placeholder="Enter detailed course syllabus" rows="4" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="createPrerequisites" class="form-label">Prerequisites</label>
+            <textarea id="createPrerequisites" [(ngModel)]="createForm.prerequisites" name="createPrerequisites"
+                      class="form-control" placeholder="Enter course prerequisites (optional)" rows="2"></textarea>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeCreateModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Creating...' : 'Create Course' }}
             </button>
-            <button class="btn-icon" (click)="openEditModal(course)" title="Edit Course">
-              <i class="fa fa-edit"></i>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showEditModal ? 'block' : 'none'" *ngIf="showEditModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Edit Course</h5>
+        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateCourse()">
+          <div class="mb-3">
+            <label for="editTitle" class="form-label">Course Title *</label>
+            <input id="editTitle" type="text" [(ngModel)]="editForm.title" name="editTitle"
+                   class="form-control" placeholder="Enter course title" required maxlength="100">
+          </div>
+          <div class="mb-3">
+            <label for="editDescription" class="form-label">Description *</label>
+            <textarea id="editDescription" [(ngModel)]="editForm.description" name="editDescription"
+                      class="form-control" placeholder="Enter course description" rows="3" required maxlength="500"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editSyllabus" class="form-label">Syllabus *</label>
+            <textarea id="editSyllabus" [(ngModel)]="editForm.syllabus" name="editSyllabus"
+                      class="form-control" placeholder="Enter detailed course syllabus" rows="4" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editPrerequisites" class="form-label">Prerequisites</label>
+            <textarea id="editPrerequisites" [(ngModel)]="editForm.prerequisites" name="editPrerequisites"
+                      class="form-control" placeholder="Enter course prerequisites (optional)" rows="2"></textarea>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeEditModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Updating...' : 'Update Course' }}
             </button>
-            <button class="btn-icon delete" (click)="openDeleteModal(course)" title="Delete Course">
-              <i class="fa fa-trash"></i>
-            </button>
           </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showDeleteModal ? 'block' : 'none'" *ngIf="showDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Delete Course</h5>
+        <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <i class="fa fa-exclamation-triangle text-warning fs-1 mb-3"></i>
+          <p>Are you sure you want to delete the course <strong>"{{ selectedCourse?.title }}"</strong>?</p>
+          <p class="text-muted">This action cannot be undone. All associated data including quizzes, progress, and enrollments will be affected.</p>
         </div>
-        
-        <div class="course-content">
-          <p class="course-description">{{ truncateText(course.description, 120) }}</p>
-          
-          <div class="course-meta">
-            <div class="meta-item">
-              <i class="fa fa-calendar"></i>
-              <span>Created: {{ formatDate(course.createdAt) }}</span>
-            </div>
-            <div class="meta-item" *ngIf="course.modifiedAt">
-              <i class="fa fa-edit"></i>
-              <span>Updated: {{ formatDate(course.modifiedAt) }}</span>
-            </div>
-          </div>
-          
-          <div class="course-tags" *ngIf="course.prerequisites">
-            <span class="tag">
-              <i class="fa fa-list"></i>
-              Prerequisites Available
-            </span>
-          </div>
-        </div>
-        
-        <div class="course-footer">
-          <button class="btn btn-outline" (click)="openDetailsModal(course)">
-            View Details
-          </button>
-          <button class="btn btn-primary" (click)="openEditModal(course)">
-            Edit Course
+        <div class="text-end">
+          <button type="button" class="btn btn-secondary me-2" (click)="closeDeleteModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="deleteCourse()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'Deleting...' : 'Delete Course' }}
           </button>
         </div>
       </div>
@@ -144,228 +228,51 @@
   </div>
 </div>
 
-<!-- Create Course Modal -->
-<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Create New Course</h3>
-      <button class="close-btn" (click)="closeCreateModal()">×</button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="createCourse()">
-        <div class="form-group">
-          <label for="createTitle">Course Title *</label>
-          <input 
-            id="createTitle"
-            type="text" 
-            [(ngModel)]="createForm.title" 
-            name="createTitle"
-            class="form-control"
-            placeholder="Enter course title"
-            required
-            maxlength="100">
+<div class="modal" [style.display]="showDetailsModal ? 'block' : 'none'" *ngIf="showDetailsModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Course Details</h5>
+        <button type="button" class="btn-close" (click)="closeDetailsModal()"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCourse">
+        <div class="mb-4">
+          <h6><i class="fa fa-book me-2"></i>Course Information</h6>
+          <div class="row">
+            <div class="col-sm-3"><strong>Title:</strong></div>
+            <div class="col-sm-9">{{ selectedCourse.title }}</div>
+          </div>
+          <div class="row">
+            <div class="col-sm-3"><strong>Created:</strong></div>
+            <div class="col-sm-9">{{ formatDate(selectedCourse.createdAt) }}</div>
+          </div>
+          <div class="row" *ngIf="selectedCourse.modifiedAt">
+            <div class="col-sm-3"><strong>Last Updated:</strong></div>
+            <div class="col-sm-9">{{ formatDate(selectedCourse.modifiedAt) }}</div>
+          </div>
         </div>
         
-        <div class="form-group">
-          <label for="createDescription">Description *</label>
-          <textarea 
-            id="createDescription"
-            [(ngModel)]="createForm.description" 
-            name="createDescription"
-            class="form-control"
-            placeholder="Enter course description"
-            rows="3"
-            required
-            maxlength="500"></textarea>
+        <div class="mb-4">
+          <h6><i class="fa fa-align-left me-2"></i>Description</h6>
+          <p>{{ selectedCourse.description }}</p>
         </div>
         
-        <div class="form-group">
-          <label for="createSyllabus">Syllabus *</label>
-          <textarea 
-            id="createSyllabus"
-            [(ngModel)]="createForm.syllabus" 
-            name="createSyllabus"
-            class="form-control"
-            placeholder="Enter detailed course syllabus"
-            rows="4"
-            required></textarea>
+        <div class="mb-4">
+          <h6><i class="fa fa-list-alt me-2"></i>Syllabus</h6>
+          <pre class="bg-light p-3 rounded">{{ selectedCourse.syllabus }}</pre>
         </div>
         
-        <div class="form-group">
-          <label for="createPrerequisites">Prerequisites</label>
-          <textarea 
-            id="createPrerequisites"
-            [(ngModel)]="createForm.prerequisites" 
-            name="createPrerequisites"
-            class="form-control"
-            placeholder="Enter course prerequisites (optional)"
-            rows="2"></textarea>
+        <div *ngIf="selectedCourse.prerequisites" class="mb-4">
+          <h6><i class="fa fa-check-square me-2"></i>Prerequisites</h6>
+          <pre class="bg-light p-3 rounded">{{ selectedCourse.prerequisites }}</pre>
         </div>
         
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-            <i *ngIf="isLoading" class="fa fa-spinner fa-spin"></i>
-            {{ isLoading ? 'Creating...' : 'Create Course' }}
+        <div class="text-end">
+          <button type="button" class="btn btn-secondary me-2" (click)="closeDetailsModal()">Close</button>
+          <button type="button" class="btn btn-primary" (click)="closeDetailsModal(); openEditModal(selectedCourse)">
+            <i class="fa fa-edit me-1"></i>Edit Course
           </button>
         </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Edit Course Modal -->
-<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Edit Course</h3>
-      <button class="close-btn" (click)="closeEditModal()">×</button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="updateCourse()">
-        <div class="form-group">
-          <label for="editTitle">Course Title *</label>
-          <input 
-            id="editTitle"
-            type="text" 
-            [(ngModel)]="editForm.title" 
-            name="editTitle"
-            class="form-control"
-            placeholder="Enter course title"
-            required
-            maxlength="100">
-        </div>
-        
-        <div class="form-group">
-          <label for="editDescription">Description *</label>
-          <textarea 
-            id="editDescription"
-            [(ngModel)]="editForm.description" 
-            name="editDescription"
-            class="form-control"
-            placeholder="Enter course description"
-            rows="3"
-            required
-            maxlength="500"></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label for="editSyllabus">Syllabus *</label>
-          <textarea 
-            id="editSyllabus"
-            [(ngModel)]="editForm.syllabus" 
-            name="editSyllabus"
-            class="form-control"
-            placeholder="Enter detailed course syllabus"
-            rows="4"
-            required></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label for="editPrerequisites">Prerequisites</label>
-          <textarea 
-            id="editPrerequisites"
-            [(ngModel)]="editForm.prerequisites" 
-            name="editPrerequisites"
-            class="form-control"
-            placeholder="Enter course prerequisites (optional)"
-            rows="2"></textarea>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-            <i *ngIf="isLoading" class="fa fa-spinner fa-spin"></i>
-            {{ isLoading ? 'Updating...' : 'Update Course' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Delete Course Modal -->
-<div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
-  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Delete Course</h3>
-      <button class="close-btn" (click)="closeDeleteModal()">×</button>
-    </div>
-    
-    <div class="modal-body">
-      <div class="delete-warning">
-        <i class="fa fa-exclamation-triangle"></i>
-        <p>Are you sure you want to delete the course <strong>"{{ selectedCourse?.title }}"</strong>?</p>
-        <p class="warning-text">This action cannot be undone. All associated data including quizzes, progress, and enrollments will be affected.</p>
-      </div>
-      
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" (click)="deleteCourse()" [disabled]="isLoading">
-          <i *ngIf="isLoading" class="fa fa-spinner fa-spin"></i>
-          {{ isLoading ? 'Deleting...' : 'Delete Course' }}
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Course Details Modal -->
-<div *ngIf="showDetailsModal" class="modal-overlay" (click)="closeDetailsModal()">
-  <div class="modal-content details-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Course Details</h3>
-      <button class="close-btn" (click)="closeDetailsModal()">×</button>
-    </div>
-    
-    <div class="modal-body" *ngIf="selectedCourse">
-      <div class="course-details">
-        <div class="detail-section">
-          <h4><i class="fa fa-book"></i> Course Information</h4>
-          <div class="detail-grid">
-            <div class="detail-item">
-              <label>Title:</label>
-              <span>{{ selectedCourse.title }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Created:</label>
-              <span>{{ formatDate(selectedCourse.createdAt) }}</span>
-            </div>
-            <div class="detail-item" *ngIf="selectedCourse.modifiedAt">
-              <label>Last Updated:</label>
-              <span>{{ formatDate(selectedCourse.modifiedAt) }}</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="detail-section">
-          <h4><i class="fa fa-align-left"></i> Description</h4>
-          <p class="description-text">{{ selectedCourse.description }}</p>
-        </div>
-        
-        <div class="detail-section">
-          <h4><i class="fa fa-list-alt"></i> Syllabus</h4>
-          <div class="syllabus-content">
-            <pre>{{ selectedCourse.syllabus }}</pre>
-          </div>
-        </div>
-        
-        <div class="detail-section" *ngIf="selectedCourse.prerequisites">
-          <h4><i class="fa fa-check-square"></i> Prerequisites</h4>
-          <div class="prerequisites-content">
-            <pre>{{ selectedCourse.prerequisites }}</pre>
-          </div>
-        </div>
-      </div>
-      
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" (click)="closeDetailsModal()">Close</button>
-        <button type="button" class="btn btn-primary" (click)="closeDetailsModal(); openEditModal(selectedCourse)">
-          <i class="fa fa-edit"></i>
-          Edit Course
-        </button>
       </div>
     </div>
   </div>

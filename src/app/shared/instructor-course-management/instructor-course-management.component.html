@@ -1,233 +1,179 @@
-<div class="instructor-course-container">
-  <!-- Header Section -->
-  <div class="header">
-    <div class="header-content">
-      <h2>Course Management</h2>
-      <p>Manage your courses, content, and track student progress</p>
-    </div>
-    <div class="header-stats">
-      <div class="stat-item">
-        <span class="stat-number">{{ stats.totalCourses }}</span>
-        <span class="stat-label">My Courses</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">{{ stats.totalStudents }}</span>
-        <span class="stat-label">Students</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">{{ stats.totalQuizzes }}</span>
-        <span class="stat-label">Quizzes</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">{{ stats.avgProgress }}%</span>
-        <span class="stat-label">Avg Progress</span>
+<div class="container-fluid">
+  <div class="card mb-4">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2>Course Management</h2>
+          <p class="text-muted mb-0">Manage your courses, content, and track student progress</p>
+        </div>
+        <div class="row text-center">
+          <div class="col-3"><span class="badge bg-primary fs-6">{{ stats.totalCourses }}</span><br><small>My Courses</small></div>
+          <div class="col-3"><span class="badge bg-success fs-6">{{ stats.totalStudents }}</span><br><small>Students</small></div>
+          <div class="col-3"><span class="badge bg-warning fs-6">{{ stats.totalQuizzes }}</span><br><small>Quizzes</small></div>
+          <div class="col-3"><span class="badge bg-info fs-6">{{ stats.avgProgress }}%</span><br><small>Avg Progress</small></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Message Display -->
-  <div *ngIf="message" class="message" [class.success]="messageType === 'success'" [class.error]="messageType === 'error'">
+  <div *ngIf="message" class="alert" [class.alert-success]="messageType === 'success'" [class.alert-danger]="messageType === 'error'">
     <i class="fa" [class.fa-check-circle]="messageType === 'success'" [class.fa-exclamation-circle]="messageType === 'error'"></i>
     {{ message }}
-    <button class="close-btn" (click)="clearMessage()">×</button>
+    <button type="button" class="btn-close float-end" (click)="clearMessage()"></button>
   </div>
 
-  <!-- Navigation Tabs -->
-  <div class="tab-navigation">
-    <button 
-      class="tab-btn" 
-      [class.active]="activeTab === 'my-courses'"
-      (click)="setActiveTab('my-courses')">
-      <i class="fa fa-book"></i>
-      My Courses
-    </button>
-    
-    <button 
-      class="tab-btn" 
-      [class.active]="activeTab === 'course-content'"
-      [disabled]="!selectedCourse"
-      (click)="setActiveTab('course-content')">
-      <i class="fa fa-file-upload"></i>
-      Course Content
-    </button>
-    
-    <button 
-      class="tab-btn" 
-      [class.active]="activeTab === 'quiz-management'"
-      [disabled]="!selectedCourse"
-      (click)="setActiveTab('quiz-management')">
-      <i class="fa fa-question-circle"></i>
-      Quiz Management
-    </button>
-    
-    <button 
-      class="tab-btn" 
-      [class.active]="activeTab === 'student-progress'"
-      [disabled]="!selectedCourse"
-      (click)="setActiveTab('student-progress')">
-      <i class="fa fa-chart-line"></i>
-      Student Progress
-    </button>
-  </div>
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'my-courses'" (click)="setActiveTab('my-courses')">
+        <i class="fa fa-book"></i> My Courses
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'course-content'" [disabled]="!selectedCourse" 
+              (click)="setActiveTab('course-content')">
+        <i class="fa fa-file-upload"></i> Course Content
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'quiz-management'" [disabled]="!selectedCourse"
+              (click)="setActiveTab('quiz-management')">
+        <i class="fa fa-question-circle"></i> Quiz Management
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab === 'student-progress'" [disabled]="!selectedCourse"
+              (click)="setActiveTab('student-progress')">
+        <i class="fa fa-chart-line"></i> Student Progress
+      </button>
+    </li>
+  </ul>
 
-  <!-- Selected Course Info -->
-  <div *ngIf="selectedCourse" class="selected-course-info">
-    <div class="course-info">
-      <h3>{{ selectedCourse.title }}</h3>
-      <p>{{ selectedCourse.description }}</p>
+  <div *ngIf="selectedCourse" class="alert alert-info d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-1">{{ selectedCourse.title }}</h5>
+      <p class="mb-0">{{ selectedCourse.description }}</p>
     </div>
     <button class="btn btn-secondary" (click)="selectedCourse = null; setActiveTab('my-courses')">
-      <i class="fa fa-arrow-left"></i>
-      Back to Courses
+      <i class="fa fa-arrow-left"></i> Back to Courses
     </button>
   </div>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="isLoading" class="loading-spinner">
-    <i class="fa fa-spinner fa-spin"></i>
-    <span>Loading...</span>
+  <div *ngIf="isLoading" class="text-center p-5">
+    <div class="spinner-border"></div>
+    <p>Loading...</p>
   </div>
 
-  <!-- Tab Content -->
-  <div *ngIf="!isLoading" class="tab-content">
-    
+  <div *ngIf="!isLoading">
     <!-- My Courses Tab -->
-    <div *ngIf="activeTab === 'my-courses'" class="courses-tab">
-      <div class="tab-header">
+    <div *ngIf="activeTab === 'my-courses'">
+      <div class="mb-3">
         <h3>My Assigned Courses</h3>
-        <p>Select a course to manage its content and track student progress</p>
+        <p class="text-muted">Select a course to manage its content and track student progress</p>
       </div>
       
-      <div *ngIf="myCourses.length === 0" class="no-data">
-        <i class="fa fa-inbox"></i>
+      <div *ngIf="myCourses.length === 0" class="text-center p-5">
+        <i class="fa fa-inbox fs-1 text-muted"></i>
         <h4>No Courses Assigned</h4>
         <p>Contact your administrator to get assigned to courses</p>
       </div>
       
-      <div *ngIf="myCourses.length > 0" class="courses-grid">
-        <div *ngFor="let course of myCourses; trackBy: trackByCourseId" 
-             class="course-card" 
-             (click)="selectCourse(course)">
-          <div class="course-header">
-            <h4>{{ course.title }}</h4>
-            <span class="course-date">{{ formatDate(course.createdAt) }}</span>
-          </div>
-          <div class="course-content">
-            <p>{{ course.description }}</p>
-            <div class="course-meta">
-              <span class="meta-item">
-                <i class="fa fa-calendar"></i>
-                Created: {{ formatDate(course.createdAt) }}
-              </span>
+      <div *ngIf="myCourses.length > 0" class="row">
+        <div *ngFor="let course of myCourses; trackBy: trackByCourseId" class="col-lg-6 mb-4">
+          <div class="card h-100" (click)="selectCourse(course)" style="cursor: pointer;">
+            <div class="card-header d-flex justify-content-between">
+              <h5 class="mb-0">{{ course.title }}</h5>
+              <small class="text-muted">{{ formatDate(course.createdAt) }}</small>
             </div>
-          </div>
-          <div class="course-actions">
-            <span class="action-hint">
-              <i class="fa fa-mouse-pointer"></i>
-              Click to manage
-            </span>
+            <div class="card-body">
+              <p class="card-text">{{ course.description }}</p>
+              <small class="text-muted"><i class="fa fa-calendar me-1"></i>Created: {{ formatDate(course.createdAt) }}</small>
+            </div>
+            <div class="card-footer">
+              <span class="badge bg-primary"><i class="fa fa-mouse-pointer me-1"></i>Click to manage</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Course Content Tab -->
-    <div *ngIf="activeTab === 'course-content'" class="content-tab">
-      <div class="tab-header">
+    <div *ngIf="activeTab === 'course-content'">
+      <div class="mb-4">
         <h3>Course Content Management</h3>
-        <p>Upload and manage learning materials for your course</p>
+        <p class="text-muted">Upload and manage learning materials for your course</p>
       </div>
 
-      <!-- Content Upload Form -->
-      <div class="upload-section">
-        <h4>Upload New Content</h4>
-        <form class="upload-form" (ngSubmit)="uploadContent()">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="contentTitle">Content Title *</label>
-              <input 
-                id="contentTitle"
-                type="text" 
-                [(ngModel)]="contentUploadForm.title" 
-                name="contentTitle"
-                class="form-control"
-                placeholder="Enter content title"
-                required>
-            </div>
-            
-            <div class="form-group">
-              <label for="contentType">Content Type *</label>
-              <select 
-                id="contentType"
-                [(ngModel)]="contentUploadForm.type" 
-                name="contentType"
-                class="form-control"
-                required>
-                <option value="PDF">PDF Document</option>
-                <option value="Video">Video</option>
-                <option value="Document">Document</option>
-                <option value="Image">Image</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="contentFile">Select File *</label>
-            <input 
-              id="contentFile"
-              type="file" 
-              (change)="onFileSelected($event)"
-              class="form-control file-input"
-              accept=".pdf,.doc,.docx,.txt,.mp4,.avi,.mov,.jpg,.jpeg,.png,.gif"
-              required>
-            <small class="file-info" *ngIf="contentUploadForm.file">
-              Selected: {{ contentUploadForm.file.name }} 
-              ({{ (contentUploadForm.file.size / 1024 / 1024).toFixed(2) }} MB)
-            </small>
-          </div>
-          
-          <button type="submit" class="btn btn-primary" [disabled]="isUploading">
-            <i *ngIf="isUploading" class="fa fa-spinner fa-spin"></i>
-            <i *ngIf="!isUploading" class="fa fa-upload"></i>
-            {{ isUploading ? 'Uploading...' : 'Upload Content' }}
-          </button>
-        </form>
-      </div>
-
-      <!-- Existing Content -->
-      <div class="existing-content">
-        <h4>Existing Content</h4>
-        
-        <div *ngIf="courseContent.length === 0" class="no-data">
-          <i class="fa fa-folder-open"></i>
-          <p>No content uploaded yet</p>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Upload New Content</h5>
         </div>
-        
-        <div *ngIf="courseContent.length > 0" class="content-list">
-          <div *ngFor="let content of courseContent; trackBy: trackByContentId" class="content-item">
-            <div class="content-icon">
-              <i class="fa" [class]="getFileIcon(content.type)"></i>
-            </div>
-            <div class="content-info">
-              <h5>{{ content.title }}</h5>
-              <div class="content-meta">
-                <span class="meta-item">
-                  <i class="fa fa-tag"></i>
-                  {{ content.type }}
-                </span>
-                <span class="meta-item">
-                  <i class="fa fa-calendar"></i>
-                  {{ formatDate(content.createdAt) }}
-                </span>
+        <div class="card-body">
+          <form (ngSubmit)="uploadContent()">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="contentTitle" class="form-label">Content Title *</label>
+                <input id="contentTitle" type="text" [(ngModel)]="contentUploadForm.title" name="contentTitle"
+                       class="form-control" placeholder="Enter content title" required>
+              </div>
+              <div class="col-md-6">
+                <label for="contentType" class="form-label">Content Type *</label>
+                <select id="contentType" [(ngModel)]="contentUploadForm.type" name="contentType" class="form-select" required>
+                  <option value="PDF">PDF Document</option>
+                  <option value="Video">Video</option>
+                  <option value="Document">Document</option>
+                  <option value="Image">Image</option>
+                </select>
               </div>
             </div>
-            <div class="content-actions">
-              <button class="btn-icon" (click)="downloadContent(content)" title="Download">
-                <i class="fa fa-download"></i>
-              </button>
-              <button class="btn-icon delete" (click)="deleteContent(content)" title="Delete">
-                <i class="fa fa-trash"></i>
-              </button>
+            
+            <div class="mb-3">
+              <label for="contentFile" class="form-label">Select File *</label>
+              <input id="contentFile" type="file" (change)="onFileSelected($event)" class="form-control"
+                     accept=".pdf,.doc,.docx,.txt,.mp4,.avi,.mov,.jpg,.jpeg,.png,.gif" required>
+              <div class="form-text" *ngIf="contentUploadForm.file">
+                Selected: {{ contentUploadForm.file.name }} ({{ (contentUploadForm.file.size / 1024 / 1024).toFixed(2) }} MB)
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" [disabled]="isUploading">
+              <span *ngIf="isUploading" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!isUploading" class="fa fa-upload me-2"></i>
+              {{ isUploading ? 'Uploading...' : 'Upload Content' }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h5>Existing Content</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="courseContent.length === 0" class="text-center p-3">
+            <i class="fa fa-folder-open fs-1 text-muted"></i>
+            <p>No content uploaded yet</p>
+          </div>
+          
+          <div *ngIf="courseContent.length > 0" class="list-group list-group-flush">
+            <div *ngFor="let content of courseContent; trackBy: trackByContentId" class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <i class="fa me-3 fs-4" [class]="getFileIcon(content.type)"></i>
+                <div>
+                  <h6 class="mb-1">{{ content.title }}</h6>
+                  <small class="text-muted">
+                    <i class="fa fa-tag me-1"></i>{{ content.type }}
+                    <i class="fa fa-calendar ms-3 me-1"></i>{{ formatDate(content.createdAt) }}
+                  </small>
+                </div>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-outline-primary" (click)="downloadContent(content)" title="Download">
+                  <i class="fa fa-download"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteContent(content)" title="Delete">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -235,103 +181,94 @@
     </div>
 
     <!-- Quiz Management Tab -->
-    <div *ngIf="activeTab === 'quiz-management'" class="quiz-tab">
-      <div class="tab-header">
-        <h3>Quiz Management</h3>
-        <div class="header-actions">
-          <button class="btn btn-primary" (click)="openCreateQuizModal()">
-            <i class="fa fa-plus"></i>
-            Create New Quiz
-          </button>
+    <div *ngIf="activeTab === 'quiz-management'">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h3>Quiz Management</h3>
         </div>
-      </div>
-
-      <div *ngIf="courseQuizzes.length === 0" class="no-data">
-        <i class="fa fa-question-circle"></i>
-        <h4>No Quizzes Created</h4>
-        <p>Create your first quiz to assess student knowledge</p>
         <button class="btn btn-primary" (click)="openCreateQuizModal()">
-          <i class="fa fa-plus"></i>
-          Create Quiz
+          <i class="fa fa-plus"></i> Create New Quiz
         </button>
       </div>
 
-      <div *ngIf="courseQuizzes.length > 0" class="quiz-list">
-        <div *ngFor="let quiz of courseQuizzes; trackBy: trackByQuizId" class="quiz-item">
-          <div class="quiz-info">
-            <h4>{{ quiz.title }}</h4>
-            <div class="quiz-meta">
-              <span class="meta-item">
-                <i class="fa fa-star"></i>
-                {{ quiz.totalMarks }} marks
-              </span>
-              <span class="meta-item">
-                <i class="fa fa-calendar"></i>
-                {{ formatDate(quiz.createdAt) }}
-              </span>
-              <span class="meta-item" *ngIf="quiz.questions">
-                <i class="fa fa-list"></i>
-                {{ quiz.questions.length }} questions
-              </span>
+      <div *ngIf="courseQuizzes.length === 0" class="text-center p-5">
+        <i class="fa fa-question-circle fs-1 text-muted"></i>
+        <h4>No Quizzes Created</h4>
+        <p>Create your first quiz to assess student knowledge</p>
+        <button class="btn btn-primary" (click)="openCreateQuizModal()">
+          <i class="fa fa-plus"></i> Create Quiz
+        </button>
+      </div>
+
+      <div *ngIf="courseQuizzes.length > 0" class="row">
+        <div *ngFor="let quiz of courseQuizzes; trackBy: trackByQuizId" class="col-lg-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ quiz.title }}</h5>
+              <div class="mb-3">
+                <span class="badge bg-primary me-2"><i class="fa fa-star me-1"></i>{{ quiz.totalMarks }} marks</span>
+                <span class="badge bg-secondary me-2"><i class="fa fa-calendar me-1"></i>{{ formatDate(quiz.createdAt) }}</span>
+                <span class="badge bg-info" *ngIf="quiz.questions"><i class="fa fa-list me-1"></i>{{ quiz.questions.length }} questions</span>
+              </div>
+              <div class="btn-group w-100">
+                <button class="btn btn-outline-primary" (click)="openAddQuestionsModal(quiz)">
+                  <i class="fa fa-plus"></i> Add Questions
+                </button>
+                <button class="btn btn-secondary" (click)="viewQuizProgress(quiz)">
+                  <i class="fa fa-chart-bar"></i> View Progress
+                </button>
+              </div>
             </div>
-          </div>
-          <div class="quiz-actions">
-            <button class="btn btn-outline" (click)="openAddQuestionsModal(quiz)">
-              <i class="fa fa-plus"></i>
-              Add Questions
-            </button>
-            <button class="btn btn-secondary" (click)="viewQuizProgress(quiz)">
-              <i class="fa fa-chart-bar"></i>
-              View Progress
-            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Student Progress Tab -->
-    <div *ngIf="activeTab === 'student-progress'" class="progress-tab">
-      <div class="tab-header">
+    <div *ngIf="activeTab === 'student-progress'">
+      <div class="mb-4">
         <h3>Student Progress</h3>
-        <p>Monitor how your students are performing in the course</p>
+        <p class="text-muted">Monitor how your students are performing in the course</p>
       </div>
 
-      <div *ngIf="studentProgress.length === 0" class="no-data">
-        <i class="fa fa-chart-line"></i>
+      <div *ngIf="studentProgress.length === 0" class="text-center p-5">
+        <i class="fa fa-chart-line fs-1 text-muted"></i>
         <h4>No Student Data</h4>
         <p>Student progress will appear here once they start taking quizzes</p>
       </div>
 
-      <div *ngIf="studentProgress.length > 0" class="progress-list">
-        <div *ngFor="let student of studentProgress" class="student-progress-item">
-          <div class="student-info">
-            <div class="student-avatar">
-              <i class="fa fa-user"></i>
-            </div>
-            <div class="student-details">
-              <h4>{{ student.learnerName }}</h4>
-              <p>Student ID: {{ student.learnerId }}</p>
-            </div>
-          </div>
-          <div class="progress-details">
-            <div class="progress-stats">
-              <div class="stat">
-                <span class="stat-value">{{ student.score }}</span>
-                <span class="stat-label">Total Score</span>
+      <div *ngIf="studentProgress.length > 0" class="row">
+        <div *ngFor="let student of studentProgress" class="col-lg-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                  <i class="fa fa-user text-white"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1">{{ student.learnerName }}</h6>
+                  <small class="text-muted">Student ID: {{ student.learnerId }}</small>
+                </div>
               </div>
-              <div class="stat">
-                <span class="stat-value">{{ student.totalMarks }}</span>
-                <span class="stat-label">Max Possible</span>
+              
+              <div class="row text-center mb-3">
+                <div class="col-4">
+                  <h6 class="text-primary">{{ student.score }}</h6>
+                  <small>Total Score</small>
+                </div>
+                <div class="col-4">
+                  <h6 class="text-secondary">{{ student.totalMarks }}</h6>
+                  <small>Max Possible</small>
+                </div>
+                <div class="col-4">
+                  <h6 class="text-success">{{ ((student.score / student.totalMarks) * 100).toFixed(1) }}%</h6>
+                  <small>Percentage</small>
+                </div>
               </div>
-              <div class="stat">
-                <span class="stat-value">{{ ((student.score / student.totalMarks) * 100).toFixed(1) }}%</span>
-                <span class="stat-label">Percentage</span>
-              </div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" 
-                   [style.width.%]="(student.score / student.totalMarks) * 100"
-                   [style.background-color]="getProgressColor((student.score / student.totalMarks) * 100)">
+              
+              <div class="progress">
+                <div class="progress-bar" [style.width.%]="(student.score / student.totalMarks) * 100"
+                     [style.background-color]="getProgressColor((student.score / student.totalMarks) * 100)"></div>
               </div>
             </div>
           </div>
@@ -341,192 +278,154 @@
   </div>
 </div>
 
-<!-- Create Quiz Modal -->
-<div *ngIf="showCreateQuizModal" class="modal-overlay" (click)="closeCreateQuizModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Create New Quiz</h3>
-      <button class="close-btn" (click)="closeCreateQuizModal()">×</button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="createQuiz()">
-        <div class="form-group">
-          <label for="quizTitle">Quiz Title *</label>
-          <input 
-            id="quizTitle"
-            type="text" 
-            [(ngModel)]="quizForm.title" 
-            name="quizTitle"
-            class="form-control"
-            placeholder="Enter quiz title"
-            required>
-        </div>
-        
-        <div class="form-group">
-          <label for="totalMarks">Total Marks *</label>
-          <input 
-            id="totalMarks"
-            type="number" 
-            [(ngModel)]="quizForm.totalMarks" 
-            name="totalMarks"
-            class="form-control"
-            min="1"
-            required>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="closeCreateQuizModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-            <i *ngIf="isLoading" class="fa fa-spinner fa-spin"></i>
-            {{ isLoading ? 'Creating...' : 'Create Quiz' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Add Questions Modal -->
-<div *ngIf="showAddQuestionsModal" class="modal-overlay" (click)="closeAddQuestionsModal()">
-  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Add Questions to {{ selectedQuiz?.title }}</h3>
-      <button class="close-btn" (click)="closeAddQuestionsModal()">×</button>
-    </div>
-    
-    <div class="modal-body">
-      <!-- Question Form -->
-      <div class="question-form">
-        <h4>Add New Question</h4>
-        
-        <div class="form-group">
-          <label for="questionText">Question *</label>
-          <textarea 
-            id="questionText"
-            [(ngModel)]="questionForm.questionText" 
-            name="questionText"
-            class="form-control"
-            placeholder="Enter your question"
-            rows="3"
-            required></textarea>
-        </div>
-        
-        <div class="options-grid">
-          <div class="form-group">
-            <label for="optionA">Option A *</label>
-            <input 
-              id="optionA"
-              type="text" 
-              [(ngModel)]="questionForm.optionA" 
-              name="optionA"
-              class="form-control"
-              placeholder="Option A"
-              required>
-          </div>
-          
-          <div class="form-group">
-            <label for="optionB">Option B *</label>
-            <input 
-              id="optionB"
-              type="text" 
-              [(ngModel)]="questionForm.optionB" 
-              name="optionB"
-              class="form-control"
-              placeholder="Option B"
-              required>
-          </div>
-          
-          <div class="form-group">
-            <label for="optionC">Option C *</label>
-            <input 
-              id="optionC"
-              type="text" 
-              [(ngModel)]="questionForm.optionC" 
-              name="optionC"
-              class="form-control"
-              placeholder="Option C"
-              required>
-          </div>
-          
-          <div class="form-group">
-            <label for="optionD">Option D *</label>
-            <input 
-              id="optionD"
-              type="text" 
-              [(ngModel)]="questionForm.optionD" 
-              name="optionD"
-              class="form-control"
-              placeholder="Option D"
-              required>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="correctOption">Correct Option *</label>
-            <select 
-              id="correctOption"
-              [(ngModel)]="questionForm.correctOption" 
-              name="correctOption"
-              class="form-control"
-              required>
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="marks">Marks *</label>
-            <input 
-              id="marks"
-              type="number" 
-              [(ngModel)]="questionForm.marks" 
-              name="marks"
-              class="form-control"
-              min="1"
-              required>
-          </div>
-        </div>
-        
-        <button type="button" class="btn btn-primary" (click)="addQuestion()">
-          <i class="fa fa-plus"></i>
-          Add Question
-        </button>
+<!-- Bootstrap Modals -->
+<div class="modal" [style.display]="showCreateQuizModal ? 'block' : 'none'" *ngIf="showCreateQuizModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Create New Quiz</h5>
+        <button type="button" class="btn-close" (click)="closeCreateQuizModal()"></button>
       </div>
-
-      <!-- Added Questions List -->
-      <div *ngIf="quizQuestions.length > 0" class="added-questions">
-        <h4>Added Questions ({{ quizQuestions.length }})</h4>
-        
-        <div *ngFor="let question of quizQuestions; let i = index" class="question-item">
-          <div class="question-header">
-            <span class="question-number">Q{{ i + 1 }}</span>
-            <span class="question-marks">{{ question.marks }} marks</span>
-            <button class="btn-icon delete" (click)="removeQuestion(i)">
-              <i class="fa fa-trash"></i>
+      <div class="modal-body">
+        <form (ngSubmit)="createQuiz()">
+          <div class="mb-3">
+            <label for="quizTitle" class="form-label">Quiz Title *</label>
+            <input id="quizTitle" type="text" [(ngModel)]="quizForm.title" name="quizTitle"
+                   class="form-control" placeholder="Enter quiz title" required>
+          </div>
+          <div class="mb-3">
+            <label for="totalMarks" class="form-label">Total Marks *</label>
+            <input id="totalMarks" type="number" [(ngModel)]="quizForm.totalMarks" name="totalMarks"
+                   class="form-control" min="1" required>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeCreateQuizModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Creating...' : 'Create Quiz' }}
             </button>
           </div>
-          <div class="question-content">
-            <p>{{ question.questionText }}</p>
-            <div class="options">
-              <span class="option" [class.correct]="question.correctOption === 'A'">A) {{ question.optionA }}</span>
-              <span class="option" [class.correct]="question.correctOption === 'B'">B) {{ question.optionB }}</span>
-              <span class="option" [class.correct]="question.correctOption === 'C'">C) {{ question.optionC }}</span>
-              <span class="option" [class.correct]="question.correctOption === 'D'">D) {{ question.optionD }}</span>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showAddQuestionsModal ? 'block' : 'none'" *ngIf="showAddQuestionsModal">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Add Questions to {{ selectedQuiz?.title }}</h5>
+        <button type="button" class="btn-close" (click)="closeAddQuestionsModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h6>Add New Question</h6>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="questionText" class="form-label">Question *</label>
+              <textarea id="questionText" [(ngModel)]="questionForm.questionText" name="questionText"
+                        class="form-control" placeholder="Enter your question" rows="3" required></textarea>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="optionA" class="form-label">Option A *</label>
+                <input id="optionA" type="text" [(ngModel)]="questionForm.optionA" name="optionA"
+                       class="form-control" placeholder="Option A" required>
+              </div>
+              <div class="col-md-6">
+                <label for="optionB" class="form-label">Option B *</label>
+                <input id="optionB" type="text" [(ngModel)]="questionForm.optionB" name="optionB"
+                       class="form-control" placeholder="Option B" required>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="optionC" class="form-label">Option C *</label>
+                <input id="optionC" type="text" [(ngModel)]="questionForm.optionC" name="optionC"
+                       class="form-control" placeholder="Option C" required>
+              </div>
+              <div class="col-md-6">
+                <label for="optionD" class="form-label">Option D *</label>
+                <input id="optionD" type="text" [(ngModel)]="questionForm.optionD" name="optionD"
+                       class="form-control" placeholder="Option D" required>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="correctOption" class="form-label">Correct Option *</label>
+                <select id="correctOption" [(ngModel)]="questionForm.correctOption" name="correctOption" class="form-select" required>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="marks" class="form-label">Marks *</label>
+                <input id="marks" type="number" [(ngModel)]="questionForm.marks" name="marks"
+                       class="form-control" min="1" required>
+              </div>
+            </div>
+            
+            <button type="button" class="btn btn-primary" (click)="addQuestion()">
+              <i class="fa fa-plus"></i> Add Question
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="quizQuestions.length > 0" class="card">
+          <div class="card-header">
+            <h6>Added Questions ({{ quizQuestions.length }})</h6>
+          </div>
+          <div class="card-body">
+            <div *ngFor="let question of quizQuestions; let i = index" class="border rounded p-3 mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-primary">Q{{ i + 1 }}</span>
+                <span class="badge bg-secondary">{{ question.marks }} marks</span>
+                <button class="btn btn-sm btn-outline-danger" (click)="removeQuestion(i)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+              <p class="fw-bold">{{ question.questionText }}</p>
+              <div class="row">
+                <div class="col-6">
+                  <span class="badge" [class.bg-success]="question.correctOption === 'A'" [class.bg-light]="question.correctOption !== 'A'">
+                    A) {{ question.optionA }}
+                  </span>
+                </div>
+                <div class="col-6">
+                  <span class="badge" [class.bg-success]="question.correctOption === 'B'" [class.bg-light]="question.correctOption !== 'B'">
+                    B) {{ question.optionB }}
+                  </span>
+                </div>
+                <div class="col-6">
+                  <span class="badge" [class.bg-success]="question.correctOption === 'C'" [class.bg-light]="question.correctOption !== 'C'">
+                    C) {{ question.optionC }}
+                  </span>
+                </div>
+                <div class="col-6">
+                  <span class="badge" [class.bg-success]="question.correctOption === 'D'" [class.bg-light]="question.correctOption !== 'D'">
+                    D) {{ question.optionD }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" (click)="closeAddQuestionsModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="saveAllQuestions()" [disabled]="quizQuestions.length === 0 || isLoading">
-          <i *ngIf="isLoading" class="fa fa-spinner fa-spin"></i>
-          {{ isLoading ? 'Saving...' : 'Save All Questions (' + quizQuestions.length + ')' }}
-        </button>
+        
+        <div class="text-end mt-3">
+          <button type="button" class="btn btn-secondary me-2" (click)="closeAddQuestionsModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="saveAllQuestions()" [disabled]="quizQuestions.length === 0 || isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'Saving...' : 'Save All Questions (' + quizQuestions.length + ')' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

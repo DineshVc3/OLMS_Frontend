@@ -1,338 +1,170 @@
-<div class="user-management-container">
-  <!-- Header -->
-  <div class="management-header">
-    <div class="header-title">
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
       <h2><i class="fa fa-users"></i> User Management</h2>
-      <p *ngIf="activeView === 'view-all'">View all users you have permission to see</p>
-      <p *ngIf="activeView === 'register'">Register new users in the system</p>
-      <p *ngIf="activeView === 'view-by-role'">Filter users by their specific roles</p>
-      <p *ngIf="activeView === 'update'">Select a user to update their information</p>
-      <p *ngIf="activeView === 'delete'">Select a user to remove from the system</p>
-      <p *ngIf="activeView === 'toggle-status'">Activate or deactivate user accounts</p>
+      <p class="text-muted" *ngIf="activeView === 'view-all'">View all users you have permission to see</p>
+      <p class="text-muted" *ngIf="activeView === 'register'">Register new users in the system</p>
+      <p class="text-muted" *ngIf="activeView === 'view-by-role'">Filter users by their specific roles</p>
+      <p class="text-muted" *ngIf="activeView === 'update'">Select a user to update their information</p>
+      <p class="text-muted" *ngIf="activeView === 'delete'">Select a user to remove from the system</p>
+      <p class="text-muted" *ngIf="activeView === 'toggle-status'">Activate or deactivate user accounts</p>
     </div>
-    <button 
-      *ngIf="canShowCreateButton()" 
-      class="btn btn-primary" 
-      (click)="openCreateModal()" 
-      [disabled]="isLoading">
-      <i class="fa fa-plus"></i>
-      Add New User
+    <button *ngIf="canShowCreateButton()" class="btn btn-primary" (click)="openCreateModal()" [disabled]="isLoading">
+      <i class="fa fa-plus"></i> Add New User
     </button>
   </div>
 
-  <!-- Message Display -->
-  <div *ngIf="message" class="message-container" [class]="'message-' + messageType">
+  <div *ngIf="message" class="alert" [class.alert-success]="messageType === 'success'" [class.alert-danger]="messageType === 'error'">
     <i class="fa" [class.fa-check-circle]="messageType === 'success'" [class.fa-exclamation-triangle]="messageType === 'error'"></i>
-    <span>{{ message }}</span>
-    <button class="message-close" (click)="clearMessage()">
-      <i class="fa fa-times"></i>
-    </button>
+    {{ message }}
+    <button type="button" class="btn-close float-end" (click)="clearMessage()"></button>
   </div>
 
-  <!-- Filters and Search -->
-  <div class="filters-section" *ngIf="activeView !== 'register'">
-    <div class="filter-group" *ngIf="showRoleFilter">
-      <label for="roleFilter">Filter by Role:</label>
-      <select id="roleFilter" [(ngModel)]="selectedRole" (change)="onRoleChange()" class="form-control">
-        <option *ngFor="let role of availableRoles" [value]="role">
-          {{ getRoleDisplayName(role) }}
-        </option>
+  <div *ngIf="activeView !== 'register'" class="row mb-4">
+    <div class="col-md-4" *ngIf="showRoleFilter">
+      <label for="roleFilter" class="form-label">Filter by Role:</label>
+      <select id="roleFilter" [(ngModel)]="selectedRole" (change)="onRoleChange()" class="form-select">
+        <option *ngFor="let role of availableRoles" [value]="role">{{ getRoleDisplayName(role) }}</option>
       </select>
     </div>
-    
-    <div class="search-group">
-      <label for="searchInput">Search Users:</label>
-      <div class="search-input-container">
-        <i class="fa fa-search search-icon"></i>
-        <input 
-          id="searchInput"
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          (input)="onSearchChange()"
-          placeholder="Search by name, email, or phone..."
-          class="form-control"
-        >
+    <div class="col-md-8">
+      <label for="searchInput" class="form-label">Search Users:</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa fa-search"></i></span>
+        <input id="searchInput" type="text" [(ngModel)]="searchTerm" (input)="onSearchChange()"
+               placeholder="Search by name, email, or phone..." class="form-control">
       </div>
     </div>
   </div>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="spinner"></div>
+  <div *ngIf="isLoading" class="text-center p-5">
+    <div class="spinner-border"></div>
     <p>Loading users...</p>
   </div>
 
-  <!-- Users Table -->
-  <div *ngIf="!isLoading && activeView !== 'register'" class="table-container">
-    <div *ngIf="filteredUsers.length === 0" class="no-users">
-      <i class="fa fa-users"></i>
+  <div *ngIf="!isLoading && activeView !== 'register'">
+    <div *ngIf="filteredUsers.length === 0" class="text-center p-5">
+      <i class="fa fa-users fs-1 text-muted"></i>
       <h3>No Users Found</h3>
       <p>{{ searchTerm ? 'No users match your search criteria.' : 'No users available for the selected role.' }}</p>
     </div>
 
-    <table *ngIf="filteredUsers.length > 0" class="users-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Role</th>
-          <th>Created</th>
-          <th>Status</th>
-          <th *ngIf="canShowEditButton() || canShowDeleteButton() || canShowToggleButton()">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of filteredUsers; trackBy: trackByUserId" class="user-row">
-          <td class="user-id">#{{ getUserId(user) }}</td>
-          <td class="user-name">
-            <div class="name-cell">
-              <div class="user-avatar">
-                <i class="fa fa-user"></i>
+    <div *ngIf="filteredUsers.length > 0" class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Created</th>
+            <th>Status</th>
+            <th *ngIf="canShowEditButton() || canShowDeleteButton() || canShowToggleButton()">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers; trackBy: trackByUserId">
+            <td><small class="text-primary">#{{ getUserId(user) }}</small></td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                     style="width: 32px; height: 32px;">
+                  <i class="fa fa-user text-white small"></i>
+                </div>
+                {{ user.name }}
               </div>
-              <span>{{ user.name }}</span>
-            </div>
-          </td>
-          <td class="user-email">{{ user.email }}</td>
-          <td class="user-phone">{{ user.phoneNumber }}</td>
-          <td class="user-role">
-            <span class="role-badge" [class]="getRoleColor(user.role)">
-              {{ getRoleDisplayName(user.role) }}
-            </span>
-          </td>
-          <td class="user-created">{{ formatDate(user.createdAt) }}</td>
-          <td class="user-status">
-            <span class="status-badge" [class]="user.isActive !== false ? 'status-active' : 'status-inactive'">
-              {{ user.isActive !== false ? 'Active' : 'Inactive' }}
-            </span>
-          </td>
-          <td class="user-actions" *ngIf="canShowEditButton() || canShowDeleteButton() || canShowToggleButton()">
-            <button 
-              *ngIf="canShowEditButton()" 
-              class="btn btn-small btn-info" 
-              (click)="openEditModal(user)" 
-              title="Edit User">
-              <i class="fa fa-edit"></i>
-            </button>
-            <button 
-              *ngIf="canShowDeleteButton()" 
-              class="btn btn-small btn-danger" 
-              (click)="openDeleteModal(user)" 
-              title="Delete User">
-              <i class="fa fa-trash"></i>
-            </button>
-            <button 
-              *ngIf="canShowToggleButton()" 
-              class="btn btn-small" 
-              [class.btn-success]="user.isActive === false" 
-              [class.btn-warning]="user.isActive !== false"
-              (click)="openToggleModal(user)" 
-              [title]="user.isActive !== false ? 'Deactivate User' : 'Activate User'">
-              <i class="fa" [class.fa-toggle-on]="user.isActive !== false" [class.fa-toggle-off]="user.isActive === false"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td><small class="text-primary">{{ user.email }}</small></td>
+            <td><small class="text-muted">{{ user.phoneNumber }}</small></td>
+            <td>
+              <span class="badge" [class]="getRoleColor(user.role)">{{ getRoleDisplayName(user.role) }}</span>
+            </td>
+            <td><small class="text-muted">{{ formatDate(user.createdAt) }}</small></td>
+            <td>
+              <span class="badge" [class.bg-success]="user.isActive !== false" [class.bg-secondary]="user.isActive === false">
+                {{ user.isActive !== false ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td *ngIf="canShowEditButton() || canShowDeleteButton() || canShowToggleButton()">
+              <div class="btn-group">
+                <button *ngIf="canShowEditButton()" class="btn btn-sm btn-outline-primary" 
+                        (click)="openEditModal(user)" title="Edit User">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button *ngIf="canShowDeleteButton()" class="btn btn-sm btn-outline-danger" 
+                        (click)="openDeleteModal(user)" title="Delete User">
+                  <i class="fa fa-trash"></i>
+                </button>
+                <button *ngIf="canShowToggleButton()" class="btn btn-sm"
+                        [class.btn-outline-success]="user.isActive === false" 
+                        [class.btn-outline-warning]="user.isActive !== false"
+                        (click)="openToggleModal(user)" 
+                        [title]="user.isActive !== false ? 'Deactivate User' : 'Activate User'">
+                  <i class="fa" [class.fa-toggle-on]="user.isActive !== false" [class.fa-toggle-off]="user.isActive === false"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Register User View -->
-  <div *ngIf="activeView === 'register' && !isLoading" class="register-view">
-    <div class="register-instructions">
-      <h3><i class="fa fa-user-plus"></i> Register New User</h3>
-      <p>Fill in the form below to create a new user account. All fields marked with * are required.</p>
+  <div *ngIf="activeView === 'register' && !isLoading" class="card">
+    <div class="card-header">
+      <h5><i class="fa fa-user-plus"></i> Register New User</h5>
+      <p class="mb-0">Fill in the form below to create a new user account. All fields marked with * are required.</p>
     </div>
-    
-    <form (ngSubmit)="createUser()" class="register-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="registerName">Full Name *</label>
-          <input 
-            id="registerName"
-            type="text" 
-            [(ngModel)]="createForm.name" 
-            name="name"
-            class="form-control"
-            placeholder="Enter full name"
-            required
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="registerEmail">Email Address *</label>
-          <input 
-            id="registerEmail"
-            type="email" 
-            [(ngModel)]="createForm.email" 
-            name="email"
-            class="form-control"
-            placeholder="Enter email address"
-            required
-          >
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="registerPhone">Phone Number *</label>
-          <input 
-            id="registerPhone"
-            type="tel" 
-            [(ngModel)]="createForm.phoneNumber" 
-            name="phoneNumber"
-            class="form-control"
-            placeholder="Enter phone number"
-            required
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="registerRole">Role *</label>
-          <select 
-            id="registerRole"
-            [(ngModel)]="createForm.role" 
-            name="role"
-            class="form-control"
-            required
-          >
-            <option *ngFor="let role of availableRoles" [value]="role">
-              {{ getRoleDisplayName(role) }}
-            </option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="registerPassword">Password *</label>
-        <div class="password-input-group">
-          <input 
-            id="registerPassword"
-            type="text" 
-            [(ngModel)]="createForm.password" 
-            name="password"
-            class="form-control"
-            placeholder="Enter password"
-            required
-          >
-          <button type="button" class="btn btn-secondary btn-small" (click)="generatePassword()">
-            <i class="fa fa-refresh"></i> Generate
-          </button>
-        </div>
-        <small class="form-help">Password will be sent to the user's email address</small>
-      </div>
-      
-      <div class="register-actions">
-        <button type="submit" class="btn btn-success btn-large" [disabled]="isLoading">
-          <i class="fa fa-save"></i>
-          {{ isLoading ? 'Creating...' : 'Create User' }}
-        </button>
-        <button type="button" class="btn btn-secondary btn-large" (click)="activeView = 'view-all'; loadUsers()">
-          <i class="fa fa-list"></i>
-          View All Users
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Create User Modal -->
-<div class="modal-overlay" [class.active]="showCreateModal" (click)="closeCreateModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa fa-user-plus"></i> Create New User</h3>
-      <button class="close-btn" (click)="closeCreateModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="createUser()" class="create-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="createName">Full Name *</label>
-            <input 
-              id="createName"
-              type="text" 
-              [(ngModel)]="createForm.name" 
-              name="name"
-              class="form-control"
-              placeholder="Enter full name"
-              required
-            >
+    <div class="card-body">
+      <form (ngSubmit)="createUser()">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="registerName" class="form-label">Full Name *</label>
+            <input id="registerName" type="text" [(ngModel)]="createForm.name" name="name"
+                   class="form-control" placeholder="Enter full name" required>
           </div>
-          
-          <div class="form-group">
-            <label for="createEmail">Email Address *</label>
-            <input 
-              id="createEmail"
-              type="email" 
-              [(ngModel)]="createForm.email" 
-              name="email"
-              class="form-control"
-              placeholder="Enter email address"
-              required
-            >
+          <div class="col-md-6">
+            <label for="registerEmail" class="form-label">Email Address *</label>
+            <input id="registerEmail" type="email" [(ngModel)]="createForm.email" name="email"
+                   class="form-control" placeholder="Enter email address" required>
           </div>
         </div>
         
-        <div class="form-row">
-          <div class="form-group">
-            <label for="createPhone">Phone Number *</label>
-            <input 
-              id="createPhone"
-              type="tel" 
-              [(ngModel)]="createForm.phoneNumber" 
-              name="phoneNumber"
-              class="form-control"
-              placeholder="Enter phone number"
-              required
-            >
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="registerPhone" class="form-label">Phone Number *</label>
+            <input id="registerPhone" type="tel" [(ngModel)]="createForm.phoneNumber" name="phoneNumber"
+                   class="form-control" placeholder="Enter phone number" required>
           </div>
-          
-          <div class="form-group">
-            <label for="createRole">Role *</label>
-            <select 
-              id="createRole"
-              [(ngModel)]="createForm.role" 
-              name="role"
-              class="form-control"
-              required
-            >
-              <option *ngFor="let role of availableRoles" [value]="role">
-                {{ getRoleDisplayName(role) }}
-              </option>
+          <div class="col-md-6">
+            <label for="registerRole" class="form-label">Role *</label>
+            <select id="registerRole" [(ngModel)]="createForm.role" name="role" class="form-select" required>
+              <option *ngFor="let role of availableRoles" [value]="role">{{ getRoleDisplayName(role) }}</option>
             </select>
           </div>
         </div>
         
-        <div class="form-group">
-          <label for="createPassword">Password *</label>
-          <div class="password-input-group">
-            <input 
-              id="createPassword"
-              type="text" 
-              [(ngModel)]="createForm.password" 
-              name="password"
-              class="form-control"
-              placeholder="Enter password"
-              required
-            >
-            <button type="button" class="btn btn-secondary btn-small" (click)="generatePassword()">
+        <div class="mb-3">
+          <label for="registerPassword" class="form-label">Password *</label>
+          <div class="input-group">
+            <input id="registerPassword" type="text" [(ngModel)]="createForm.password" name="password"
+                   class="form-control" placeholder="Enter password" required>
+            <button type="button" class="btn btn-outline-secondary" (click)="generatePassword()">
               <i class="fa fa-refresh"></i> Generate
             </button>
           </div>
-          <small class="form-help">Password will be sent to the user's email address</small>
+          <div class="form-text">Password will be sent to the user's email address</div>
         </div>
         
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-success" [disabled]="isLoading">
-            <i class="fa fa-save"></i>
+        <div class="text-center">
+          <button type="submit" class="btn btn-success me-2" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!isLoading" class="fa fa-save me-2"></i>
             {{ isLoading ? 'Creating...' : 'Create User' }}
           </button>
-          <button type="button" class="btn btn-secondary" (click)="closeCreateModal()" [disabled]="isLoading">
-            <i class="fa fa-times"></i>
-            Cancel
+          <button type="button" class="btn btn-secondary" (click)="activeView = 'view-all'; loadUsers()">
+            <i class="fa fa-list me-2"></i>View All Users
           </button>
         </div>
       </form>
@@ -340,161 +172,176 @@
   </div>
 </div>
 
-<!-- Edit User Modal -->
-<div class="modal-overlay" [class.active]="showEditModal" (click)="closeEditModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa fa-edit"></i> Edit User</h3>
-      <button class="close-btn" (click)="closeEditModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="updateUser()" class="edit-form">
-        <div class="form-group">
-          <label for="editEmail">Email Address</label>
-          <input 
-            id="editEmail"
-            type="email" 
-            [value]="editForm.email" 
-            class="form-control readonly"
-            readonly
-            title="Email cannot be changed"
-          >
-          <small class="form-help">Email address cannot be modified</small>
-        </div>
-        
-        <div class="form-group">
-          <label for="editName">Full Name *</label>
-          <input 
-            id="editName"
-            type="text" 
-            [(ngModel)]="editForm.name" 
-            name="name"
-            class="form-control"
-            placeholder="Enter full name"
-            required
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="editPhone">Phone Number *</label>
-          <input 
-            id="editPhone"
-            type="tel" 
-            [(ngModel)]="editForm.phonenumber" 
-            name="phonenumber"
-            class="form-control"
-            placeholder="Enter phone number"
-            required
-          >
-        </div>
-        
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-success" [disabled]="isLoading">
-            <i class="fa fa-save"></i>
-            {{ isLoading ? 'Updating...' : 'Update User' }}
-          </button>
-          <button type="button" class="btn btn-secondary" (click)="closeEditModal()" [disabled]="isLoading">
-            <i class="fa fa-times"></i>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Delete User Modal -->
-<div class="modal-overlay" [class.active]="showDeleteModal" (click)="closeDeleteModal()">
-  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3><i class="fa fa-trash"></i> Delete User</h3>
-      <button class="close-btn" (click)="closeDeleteModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <div class="delete-confirmation">
-        <div class="warning-icon">
-          <i class="fa fa-exclamation-triangle"></i>
-        </div>
-        <h4>Are you sure?</h4>
-        <p>You are about to delete the user:</p>
-        <div class="user-info" *ngIf="selectedUser">
-          <strong>{{ selectedUser.name }}</strong><br>
-          <span>{{ selectedUser.email }}</span><br>
-          <span class="role-badge" [class]="getRoleColor(selectedUser.role)">
-            {{ getRoleDisplayName(selectedUser.role) }}
-          </span>
-        </div>
-        <p class="warning-text">This action cannot be undone.</p>
+<!-- Bootstrap Modals -->
+<div class="modal" [style.display]="showCreateModal ? 'block' : 'none'" *ngIf="showCreateModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa fa-user-plus"></i> Create New User</h5>
+        <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
       </div>
-      
-      <div class="modal-actions">
-        <button class="btn btn-danger" (click)="deleteUser()" [disabled]="isLoading">
-          <i class="fa fa-trash"></i>
-          {{ isLoading ? 'Deleting...' : 'Delete User' }}
-        </button>
-        <button class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="isLoading">
-          <i class="fa fa-times"></i>
-          Cancel
-        </button>
+      <div class="modal-body">
+        <form (ngSubmit)="createUser()">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="createName" class="form-label">Full Name *</label>
+              <input id="createName" type="text" [(ngModel)]="createForm.name" name="name"
+                     class="form-control" placeholder="Enter full name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="createEmail" class="form-label">Email Address *</label>
+              <input id="createEmail" type="email" [(ngModel)]="createForm.email" name="email"
+                     class="form-control" placeholder="Enter email address" required>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="createPhone" class="form-label">Phone Number *</label>
+              <input id="createPhone" type="tel" [(ngModel)]="createForm.phoneNumber" name="phoneNumber"
+                     class="form-control" placeholder="Enter phone number" required>
+            </div>
+            <div class="col-md-6">
+              <label for="createRole" class="form-label">Role *</label>
+              <select id="createRole" [(ngModel)]="createForm.role" name="role" class="form-select" required>
+                <option *ngFor="let role of availableRoles" [value]="role">{{ getRoleDisplayName(role) }}</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="createPassword" class="form-label">Password *</label>
+            <div class="input-group">
+              <input id="createPassword" type="text" [(ngModel)]="createForm.password" name="password"
+                     class="form-control" placeholder="Enter password" required>
+              <button type="button" class="btn btn-outline-secondary" (click)="generatePassword()">
+                <i class="fa fa-refresh"></i> Generate
+              </button>
+            </div>
+            <div class="form-text">Password will be sent to the user's email address</div>
+          </div>
+          
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeCreateModal()" [disabled]="isLoading">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Creating...' : 'Create User' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showEditModal ? 'block' : 'none'" *ngIf="showEditModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa fa-edit"></i> Edit User</h5>
+        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateUser()">
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">Email Address</label>
+            <input id="editEmail" type="email" [value]="editForm.email" class="form-control" 
+                   readonly title="Email cannot be changed">
+            <div class="form-text">Email address cannot be modified</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="editName" class="form-label">Full Name *</label>
+            <input id="editName" type="text" [(ngModel)]="editForm.name" name="name"
+                   class="form-control" placeholder="Enter full name" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="editPhone" class="form-label">Phone Number *</label>
+            <input id="editPhone" type="tel" [(ngModel)]="editForm.phonenumber" name="phonenumber"
+                   class="form-control" placeholder="Enter phone number" required>
+          </div>
+          
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="closeEditModal()" [disabled]="isLoading">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Updating...' : 'Update User' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" [style.display]="showDeleteModal ? 'block' : 'none'" *ngIf="showDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5><i class="fa fa-trash"></i> Delete User</h5>
+        <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <i class="fa fa-exclamation-triangle text-warning fs-1 mb-3"></i>
+          <h6>Are you sure?</h6>
+          <p>You are about to delete the user:</p>
+          <div class="alert alert-warning" *ngIf="selectedUser">
+            <strong>{{ selectedUser.name }}</strong><br>
+            {{ selectedUser.email }}<br>
+            <span class="badge" [class]="getRoleColor(selectedUser.role)">{{ getRoleDisplayName(selectedUser.role) }}</span>
+          </div>
+          <p class="text-muted">This action cannot be undone.</p>
+        </div>
+        
+        <div class="text-end">
+          <button type="button" class="btn btn-secondary me-2" (click)="closeDeleteModal()" [disabled]="isLoading">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="deleteUser()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'Deleting...' : 'Delete User' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div> 
 
-<!-- Toggle User Status Modal -->
-<div class="modal-overlay" [class.active]="showToggleModal" (click)="closeToggleModal()">
-  <div class="modal-content toggle-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>
-        <i class="fa" [class.fa-toggle-on]="toggleAction === 'activate'" [class.fa-toggle-off]="toggleAction === 'deactivate'"></i>
-        {{ toggleAction === 'activate' ? 'Activate' : 'Deactivate' }} User
-      </h3>
-      <button class="close-btn" (click)="closeToggleModal()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <div class="toggle-confirmation">
-        <div class="toggle-icon">
-          <i class="fa fa-user" [class.text-success]="toggleAction === 'activate'" [class.text-warning]="toggleAction === 'deactivate'"></i>
-        </div>
-        <h4>{{ toggleAction === 'activate' ? 'Activate' : 'Deactivate' }} User Account?</h4>
-        <p *ngIf="toggleAction === 'activate'">This will allow the user to access the system again.</p>
-        <p *ngIf="toggleAction === 'deactivate'">This will prevent the user from accessing the system.</p>
-        
-        <div class="user-info" *ngIf="selectedUser">
-          <strong>{{ selectedUser.name }}</strong><br>
-          <span>{{ selectedUser.email }}</span><br>
-          <span class="role-badge" [class]="getRoleColor(selectedUser.role)">
-            {{ getRoleDisplayName(selectedUser.role) }}
-          </span><br>
-          <span class="status-badge" [class]="selectedUser.isActive !== false ? 'status-active' : 'status-inactive'">
-            Current Status: {{ selectedUser.isActive !== false ? 'Active' : 'Inactive' }}
-          </span>
-        </div>
-      </div>
-      
-      <div class="modal-actions">
-        <button 
-          class="btn" 
-          [class.btn-success]="toggleAction === 'activate'" 
-          [class.btn-warning]="toggleAction === 'deactivate'"
-          (click)="toggleUserStatus()" 
-          [disabled]="isLoading">
+<div class="modal" [style.display]="showToggleModal ? 'block' : 'none'" *ngIf="showToggleModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>
           <i class="fa" [class.fa-toggle-on]="toggleAction === 'activate'" [class.fa-toggle-off]="toggleAction === 'deactivate'"></i>
-          {{ isLoading ? (toggleAction === 'activate' ? 'Activating...' : 'Deactivating...') : (toggleAction === 'activate' ? 'Activate User' : 'Deactivate User') }}
-        </button>
-        <button class="btn btn-secondary" (click)="closeToggleModal()" [disabled]="isLoading">
-          <i class="fa fa-times"></i>
-          Cancel
-        </button>
+          {{ toggleAction === 'activate' ? 'Activate' : 'Deactivate' }} User
+        </h5>
+        <button type="button" class="btn-close" (click)="closeToggleModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <i class="fa fa-user fs-1 mb-3" [class.text-success]="toggleAction === 'activate'" [class.text-warning]="toggleAction === 'deactivate'"></i>
+          <h6>{{ toggleAction === 'activate' ? 'Activate' : 'Deactivate' }} User Account?</h6>
+          <p *ngIf="toggleAction === 'activate'">This will allow the user to access the system again.</p>
+          <p *ngIf="toggleAction === 'deactivate'">This will prevent the user from accessing the system.</p>
+          
+          <div class="alert alert-info" *ngIf="selectedUser">
+            <strong>{{ selectedUser.name }}</strong><br>
+            {{ selectedUser.email }}<br>
+            <span class="badge" [class]="getRoleColor(selectedUser.role)">{{ getRoleDisplayName(selectedUser.role) }}</span><br>
+            <span class="badge mt-2" [class.bg-success]="selectedUser.isActive !== false" [class.bg-secondary]="selectedUser.isActive === false">
+              Current Status: {{ selectedUser.isActive !== false ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="text-end">
+          <button type="button" class="btn btn-secondary me-2" (click)="closeToggleModal()" [disabled]="isLoading">Cancel</button>
+          <button type="button" class="btn" [class.btn-success]="toggleAction === 'activate'" [class.btn-warning]="toggleAction === 'deactivate'"
+                  (click)="toggleUserStatus()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? (toggleAction === 'activate' ? 'Activating...' : 'Deactivating...') : (toggleAction === 'activate' ? 'Activate User' : 'Deactivate User') }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

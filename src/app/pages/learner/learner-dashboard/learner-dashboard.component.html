@@ -1,178 +1,102 @@
-<div class="dashboard-layout" [class.sidebar-collapsed]="isCollapsed">
-  <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
-  <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
-  
-  <div class="dashboard-content">
-    <!-- Profile Section -->
-    <div *ngIf="showProfile" class="profile-section">
-      <app-profile></app-profile>
-    </div>
-    
-    <!-- Course Section -->
-    <div *ngIf="showCourse" class="course-section">
-      <app-learner-course></app-learner-course>
-    </div>
-    
-    <!-- Progress Section -->
-    <div *ngIf="showProgress" class="progress-section">
-      <app-learner-progress></app-learner-progress>
-    </div>
-    
-    <!-- Reports Section -->
-    <div *ngIf="showReports" class="reports-section">
-      <app-learner-reports></app-learner-reports>
-    </div>
-    
-    <!-- Main dashboard content (Home section) -->
-    <div *ngIf="!showProfile && !showCourse && !showProgress && !showReports" class="main-content">
-      <div class="learner-dashboard">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-          <div class="header-content">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-auto"><app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar></div>
+    <div class="col">
+      <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
+      
+      <main class="p-4">
+        <div *ngIf="showProfile"><app-profile></app-profile></div>
+        <div *ngIf="showCourse"><app-learner-course></app-learner-course></div>
+        <div *ngIf="showProgress"><app-learner-progress></app-learner-progress></div>
+        <div *ngIf="showReports"><app-learner-reports></app-learner-reports></div>
+        
+        <div *ngIf="!showProfile && !showCourse && !showProgress && !showReports">
+          <div class="text-center mb-4">
             <h1><i class="fas fa-graduation-cap"></i> My Learning Dashboard</h1>
-            <p>Track your progress and continue your learning journey</p>
-          </div>
-        </div>
-
-        <!-- Dashboard Statistics -->
-        <div class="dashboard-stats">
-          <div class="stat-card">
-            <div class="stat-icon total">
-              <i class="fas fa-book"></i>
-            </div>
-            <div class="stat-content">
-              <h3>{{ totalCourses }}</h3>
-              <p>Total Courses</p>
-            </div>
+            <p class="text-muted">Track your progress and continue your learning journey</p>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon completed">
-              <i class="fas fa-check-circle"></i>
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card text-center">
+                <div class="card-body">
+                  <i class="fas fa-book fs-1 text-primary"></i>
+                  <h3>{{ totalCourses }}</h3>
+                  <p>Total Courses</p>
+                </div>
+              </div>
             </div>
-            <div class="stat-content">
-              <h3>{{ completedCourses }}</h3>
-              <p>Completed</p>
+            <div class="col-md-4">
+              <div class="card text-center">
+                <div class="card-body">
+                  <i class="fas fa-check-circle fs-1 text-success"></i>
+                  <h3>{{ completedCourses }}</h3>
+                  <p>Completed</p>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon progress">
-              <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-content">
-              <h3>{{ inProgressCourses }}</h3>
-              <p>In Progress</p>
+            <div class="col-md-4">
+              <div class="card text-center">
+                <div class="card-body">
+                  <i class="fas fa-clock fs-1 text-warning"></i>
+                  <h3>{{ inProgressCourses }}</h3>
+                  <p>In Progress</p>
+                </div>
+              </div>
             </div>
           </div>
 
-
-        </div>
-
-        <!-- Loading State -->
-        <div *ngIf="loading" class="loading-container">
-          <div class="spinner"></div>
-          <p>Loading your courses...</p>
-        </div>
-
-                  <!-- Error State -->
-          <div *ngIf="error && !loading" class="error-container">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>{{ error }}</p>
-            <button *ngIf="!error.includes('Access denied') && !error.includes('log in')" 
-                    class="retry-btn" 
-                    (click)="retryLoadCourses()">
-              <i class="fas fa-retry"></i>
-              Try Again
-            </button>
+          <div *ngIf="loading" class="text-center">
+            <div class="spinner-border"></div>
+            <p>Loading your courses...</p>
           </div>
 
-        <!-- Enrolled Courses -->
-        <div *ngIf="!loading && !error" class="courses-section">
-          <div class="section-header">
-            <h2><i class="fas fa-books"></i> My Enrolled Courses</h2>
-            <span class="course-count">{{ enrolledCourses.length }} course(s)</span>
+          <div *ngIf="error && !loading" class="alert alert-danger">
+            {{ error }}
+            <button *ngIf="!error.includes('Access denied')" class="btn btn-sm btn-outline-danger ms-2" (click)="retryLoadCourses()">Try Again</button>
           </div>
 
-                      <!-- No Courses Message -->
-            <div *ngIf="enrolledCourses.length === 0 && !loading && !error" class="no-courses">
-              <i class="fas fa-book-open"></i>
+          <div *ngIf="!loading && !error">
+            <h2>My Enrolled Courses <span class="badge bg-primary">{{ enrolledCourses.length }}</span></h2>
+
+            <div *ngIf="enrolledCourses.length === 0" class="text-center p-5">
+              <i class="fas fa-book-open fs-1 text-muted"></i>
               <h3>No Courses Assigned</h3>
-              <p>You don't have any courses assigned yet. Please contact your administrator to get enrolled in courses.</p>
-              <div class="contact-info">
-                <p><i class="fas fa-info-circle"></i> Need help? Contact your course administrator or instructor.</p>
-              </div>
+              <p>Contact your administrator to get enrolled in courses.</p>
             </div>
 
-          <!-- Course Cards - Optimized Compact Layout -->
-          <div *ngIf="enrolledCourses.length > 0" class="courses-grid">
-            <div 
-              class="course-card" 
-              *ngFor="let course of enrolledCourses"
-              (click)="openCourse(course.courseId)">
-              
-              <!-- Course Header - Compact -->
-              <div class="course-header">
-                <div class="course-title">
-                  <h3>{{ course.title }}</h3>
-                  <span class="status-badge" [ngClass]="getStatusBadgeClass(course.status || 'Not Started')">
-                    {{ course.status || 'Not Started' }}
-                  </span>
-                </div>
-                <div class="course-instructor">
-                  <i class="fas fa-user-tie"></i>
-                  {{ course.instructorName }}
-                </div>
-              </div>
-
-              <!-- Course Description - Compact -->
-              <div class="course-description">
-                <p>{{ course.description || 'No description available.' }}</p>
-              </div>
-
-              <!-- Progress Section - Ultra Compact -->
-              <div class="progress-section-inline">
-                <span class="progress-label">Progress: {{ course.progressPercentage || 0 }}%</span>
-                <div class="progress-bar-inline">
-                  <div 
-                    class="progress-fill" 
-                    [ngClass]="getProgressBarClass(course.progressPercentage || 0)"
-                    [style.width]="getProgressWidth(course.progressPercentage || 0)">
+            <div class="row" *ngIf="enrolledCourses.length > 0">
+              <div class="col-lg-4 col-md-6 mb-3" *ngFor="let course of enrolledCourses">
+                <div class="card h-100" (click)="openCourse(course.courseId)">
+                  <div class="card-header">
+                    <h5 class="mb-0">{{ course.title }}</h5>
+                    <small>{{ course.instructorName }}</small>
+                    <span class="badge float-end" [ngClass]="getStatusBadgeClass(course.status || 'Not Started')">{{ course.status || 'Not Started' }}</span>
+                  </div>
+                  <div class="card-body">
+                    <p class="small">{{ course.description || 'No description available.' }}</p>
+                    <div class="mb-2">
+                      <small>Progress: {{ course.progressPercentage || 0 }}%</small>
+                      <div class="progress">
+                        <div class="progress-bar" [style.width]="getProgressWidth(course.progressPercentage || 0)"></div>
+                      </div>
+                    </div>
+                    <div class="row text-center">
+                      <div class="col-4"><small>{{ course.totalQuizzes || 0 }} Total</small></div>
+                      <div class="col-4"><small>{{ course.completedQuizzes || 0 }} Done</small></div>
+                      <div class="col-4"><small>{{ course.passedQuizzes || 0 }} Passed</small></div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <small class="text-muted">{{ formatDate(course.enrolledAt) }}</small>
+                    <button class="btn btn-primary btn-sm float-end">{{ course.status === 'Not Started' ? 'Start' : 'Continue' }}</button>
                   </div>
                 </div>
               </div>
-
-              <!-- Quiz Statistics - Horizontal Compact -->
-              <div class="quiz-stats">
-                <div class="quiz-stat-item">
-                  <i class="fas fa-question-circle"></i>
-                  <span>{{ course.totalQuizzes || 0 }}</span>
-                </div>
-                <div class="quiz-stat-item">
-                  <i class="fas fa-check"></i>
-                  <span>{{ course.completedQuizzes || 0 }}</span>
-                </div>
-                <div class="quiz-stat-item">
-                  <i class="fas fa-trophy"></i>
-                  <span>{{ course.passedQuizzes || 0 }}</span>
-                </div>
-              </div>
-
-              <!-- Course Footer - Compact -->
-              <div class="course-footer">
-                <div class="enrolled-date">
-                  <i class="fas fa-calendar"></i>
-                  {{ formatDate(course.enrolledAt) }}
-                </div>
-                <button class="continue-btn">
-                  <i class="fas fa-play"></i>
-                  {{ course.status === 'Not Started' ? 'Start' : 'Continue' }}
-                </button>
-              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   </div>
 </div>

@@ -1,322 +1,163 @@
-<!-- Course Header -->
-<div class="course-header" *ngIf="selectedCourse">
-  <div class="course-title">
+<div class="container-fluid" *ngIf="selectedCourse">
+  <div class="mb-3">
     <h1>{{ selectedCourse.title }}</h1>
-    <p class="course-description">{{ selectedCourse.description }}</p>
+    <p class="text-muted">{{ selectedCourse.description }}</p>
   </div>
-</div>
 
-<!-- Course Statistics -->
-<div class="course-stats" *ngIf="selectedCourse">
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-number">{{ selectedCourse.materials?.length || 0 }}</div>
-      <div class="stat-label">Materials</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number">{{ courseQuizzes?.length || 0 }}</div>
-      <div class="stat-label">Quizzes</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number">{{ completedQuizzes }}</div>
-      <div class="stat-label">Completed</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number">{{ passedQuizzes }}</div>
-      <div class="stat-label">Passed</div>
-    </div>
+  <div class="row mb-4">
+    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h4>{{ selectedCourse.materials?.length || 0 }}</h4><small>Materials</small></div></div></div>
+    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h4>{{ courseQuizzes?.length || 0 }}</h4><small>Quizzes</small></div></div></div>
+    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h4>{{ completedQuizzes }}</h4><small>Completed</small></div></div></div>
+    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h4>{{ passedQuizzes }}</h4><small>Passed</small></div></div></div>
   </div>
-</div>
 
-<!-- Course Content -->
-<div class="course-content" *ngIf="selectedCourse">
-  
-  <!-- Course Details -->
-  <div class="course-details" *ngIf="fullCourseDetails">
-    <div class="detail-card" *ngIf="fullCourseDetails?.syllabus">
-      <h3>Syllabus</h3>
-      <p>{{ fullCourseDetails?.syllabus }}</p>
+  <div class="row mb-4" *ngIf="fullCourseDetails">
+    <div class="col-md-6" *ngIf="fullCourseDetails?.syllabus">
+      <div class="card"><div class="card-body"><h5>Syllabus</h5><p>{{ fullCourseDetails?.syllabus }}</p></div></div>
     </div>
-    <div class="detail-card" *ngIf="fullCourseDetails?.prerequisites">
-      <h3>Prerequisites</h3>
-      <p>{{ fullCourseDetails?.prerequisites }}</p>
+    <div class="col-md-6" *ngIf="fullCourseDetails?.prerequisites">
+      <div class="card"><div class="card-body"><h5>Prerequisites</h5><p>{{ fullCourseDetails?.prerequisites }}</p></div></div>
     </div>
   </div>
 
-  <!-- Course Materials -->
-  <div class="course-section" *ngIf="selectedCourse.materials && selectedCourse.materials.length > 0">
-    <h2>Course Materials</h2>
-    <div class="materials-grid">
-      <div class="material-item" *ngFor="let material of selectedCourse.materials; trackBy: trackByMaterialId">
-        <div class="material-icon">
-          <i [class]="getMaterialIcon(material?.type || material?.filePath || '')"></i>
-        </div>
-        <div class="material-info">
-          <h4>{{ material.title }}</h4>
-          <p>{{ getMaterialType(material?.type || material?.filePath || '') }}</p>
-        </div>
-        <div class="material-actions">
-          <button class="view-btn" (click)="viewMaterial(material)">
-            <i class="fas fa-eye"></i> View
-          </button>
-          <button class="download-btn" (click)="downloadMaterial(material)">
-            <i class="fas fa-download"></i> Download
-          </button>
+  <div class="mb-4" *ngIf="selectedCourse.materials && selectedCourse.materials.length > 0">
+    <h4>Course Materials</h4>
+    <div class="row">
+      <div class="col-lg-4 col-md-6 mb-2" *ngFor="let material of selectedCourse.materials; trackBy: trackByMaterialId">
+        <div class="card">
+          <div class="card-body text-center">
+            <i [class]="getMaterialIcon(material?.type || material?.filePath || '')" class="fs-2"></i>
+            <h6>{{ material.title }}</h6>
+            <small>{{ getMaterialType(material?.type || material?.filePath || '') }}</small>
+            <div class="mt-2">
+              <button class="btn btn-sm btn-primary me-1" (click)="viewMaterial(material)">View</button>
+              <button class="btn btn-sm btn-secondary" (click)="downloadMaterial(material)">Download</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Course Quizzes -->
-  <div class="course-quizzes">
-    <h2>Quizzes</h2>
-    
-    <!-- Loading State -->
-    <div class="loading-state" *ngIf="quizLoading">
-      <i class="fas fa-spinner fa-spin"></i>
+  <div>
+    <h4>Quizzes</h4>
+    <div *ngIf="quizLoading" class="text-center p-3">
+      <div class="spinner-border"></div>
       <p>Loading quizzes...</p>
     </div>
 
-    <!-- Error State -->
-    <div class="error-state" *ngIf="quizError && !quizLoading">
-      <i class="fas fa-exclamation-triangle"></i>
-      <p>{{ quizError }}</p>
-      <button class="retry-btn" (click)="loadCourseQuizzes(selectedCourse.courseId)">
-        <i class="fas fa-redo"></i> Retry
-      </button>
+    <div *ngIf="quizError && !quizLoading" class="alert alert-danger">
+      {{ quizError }}
+      <button class="btn btn-sm btn-outline-danger ms-2" (click)="loadCourseQuizzes(selectedCourse.courseId)">Retry</button>
     </div>
 
-    <!-- No Quizzes -->
-    <div class="no-quizzes" *ngIf="!quizLoading && !quizError && courseQuizzes.length === 0">
-      <i class="fas fa-clipboard-list"></i>
-      <p>No quizzes available for this course.</p>
+    <div *ngIf="!quizLoading && !quizError && courseQuizzes.length === 0" class="text-center p-3">
+      <i class="fas fa-clipboard-list fs-1 text-muted"></i>
+      <h5>No Quizzes Available</h5>
     </div>
 
-    <!-- Quiz List -->
-    <div class="quiz-list" *ngIf="!quizLoading && !quizError && courseQuizzes.length > 0">
-      <div class="quiz-item" 
-           *ngFor="let quiz of courseQuizzes; trackBy: trackByQuizId"
-           [class.attempted]="quiz.IsAttempted">
-        
-        <div class="quiz-icon">
-          <i class="fas fa-clipboard-question"></i>
-        </div>
-
-        <div class="quiz-details">
-          <h3>{{ quiz.title }}</h3>
-          <div class="quiz-meta">
-            <span class="marks">
-              <i class="fas fa-star"></i>
-              {{ quiz.totalMarks }} marks
-            </span>
-            <span class="questions">
-              <i class="fas fa-list"></i>
-              {{ quiz.QuestionCount || quiz.questions?.length || 0 }} questions
-            </span>
-            <span class="date">
-              <i class="fas fa-calendar"></i>
-              {{ quiz.createdAt | date:'short' }}
-            </span>
+    <div class="row" *ngIf="!quizLoading && !quizError && courseQuizzes.length > 0">
+      <div class="col-lg-6 mb-3" *ngFor="let quiz of courseQuizzes; trackBy: trackByQuizId">
+        <div class="card" [class.border-success]="quiz.IsAttempted">
+          <div class="card-body">
+            <h6>{{ quiz.title }}</h6>
+            <small class="text-muted d-block">{{ quiz.totalMarks }} marks • {{ quiz.QuestionCount || quiz.questions?.length || 0 }} questions</small>
+            <small class="text-muted d-block">{{ quiz.createdAt | date:'short' }}</small>
+            <div class="mt-2">
+              <ng-container *ngIf="isLearner()">
+                <button class="btn btn-sm" [class.btn-primary]="!quiz.IsAttempted" [class.btn-success]="quiz.IsAttempted" 
+                        (click)="attemptQuiz(quiz)" [disabled]="quiz.IsAttempted">
+                  {{ quiz.IsAttempted ? 'Passed ✅' : 'Take Quiz' }}
+                </button>
+                <button *ngIf="quiz.IsAttempted" class="btn btn-sm btn-outline-info ms-1" (click)="viewQuizResult(quiz)">Results</button>
+              </ng-container>
+              <ng-container *ngIf="isInstructor()">
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="editQuiz(quiz)">Edit</button>
+                <button class="btn btn-sm btn-outline-info" (click)="viewQuizResult(quiz)">Student Results</button>
+              </ng-container>
+              <ng-container *ngIf="canManageCourses()">
+                <button class="btn btn-sm btn-outline-secondary" (click)="viewQuizDetails(quiz)">View Details</button>
+              </ng-container>
+            </div>
           </div>
-        </div>
-
-        <div class="quiz-status" *ngIf="quiz.IsAttempted">
-          <span class="status-badge attempted">
-            <i class="fas fa-check-circle"></i>
-            Passed
-          </span>
-        </div>
-
-        <div class="quiz-actions">
-          <!-- Learner Actions -->
-          <ng-container *ngIf="isLearner()">
-            <button class="attempt-btn" 
-                    (click)="attemptQuiz(quiz)"
-                    [disabled]="quiz.IsAttempted">
-              <i class="fas" [class.fa-play]="!quiz.IsAttempted" [class.fa-check-circle]="quiz.IsAttempted"></i>
-              {{ quiz.IsAttempted ? 'Passed ✅' : 'Take Quiz' }}
-            </button>
-            <button class="result-btn" 
-                    (click)="viewQuizResult(quiz)"
-                    *ngIf="quiz.IsAttempted">
-              <i class="fas fa-chart-line"></i>
-              Results
-            </button>
-          </ng-container>
-
-          <!-- Instructor Actions -->
-          <ng-container *ngIf="isInstructor()">
-            <button class="edit-btn" (click)="editQuiz(quiz)">
-              <i class="fas fa-edit"></i>
-              Edit
-            </button>
-            <button class="result-btn" (click)="viewQuizResult(quiz)">
-              <i class="fas fa-users"></i>
-              Student Results
-            </button>
-          </ng-container>
-
-          <!-- Admin Actions -->
-          <ng-container *ngIf="canManageCourses()">
-            <button class="view-btn" (click)="viewQuizDetails(quiz)">
-              <i class="fas fa-info-circle"></i>
-              View Details
-            </button>
-          </ng-container>
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- Loading State for Course -->
-<div class="loading-container" *ngIf="loading">
-  <div class="spinner"></div>
+<div *ngIf="loading" class="text-center p-5">
+  <div class="spinner-border"></div>
   <p>Loading course content...</p>
 </div>
 
-<!-- Error State for Course -->
-<div class="error-container" *ngIf="error && !loading">
-  <i class="fas fa-exclamation-triangle"></i>
-  <h3>Error Loading Course</h3>
+<div *ngIf="error && !loading" class="alert alert-danger">
+  <h5>Error Loading Course</h5>
   <p>{{ error }}</p>
-  <button class="retry-button" (click)="ngOnInit()">
-    <i class="fas fa-redo"></i> Retry
-  </button>
+  <button class="btn btn-outline-danger" (click)="ngOnInit()">Retry</button>
 </div>
 
-<!-- Empty State -->
-<div class="empty-state" *ngIf="!selectedCourse && !loading && !error">
-  <i class="fas fa-book-open"></i>
+<div *ngIf="!selectedCourse && !loading && !error" class="text-center p-5">
+  <i class="fas fa-book-open fs-1 text-muted"></i>
   <h3>No Course Selected</h3>
-  <p>Please select a course from the sidebar to view its content.</p>
+  <p class="text-muted">Please select a course from the sidebar to view its content.</p>
 </div> 
 
-<!-- Debug Test Button (REMOVE AFTER TESTING) -->
-<button *ngIf="isLearner()" 
-        style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: orange; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;"
-        (click)="testQuizModal()">
-  🧪 Test Quiz Modal
-</button>
-
-<!-- DEBUG: Force Show Modal Button -->
-<button *ngIf="isLearner()" 
-        style="position: fixed; bottom: 70px; right: 20px; z-index: 1000; background: red; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;"
-        (click)="forceShowModal()">
-  🚨 Force Show Modal
-</button>
-
-<!-- DEBUG: Simple Modal Test -->
-<div *ngIf="debugModal" 
-     style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: yellow; padding: 20px; z-index: 10000; border: 3px solid red;">
-  <h3>🧪 DEBUG MODAL WORKS!</h3>
-  <p>If you see this, Angular is working fine.</p>
-  <button (click)="debugModal = false">Close</button>
-</div>
-
-
-
-<!-- Quiz Modal with debugging -->
-<div class="quiz-modal-overlay" 
-     *ngIf="!!showQuizModal" 
-     (click)="closeQuizModal()"
-     style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9999 !important; display: flex; align-items: center; justify-content: center;">
-  
-  <div class="quiz-modal" (click)="$event.stopPropagation()" *ngIf="currentQuiz"
-       style="background: white; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-    
-    <!-- Quiz Header -->
-    <div class="quiz-header">
-      <h2>{{ currentQuiz.Title || currentQuiz.title }}</h2>
-      <div class="quiz-info">
-        <span class="total-marks">
-          <i class="fas fa-star"></i>
-          Total Marks: {{ currentQuiz.TotalMarks || currentQuiz.totalMarks }}
-        </span>
-        <span class="question-count">
-          <i class="fas fa-list"></i>
-          {{ quizQuestions.length }} Questions
-        </span>
+<!-- Quiz Modal -->
+<div class="modal" [style.display]="!!showQuizModal ? 'block' : 'none'" *ngIf="!!showQuizModal">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content" *ngIf="currentQuiz">
+      <div class="modal-header">
+        <h4>{{ currentQuiz.Title || currentQuiz.title }}</h4>
+        <button type="button" class="btn-close" (click)="closeQuizModal()"></button>
       </div>
-      <button class="close-btn" (click)="closeQuizModal()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-
-    <!-- Quiz Content -->
-    <div class="quiz-content">
-      <div class="question-container" *ngFor="let question of quizQuestions; let i = index">
-        
-        <!-- Question -->
-        <div class="question-header">
-          <h3>Question {{ i + 1 }}</h3>
-          <span class="question-marks">{{ question.Marks || question.marks }} marks</span>
-        </div>
-        
-        <div class="question-text">
-          {{ question.QuestionText || question.questionText }}
-        </div>
-
-        <!-- Answer Options -->
-        <div class="answer-options">
-          <div class="option" 
-               [class.selected]="userAnswers[question.QuestionId || question.questionId] === 'A'"
-               (click)="selectAnswer(question.QuestionId || question.questionId, 'A')">
-            <input type="radio" 
-                   [name]="'question_' + (question.QuestionId || question.questionId)"
-                   [checked]="userAnswers[question.QuestionId || question.questionId] === 'A'"
-                   (change)="selectAnswer(question.QuestionId || question.questionId, 'A')">
-            <label>A. {{ question.OptionA || question.optionA }}</label>
-          </div>
-          
-          <div class="option"
-               [class.selected]="userAnswers[question.QuestionId || question.questionId] === 'B'"
-               (click)="selectAnswer(question.QuestionId || question.questionId, 'B')">
-            <input type="radio" 
-                   [name]="'question_' + (question.QuestionId || question.questionId)"
-                   [checked]="userAnswers[question.QuestionId || question.questionId] === 'B'"
-                   (change)="selectAnswer(question.QuestionId || question.questionId, 'B')">
-            <label>B. {{ question.OptionB || question.optionB }}</label>
-          </div>
-          
-          <div class="option"
-               [class.selected]="userAnswers[question.QuestionId || question.questionId] === 'C'"
-               (click)="selectAnswer(question.QuestionId || question.questionId, 'C')">
-            <input type="radio" 
-                   [name]="'question_' + (question.QuestionId || question.questionId)"
-                   [checked]="userAnswers[question.QuestionId || question.questionId] === 'C'"
-                   (change)="selectAnswer(question.QuestionId || question.questionId, 'C')">
-            <label>C. {{ question.OptionC || question.optionC }}</label>
-          </div>
-          
-          <div class="option"
-               [class.selected]="userAnswers[question.QuestionId || question.questionId] === 'D'"
-               (click)="selectAnswer(question.QuestionId || question.questionId, 'D')">
-            <input type="radio" 
-                   [name]="'question_' + (question.QuestionId || question.questionId)"
-                   [checked]="userAnswers[question.QuestionId || question.questionId] === 'D'"
-                   (change)="selectAnswer(question.QuestionId || question.questionId, 'D')">
-            <label>D. {{ question.OptionD || question.optionD }}</label>
+      <div class="modal-body">
+        <div *ngFor="let question of quizQuestions; let i = index" class="mb-4">
+          <div class="card">
+            <div class="card-header">
+              <strong>Question {{ i + 1 }}</strong>
+              <span class="badge bg-primary float-end">{{ question.Marks || question.marks }} marks</span>
+            </div>
+            <div class="card-body">
+              <p>{{ question.QuestionText || question.questionText }}</p>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" [name]="'question_' + (question.QuestionId || question.questionId)"
+                           (change)="selectAnswer(question.QuestionId || question.questionId, 'A')">
+                    <label class="form-check-label">A. {{ question.OptionA || question.optionA }}</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" [name]="'question_' + (question.QuestionId || question.questionId)"
+                           (change)="selectAnswer(question.QuestionId || question.questionId, 'B')">
+                    <label class="form-check-label">B. {{ question.OptionB || question.optionB }}</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" [name]="'question_' + (question.QuestionId || question.questionId)"
+                           (change)="selectAnswer(question.QuestionId || question.questionId, 'C')">
+                    <label class="form-check-label">C. {{ question.OptionC || question.optionC }}</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" [name]="'question_' + (question.QuestionId || question.questionId)"
+                           (change)="selectAnswer(question.QuestionId || question.questionId, 'D')">
+                    <label class="form-check-label">D. {{ question.OptionD || question.optionD }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Quiz Footer -->
-    <div class="quiz-footer">
-      <div class="quiz-progress">
-        Answered: {{ Object.keys(userAnswers).length }} / {{ quizQuestions.length }}
-      </div>
-      <div class="quiz-actions">
-        <button class="cancel-btn" (click)="closeQuizModal()">
-          <i class="fas fa-times"></i>
-          Cancel
-        </button>
-        <button class="submit-btn" (click)="submitQuiz()">
-          <i class="fas fa-paper-plane"></i>
-          Submit Quiz
-        </button>
+      <div class="modal-footer">
+        <small>Answered: {{ Object.keys(userAnswers).length }} / {{ quizQuestions.length }}</small>
+        <button class="btn btn-secondary" (click)="closeQuizModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="submitQuiz()">Submit Quiz</button>
       </div>
     </div>
   </div>

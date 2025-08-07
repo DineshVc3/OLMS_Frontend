@@ -39,4 +39,88 @@ i[class*="fa-"]::before {
   z-index: 1;
 }
 
-/* You can add other global styles here */
+/* Bootstrap 5 custom variables for OLMS branding */
+:root {
+  --bs-primary: #667eea;
+  --bs-primary-rgb: 102, 126, 234;
+  --bs-secondary: #764ba2;
+  --bs-success: #198754;
+  --bs-info: #0dcaf0;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-light: #f8f9fa;
+  --bs-dark: #212529;
+}
+
+/* Override Bootstrap primary colors */
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+  background-color: #5a67d8;
+  border-color: #5a67d8;
+}
+
+.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
+.text-primary {
+  color: var(--bs-primary) !important;
+}
+
+.border-primary {
+  border-color: var(--bs-primary) !important;
+}
+
+/* Custom scrollbar for better UX */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Global transition for smooth interactions */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Fix for Angular router outlet */
+router-outlet + * {
+  display: block;
+}
+
+/* Ensure proper typography */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* Utility classes for consistent spacing */
+.section-spacing {
+  padding: 2rem 0;
+}
+
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
