@@ -1,6 +1,6 @@
 <div class="sidebar-wrapper" [class.collapsed]="isCollapsed">
   <!-- Sidebar -->
-  <nav class="sidebar bg-primary text-white h-100 d-flex flex-column">
+  <nav class="sidebar bg-primary text-white h-100 d-flex flex-column shadow-sm">
     <!-- Sidebar Menu -->
     <ul class="list-unstyled flex-grow-1 p-0">
       <li class="nav-item" *ngFor="let item of menuItems">
@@ -18,13 +18,7 @@
       </li>
     </ul>
 
-    <!-- Sidebar Footer -->
-    <div class="sidebar-footer p-3 border-top border-secondary" *ngIf="!isCollapsed">
-      <small class="text-muted">
-        <i class="fas fa-info-circle me-1"></i>
-        OLMS v1.0
-      </small>
-    </div>
+  
   </nav>
 </div>
   

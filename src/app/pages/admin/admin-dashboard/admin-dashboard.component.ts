@@ -1,7 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
-import { NavbarComponent } from '../../../shared/navbar/navbar.component';
 import { ProfileComponent } from '../../../shared/profile/profile.component';
 import { UserManagementComponent } from '../../../shared/user-management/user-management.component';
 import { EnrollmentsComponent } from '../../../shared/enrollments/enrollments.component';
@@ -11,7 +10,7 @@ import { SidebarService } from '../../../services/sidebar.service';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [CommonModule, SidebarComponent, NavbarComponent, ProfileComponent, UserManagementComponent, EnrollmentsComponent, CourseManagementComponent, AdminReportsComponent],
+  imports: [CommonModule, SidebarComponent,  ProfileComponent, UserManagementComponent, EnrollmentsComponent, CourseManagementComponent, AdminReportsComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })

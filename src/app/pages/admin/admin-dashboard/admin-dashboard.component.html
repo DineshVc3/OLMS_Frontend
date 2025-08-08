@@ -7,10 +7,7 @@
     
     <!-- Main Content -->
     <div class="col d-flex flex-column">
-      <!-- Navbar -->
-      <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
       
-      <!-- Dashboard Content -->
       <main class="flex-grow-1 p-4 bg-light overflow-auto">
         <!-- Profile Section -->
         <div *ngIf="showProfile" class="mb-4">

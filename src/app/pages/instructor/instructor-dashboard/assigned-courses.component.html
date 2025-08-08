@@ -84,7 +84,7 @@
 <!-- Modals using Bootstrap 5 modal structure -->
 <div class="modal" [style.display]="showDetailsModal ? 'block' : 'none'" *ngIf="showDetailsModal">
   <div class="modal-dialog modal-xl">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5><i class="fas fa-info-circle"></i> Course Details: {{ selectedCourse?.title }}</h5>
         <button type="button" class="btn-close" (click)="closeDetailsModal()"></button>

@@ -14,6 +14,7 @@
     z-index: 1;
     margin-top: 60px; /* Account for fixed header height */
     padding-left: 0; /* Default - no sidebar margin */
+    margin-left: 45px;
 }
 
 /* When sidebar is present (add this class to main-content when sidebar is shown) */
@@ -22,7 +23,7 @@
 }
 
 .main-content.with-sidebar.sidebar-collapsed {
-    margin-left: 60px; /* Account for collapsed sidebar width */
+    margin-left: 100px; /* Account for collapsed sidebar width */
 }
 
 /* Ensure body and html have proper styling */
@@ -62,7 +63,9 @@ html, body {
 * {
     max-width: 100%;
 }
-
+.modal-content{
+    margin-top: 25%;
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .app-container {

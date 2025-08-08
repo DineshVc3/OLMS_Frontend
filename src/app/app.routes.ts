@@ -11,13 +11,12 @@ import { InstructorDashboardComponent } from './pages/instructor/instructor-dash
 import { LearnerDashboardComponent } from './pages/learner/learner-dashboard/learner-dashboard.component';
 
 import { HeaderComponent } from './shared/header/header.component';
-import { FooterComponent } from './shared/footer/footer.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
-import { NavbarComponent } from './shared/navbar/navbar.component';
 
 import { authGuard } from './guards/auth.guard';
 
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { ProfileComponent } from './shared/profile/profile.component';
 
 
 export const routes : Routes =[
@@ -44,6 +43,11 @@ export const routes : Routes =[
       canActivate: [authGuard]
     },
     {
+      path:'profile',
+      component:ProfileComponent,
+      canActivate: [authGuard]
+    },
+    {
       path: 'app-superadmin-dashboard',
       component: SuperadminDashboardComponent,
       canActivate: [authGuard]
@@ -63,18 +67,11 @@ export const routes : Routes =[
       component: HeaderComponent
     },
     {
-      path: 'app-footer',
-      component: FooterComponent
-    },
-    {
       path: 'app-sidebar',
       component: SidebarComponent,
       canActivate: [authGuard]
     },
-    {
-      path: 'app-navbar',
-      component: NavbarComponent
-    },
+    
     {
       path: '**',
       redirectTo: '/login'

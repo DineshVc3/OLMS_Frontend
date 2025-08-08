@@ -121,7 +121,7 @@
 <!-- Modals using Bootstrap 5 structure -->
 <div class="modal" [style.display]="showCreateModal ? 'block' : 'none'" *ngIf="showCreateModal">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5>Create New Course</h5>
         <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
@@ -163,7 +163,7 @@
 
 <div class="modal" [style.display]="showEditModal ? 'block' : 'none'" *ngIf="showEditModal">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5>Edit Course</h5>
         <button type="button" class="btn-close" (click)="closeEditModal()"></button>
@@ -230,7 +230,7 @@
 
 <div class="modal" [style.display]="showDetailsModal ? 'block' : 'none'" *ngIf="showDetailsModal">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5>Course Details</h5>
         <button type="button" class="btn-close" (click)="closeDetailsModal()"></button>
