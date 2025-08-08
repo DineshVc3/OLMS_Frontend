@@ -18,8 +18,8 @@ export class SidebarComponent {
   constructor(private sidebarService: SidebarService) {}
 
   ngOnInit(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      this.role = localStorage.getItem('role') || '';
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      this.role = sessionStorage.getItem('role') || '';
       this.setMenuItems();
     } else {
       // Fallback if running in SSR or test environment

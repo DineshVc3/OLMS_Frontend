@@ -62,7 +62,7 @@ export class UserManagementComponent implements OnInit {
 
   // Helper method to debug JWT token
   private debugJWTToken(): void {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       try {
         // Decode JWT payload (without verification - just for debugging)
@@ -337,8 +337,8 @@ export class UserManagementComponent implements OnInit {
     };
 
     console.log('Final user data being sent:', userData);
-    console.log('Token exists:', !!localStorage.getItem('token'));
-    console.log('User role:', localStorage.getItem('role'));
+    console.log('Token exists:', !!sessionStorage.getItem('token'));
+    console.log('User role:', sessionStorage.getItem('role'));
 
     this.isLoading = true;
     

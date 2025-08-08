@@ -271,9 +271,9 @@ export class CreateQuizComponent implements OnInit {
   }
 
   saveDraft(): void {
-    // For now, just save to localStorage
+    // For now, just save to sessionStorage
     const draftKey = `quiz_draft_${Date.now()}`;
-    localStorage.setItem(draftKey, JSON.stringify(this.quiz));
+    sessionStorage.setItem(draftKey, JSON.stringify(this.quiz));
     this.showMessage('Quiz saved as draft in local storage.', 'success');
   }
 

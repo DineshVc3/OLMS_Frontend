@@ -101,7 +101,7 @@ export class LearnerService {
   constructor(private http: HttpClient) { }
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -110,7 +110,7 @@ export class LearnerService {
 
   // Check if user is authenticated
   isAuthenticated(): boolean {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return false;
     
     try {
@@ -126,7 +126,7 @@ export class LearnerService {
 
   // Get user role from token (simplified)
   getUserRole(): string {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return '';
     
     try {
@@ -142,7 +142,7 @@ export class LearnerService {
 
   // Get user email from token
   getUserEmail(): string {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return '';
     
     try {
@@ -301,7 +301,7 @@ export class LearnerService {
 
   // Helper method to get current learner ID from token
   private getCurrentLearnerId(): number {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return 0;
     
     try {
@@ -320,7 +320,7 @@ export class LearnerService {
     const headers = this.getAuthHeaders();
     
     // Debug: Log JWT token details
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));

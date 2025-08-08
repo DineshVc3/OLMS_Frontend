@@ -229,7 +229,7 @@ export class AdminReportsComponent implements OnInit {
 
   private getPersistedCompletions(): any[] {
     try {
-      const completionsData = localStorage.getItem('completedCourses');
+      const completionsData = sessionStorage.getItem('completedCourses');
       if (!completionsData) return [];
       
       const completions = JSON.parse(completionsData);

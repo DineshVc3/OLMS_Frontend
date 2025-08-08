@@ -44,14 +44,14 @@ export class QuizCompletionService {
   constructor(private http: HttpClient) { }
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
   }
 
-  // Log quiz completion when a student completes a quiz (localStorage only)
+  // Log quiz completion when a student completes a quiz (sessionStorage only)
   logQuizCompletion(completionData: QuizCompletionLog): Observable<any> {
     console.log('📝 Logging quiz completion:', completionData);
     
@@ -96,7 +96,7 @@ export class QuizCompletionService {
     });
   }
 
-  // Mark course as completed for a student (localStorage only)
+  // Mark course as completed for a student (sessionStorage only)
   markCourseCompleted(learnerId: number, courseId: number): Observable<any> {
     const completionData = {
       learnerId,
@@ -116,27 +116,27 @@ export class QuizCompletionService {
     });
   }
 
-  // Store quiz completion in localStorage
+  // Store quiz completion in sessionStorage
   private storeQuizCompletionLocally(completionData: QuizCompletionLog): void {
     try {
       // Store individual quiz completions for detailed tracking
-      const quizCompletions = JSON.parse(localStorage.getItem('quizCompletions') || '[]');
+      const quizCompletions = JSON.parse(sessionStorage.getItem('quizCompletions') || '[]');
       quizCompletions.push({
         ...completionData,
         timestamp: new Date().toISOString()
       });
-      localStorage.setItem('quizCompletions', JSON.stringify(quizCompletions));
+      sessionStorage.setItem('quizCompletions', JSON.stringify(quizCompletions));
       console.log('📝 Quiz completion stored locally:', completionData);
     } catch (error) {
       console.error('❌ Failed to store quiz completion locally:', error);
     }
   }
 
-  // Store course completion in localStorage  
+  // Store course completion in sessionStorage  
   private storeCourseCompletionLocally(completionData: any): void {
     try {
       // This is the main completion data that admin reports will read
-      const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+      const completedCourses = JSON.parse(sessionStorage.getItem('completedCourses') || '[]');
       
       // Check if this course completion already exists for this learner
       const existingIndex = completedCourses.findIndex((c: any) => 
@@ -150,7 +150,7 @@ export class QuizCompletionService {
           courseId: completionData.courseId,
           completedAt: completionData.completedAt.toISOString()
         });
-        localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
+        sessionStorage.setItem('completedCourses', JSON.stringify(completedCourses));
         console.log('✅ Course completion stored locally:', completionData);
       } else {
         console.log('ℹ️ Course completion already exists for this learner and course');
@@ -162,7 +162,7 @@ export class QuizCompletionService {
 
   // Get user ID from token
   private getCurrentUserId(): number {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return 0;
     
     try {
@@ -178,7 +178,7 @@ export class QuizCompletionService {
 
   // Get user name from token
   private getCurrentUserName(): string {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return 'Unknown User';
     
     try {
@@ -224,7 +224,7 @@ export class QuizCompletionService {
   // Get locally stored quiz completions (for instructor reports)
   getLocalQuizCompletions(): QuizCompletionLog[] {
     try {
-      return JSON.parse(localStorage.getItem('quizCompletions') || '[]');
+      return JSON.parse(sessionStorage.getItem('quizCompletions') || '[]');
     } catch (error) {
       console.error('❌ Failed to read local quiz completions:', error);
       return [];
@@ -234,7 +234,7 @@ export class QuizCompletionService {
   // Get locally stored course completions (for admin reports)
   getLocalCourseCompletions(): any[] {
     try {
-      return JSON.parse(localStorage.getItem('completedCourses') || '[]');
+      return JSON.parse(sessionStorage.getItem('completedCourses') || '[]');
     } catch (error) {
       console.error('❌ Failed to read local course completions:', error);
       return [];

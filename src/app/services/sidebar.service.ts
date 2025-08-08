@@ -9,9 +9,9 @@ export class SidebarService {
   public isCollapsed$ = this.isCollapsedSubject.asObservable();
 
   constructor() {
-    // Load saved state from localStorage
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const savedState = localStorage.getItem('sidebarCollapsed');
+    // Load saved state from sessionStorage
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const savedState = sessionStorage.getItem('sidebarCollapsed');
       if (savedState !== null) {
         this.isCollapsedSubject.next(JSON.parse(savedState));
       }
@@ -22,23 +22,23 @@ export class SidebarService {
     const newState = !this.isCollapsedSubject.value;
     this.isCollapsedSubject.next(newState);
     
-    // Save state to localStorage
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
+    // Save state to sessionStorage
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
     }
   }
 
   collapseSidebar(): void {
     this.isCollapsedSubject.next(true);
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('sidebarCollapsed', 'true');
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.setItem('sidebarCollapsed', 'true');
     }
   }
 
   expandSidebar(): void {
     this.isCollapsedSubject.next(false);
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('sidebarCollapsed', 'false');
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.setItem('sidebarCollapsed', 'false');
     }
   }
 
