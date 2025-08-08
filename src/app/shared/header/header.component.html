@@ -53,9 +53,12 @@
                 <input type="password" class="form-control" placeholder="Password" required 
                        [(ngModel)]="password" name="password" #passwordInput="ngModel">
               </div>
-              <button type="submit" class="btn btn-primary w-100" [disabled]="!loginForm.form.valid">
-                Sign In
-              </button>
+              <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary btn-sm">Login</button>
+                <a href="#" class="btn btn-link btn-sm text-decoration-none" (click)="goToForgotPassword()">
+                  Forgot Password?
+                </a>
+              </div>
             </form>
           </div>
         </div>
@@ -64,8 +67,5 @@
   </div>
 </nav>
 
-<div *ngIf="isProfileOpen && isLoggedIn()" class="dropdown-menu show position-absolute end-0 mt-2">
-  <!-- Profile menu content here -->
-<app-profile></app-profile>
-  <!-- <a class="dropdown-item" (click)="logout()">Logout</a> -->
-</div>
+<!-- Modal Profile Component (available globally) -->
+<app-profile displayMode="modal"></app-profile>

@@ -1,172 +1,205 @@
-<div class="profile-container">
-  <div class="profile-header">
-    <div class="profile-avatar">
-      <i class="fa fa-user-circle"></i>
-    </div>
-    <div class="profile-title">
-      <h2>My Profile</h2>
-      <p>Manage your account information</p>
+<!-- Modal Mode: Button to trigger profile modal -->
+<div *ngIf="displayMode === 'modal'">
+  <button type="button" class="btn btn-outline-primary" (click)="openModal()">
+    <i class="fa fa-user-circle me-2"></i>My Profile
+  </button>
+</div>
+
+<!-- Inline Mode: Direct content display -->
+<div *ngIf="displayMode === 'inline'" class="container-fluid">
+  <ng-container *ngTemplateOutlet="profileContent"></ng-container>
+</div>
+
+<!-- Profile Modal (for modal mode) -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="profileModalLabel">
+          <i class="fa fa-user-circle me-2"></i>My Profile
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <ng-container *ngTemplateOutlet="profileContent"></ng-container>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" *ngIf="user && !isLoading">
+        <ng-container *ngTemplateOutlet="actionButtons"></ng-container>
+      </div>
     </div>
   </div>
+</div>
 
+<!-- Shared Profile Content Template -->
+<ng-template #profileContent>
   <!-- Loading Spinner -->
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Updating profile...</p>
+  <div *ngIf="isLoading" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-muted">Updating profile...</p>
   </div>
 
   <!-- Message Display -->
-  <div *ngIf="message" class="message-container" [class]="'message-' + messageType">
-    <i class="fa" [class.fa-check-circle]="messageType === 'success'" [class.fa-exclamation-triangle]="messageType === 'error'"></i>
-    <span>{{ message }}</span>
-    <button class="message-close" (click)="clearMessage()">
-      <i class="fa fa-times"></i>
-    </button>
+  <div *ngIf="message" class="alert alert-dismissible fade show" 
+       [class.alert-success]="messageType === 'success'" 
+       [class.alert-danger]="messageType === 'error'">
+    <i class="fa me-2" 
+       [class.fa-check-circle]="messageType === 'success'" 
+       [class.fa-exclamation-triangle]="messageType === 'error'"></i>
+    {{ message }}
+    <button type="button" class="btn-close" (click)="clearMessage()"></button>
   </div>
 
   <!-- Profile Content -->
-  <div *ngIf="user && !isLoading" class="profile-content">
-    
-    <!-- View Mode -->
-    <div *ngIf="!isEditing" class="profile-view">
-      <div class="profile-section">
-        <h3>Personal Information</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>Full Name</label>
-            <p>{{ user.name || 'Not provided' }}</p>
-          </div>
-          <div class="info-item">
-            <label>Email Address</label>
-            <p>{{ user.email }}</p>
-          </div>
-          <div class="info-item">
-            <label>Phone Number</label>
-            <p>{{ user.phoneNumber || 'Not provided' }}</p>
-          </div>
-          <div class="info-item">
-            <label>Role</label>
-            <p>
-              <span class="role-badge" [class]="getRoleColor(user.role)">
-                {{ getRoleDisplayName(user.role) }}
-              </span>
-            </p>
-          </div>
-        </div>
+  <div *ngIf="user && !isLoading">
+    <!-- Card wrapper for inline mode only -->
+    <div [class.card]="displayMode === 'inline'">
+      <div *ngIf="displayMode === 'inline'" class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+          <i class="fa fa-user-circle me-2"></i>My Profile
+        </h5>
       </div>
-
-      <div class="profile-section">
-        <h3>Account Details</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>User ID</label>
-            <p>#{{ getUserId() || 'N/A' }}</p>
-          </div>
-          <div class="info-item">
-            <label>Account Created</label>
-            <p>{{ formatDate(user.createdAt) }}</p>
-          </div>
-          <div class="info-item" *ngIf="user.modifiedAt">
-            <label>Last Modified</label>
-            <p>{{ formatDate(user.modifiedAt) }}</p>
+      <div [class.card-body]="displayMode === 'inline'">
+        
+        <!-- View Mode -->
+        <div *ngIf="!isEditing">
+          <ng-container *ngTemplateOutlet="profileView"></ng-container>
+          <!-- Action buttons for inline mode -->
+          <div *ngIf="displayMode === 'inline'" class="mt-3">
+            <ng-container *ngTemplateOutlet="actionButtons"></ng-container>
           </div>
         </div>
+
+        <!-- Edit Mode -->
+        <div *ngIf="isEditing">
+          <ng-container *ngTemplateOutlet="profileEdit"></ng-container>
+          <!-- Action buttons for inline mode -->
+          <div *ngIf="displayMode === 'inline'" class="mt-3">
+            <ng-container *ngTemplateOutlet="editButtons"></ng-container>
+          </div>
+        </div>
+
       </div>
-
-      <div class="profile-actions">
-        <button class="btn btn-primary" (click)="toggleEdit()">
-          <i class="fa fa-edit"></i>
-          Edit Profile
-        </button>
-      </div>
-    </div>
-
-    <!-- Edit Mode -->
-    <div *ngIf="isEditing" class="profile-edit">
-      <form class="edit-form" (ngSubmit)="saveProfile()">
-        <div class="profile-section">
-          <h3>Edit Personal Information</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="name">Full Name *</label>
-              <input
-                type="text"
-                id="name"
-                [(ngModel)]="editForm.name"
-                name="name"
-                required
-                placeholder="Enter your full name"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="email">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                [value]="editForm.email"
-                readonly
-                class="form-control readonly"
-                title="Email cannot be changed"
-              >
-              <small class="form-help">Email address cannot be modified</small>
-            </div>
-
-            <div class="form-group">
-              <label for="phone">Phone Number *</label>
-              <input
-                type="tel"
-                id="phone"
-                [(ngModel)]="editForm.phoneNumber"
-                name="phone"
-                required
-                placeholder="Enter your phone number"
-                class="form-control"
-              >
-            </div>
-
-            <div class="form-group">
-              <label>Role</label>
-              <div class="readonly-field">
-                <span class="role-badge" [class]="getRoleColor(user.role)">
-                  {{ getRoleDisplayName(user.role) }}
-                </span>
-                <small class="form-help">Role cannot be modified</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="profile-actions">
-          <button 
-            type="submit" 
-            class="btn btn-success"
-            [disabled]="!isValidForm() || isLoading"
-          >
-            <i class="fa fa-save"></i>
-            Save Changes
-          </button>
-          <button 
-            type="button" 
-            class="btn btn-secondary"
-            (click)="cancelEdit()"
-            [disabled]="isLoading"
-          >
-            <i class="fa fa-arrow-left"></i>
-            Back to Profile
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 
   <!-- No User Data -->
-  <div *ngIf="!user && !isLoading" class="no-user-container">
-    <div class="no-user-content">
-      <i class="fa fa-user-times"></i>
-      <h3>No Profile Data</h3>
-      <p>Unable to load your profile information. Please try logging in again.</p>
+  <div *ngIf="!user && !isLoading" class="text-center py-4">
+    <i class="fa fa-user-times text-danger" style="font-size: 3rem;"></i>
+    <h6 class="mt-3">No Profile Data</h6>
+    <p class="text-muted">Unable to load your profile information. Please try logging in again.</p>
+  </div>
+</ng-template>
+
+<!-- Profile View Template -->
+<ng-template #profileView>
+  <!-- Personal Information -->
+  <h6 class="text-primary border-bottom pb-2 mb-3">Personal Information</h6>
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <label class="form-label text-muted small">Full Name</label>
+      <p class="fw-semibold">{{ user?.name || 'Not provided' }}</p>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label text-muted small">Email Address</label>
+      <p class="fw-semibold">{{ user?.email }}</p>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label text-muted small">Phone Number</label>
+      <p class="fw-semibold">{{ user?.phoneNumber || 'Not provided' }}</p>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label text-muted small">Role</label>
+      <p>
+        <span class="badge" [class]="'bg-' + getRoleBootstrapColor(user?.role || 0)">
+          {{ getRoleDisplayName(user?.role || 0) }}
+        </span>
+      </p>
     </div>
   </div>
-</div> 
+
+  <!-- Account Details -->
+  <h6 class="text-primary border-bottom pb-2 mb-3">Account Details</h6>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label text-muted small">User ID</label>
+      <p class="fw-semibold">#{{ getUserId() || 'N/A' }}</p>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label text-muted small">Account Created</label>
+      <p class="fw-semibold">{{ formatDate(user?.createdAt) }}</p>
+    </div>
+    <div class="col-md-6" *ngIf="user?.modifiedAt">
+      <label class="form-label text-muted small">Last Modified</label>
+      <p class="fw-semibold">{{ formatDate(user?.modifiedAt) }}</p>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Profile Edit Template -->
+<ng-template #profileEdit>
+  <form (ngSubmit)="saveProfile()">
+    <h6 class="text-primary border-bottom pb-2 mb-3">Edit Personal Information</h6>
+    
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="name" 
+               [(ngModel)]="editForm.name" name="name" required
+               placeholder="Enter your full name">
+      </div>
+
+      <div class="col-md-6">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" class="form-control" id="email" 
+               [value]="editForm.email" readonly
+               title="Email cannot be changed">
+        <div class="form-text">Email address cannot be modified</div>
+      </div>
+
+      <div class="col-md-6">
+        <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+        <input type="tel" class="form-control" id="phone"
+               [(ngModel)]="editForm.phoneNumber" name="phone" required
+               placeholder="Enter your phone number">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Role</label>
+        <div class="p-2 bg-light rounded">
+          <span class="badge" [class]="'bg-' + getRoleBootstrapColor(user?.role || 0)">
+            {{ getRoleDisplayName(user?.role || 0) }}
+          </span>
+          <div class="form-text">Role cannot be modified</div>
+        </div>
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Action Buttons Template (for view mode) -->
+<ng-template #actionButtons>
+  <button type="button" class="btn btn-primary" (click)="toggleEdit()">
+    <i class="fa fa-edit me-2"></i>Edit Profile
+  </button>
+</ng-template>
+
+<!-- Edit Buttons Template (for edit mode) -->
+<ng-template #editButtons>
+  <div class="d-flex gap-2" [class.w-100]="displayMode === 'modal'">
+    <button type="button" class="btn btn-success" (click)="saveProfile()" 
+            [disabled]="!isValidForm() || isLoading">
+      <i class="fa fa-save me-2"></i>Save Changes
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="cancelEdit()" 
+            [disabled]="isLoading">
+      <i class="fa fa-times me-2"></i>Cancel
+    </button>
+  </div>
+</ng-template> 

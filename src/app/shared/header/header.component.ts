@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { ProfileComponent } from "../profile/profile.component";
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   @Output() profileToggle = new EventEmitter<boolean>();
+  @ViewChild(ProfileComponent) profileComponent!: ProfileComponent;
   
   isMenuOpen = false;
   isLoginOpen = false;
@@ -50,10 +51,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   openProfile(): void {
-    this.isProfileOpen = !this.isProfileOpen;
-    this.isLogged=!this.isLogged; // Toggle logged-in state
-    console.log('is toggle:', this.isLogged+"profile open:", this.isProfileOpen);
-    this.profileToggle.emit(this.isProfileOpen);
+    // If we have a profile component, open its modal
+    if (this.profileComponent) {
+      this.profileComponent.openModal();
+    } else {
+      // Fallback to the old behavior for dashboard components that expect it
+      this.isProfileOpen = !this.isProfileOpen;
+      this.profileToggle.emit(this.isProfileOpen);
+    }
   }
 
   toggleMobileMenu() {

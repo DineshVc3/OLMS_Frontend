@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
 import { AppUser, UserUpdateDto, UserRole, NumericRoleMapping } from '../../models/user.model';
+
+// Declare bootstrap for TypeScript
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-profile',
@@ -11,13 +14,15 @@ import { AppUser, UserUpdateDto, UserRole, NumericRoleMapping } from '../../mode
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  @Input() displayMode: 'modal' | 'inline' = 'inline';
+  
   user: AppUser | null = null;
-  isEditing: boolean = false;
-  isLoading: boolean = false;
-  message: string = '';
+  isEditing = false;
+  isLoading = false;
+  message = '';
   messageType: 'success' | 'error' | '' = '';
+  private modal: any;
 
-  // Edit form data
   editForm = {
     name: '',
     phoneNumber: '',
@@ -28,21 +33,33 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserProfile();
+    if (this.displayMode === 'modal') {
+      setTimeout(() => {
+        const modalElement = document.getElementById('profileModal');
+        if (modalElement) {
+          this.modal = new bootstrap.Modal(modalElement);
+        }
+      }, 100);
+    }
+  }
+
+  openModal(): void {
+    this.modal?.show();
+  }
+
+  closeModal(): void {
+    this.modal?.hide();
   }
 
   loadUserProfile(): void {
-    // Load from localStorage first for immediate display
     this.user = this.profileService.getCurrentUserFromStorage();
     if (this.user) {
       this.resetEditForm();
     }
     
-    // Then fetch fresh data from API
     const email = localStorage.getItem('email');
     if (email) {
       this.profileService.fetchAndUpdateCurrentUser(email);
-      
-      // Subscribe to updates
       this.profileService.currentUser$.subscribe(user => {
         if (user) {
           this.user = user;
@@ -88,26 +105,26 @@ export class ProfileComponent implements OnInit {
     const updateData: UserUpdateDto = {
       email: this.user.email,
       name: this.editForm.name.trim(),
-      phonenumber: this.editForm.phoneNumber.trim() // Use phonenumber to match backend API
+      phonenumber: this.editForm.phoneNumber.trim()
     };
 
     try {
       await this.profileService.updateUser(updateData).toPromise();
       
-      // Update local user data
       if (this.user) {
         this.user.name = this.editForm.name.trim();
         this.user.phoneNumber = this.editForm.phoneNumber.trim();
         this.user.modifiedAt = new Date().toISOString();
-        
-        // Update in localStorage and service
         this.profileService.updateCurrentUser(this.user);
       }
 
       this.isEditing = false;
       this.showMessage('Profile updated successfully!', 'success');
+      
+      if (this.displayMode === 'modal') {
+        setTimeout(() => this.closeModal(), 1500);
+      }
     } catch (error: any) {
-      console.error('Error updating profile:', error);
       this.showMessage(
         error.error?.message || 'Failed to update profile. Please try again.',
         'error'
@@ -126,7 +143,6 @@ export class ProfileComponent implements OnInit {
     this.message = text;
     this.messageType = type;
     
-    // Auto-clear success messages after 3 seconds
     if (type === 'success') {
       setTimeout(() => this.clearMessage(), 3000);
     }
@@ -137,49 +153,36 @@ export class ProfileComponent implements OnInit {
     this.messageType = '';
   }
 
-  // Helper method to get user ID (handles both id and userId)
   getUserId(): number | null {
-    if (!this.user) return null;
-    return this.user.id || this.user.userId || null;
+    return this.user?.id || this.user?.userId || null;
   }
 
-  // Helper method to convert numeric role to UserRole enum
-  private convertRole(role: UserRole | number): UserRole {
+  private convertRole(role: UserRole | number | undefined): UserRole {
     if (typeof role === 'number') {
       return NumericRoleMapping[role as keyof typeof NumericRoleMapping] || UserRole.Learner;
     }
-    return role;
+    return role || UserRole.Learner;
   }
 
-  getRoleDisplayName(role: UserRole | number): string {
+  getRoleDisplayName(role: UserRole | number | undefined): string {
     const convertedRole = this.convertRole(role);
     switch (convertedRole) {
-      case UserRole.SuperAdmin:
-        return 'Super Administrator';
-      case UserRole.Admin:
-        return 'Administrator';
-      case UserRole.Instructor:
-        return 'Instructor';
-      case UserRole.Learner:
-        return 'Learner';
-      default:
-        return convertedRole || 'Unknown Role';
+      case UserRole.SuperAdmin: return 'Super Administrator';
+      case UserRole.Admin: return 'Administrator';
+      case UserRole.Instructor: return 'Instructor';
+      case UserRole.Learner: return 'Learner';
+      default: return 'Unknown Role';
     }
   }
 
-  getRoleColor(role: UserRole | number): string {
+  getRoleBootstrapColor(role: UserRole | number | undefined): string {
     const convertedRole = this.convertRole(role);
     switch (convertedRole) {
-      case UserRole.SuperAdmin:
-        return 'role-superadmin';
-      case UserRole.Admin:
-        return 'role-admin';
-      case UserRole.Instructor:
-        return 'role-instructor';
-      case UserRole.Learner:
-        return 'role-learner';
-      default:
-        return 'role-default';
+      case UserRole.SuperAdmin: return 'danger';
+      case UserRole.Admin: return 'warning';
+      case UserRole.Instructor: return 'info';
+      case UserRole.Learner: return 'success';
+      default: return 'secondary';
     }
   }
 
@@ -187,15 +190,14 @@ export class ProfileComponent implements OnInit {
     if (!dateString) return 'N/A';
     
     try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
+      return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
       });
-    } catch (error) {
+    } catch {
       return 'N/A';
     }
   }
