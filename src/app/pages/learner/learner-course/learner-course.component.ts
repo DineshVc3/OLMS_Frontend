@@ -1271,8 +1271,8 @@ export class LearnerCourseComponent implements OnInit, OnDestroy {
   private persistCourseCompletion(): void {
     if (!this.selectedCourse) return;
     
-    // Store completion status in localStorage for persistence
-    const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+    // Store completion status in sessionStorage for persistence
+    const completedCourses = JSON.parse(sessionStorage.getItem('completedCourses') || '[]');
     const courseCompletion = {
       courseId: this.selectedCourse.courseId,
       completedAt: new Date().toISOString(),
@@ -1282,7 +1282,7 @@ export class LearnerCourseComponent implements OnInit, OnDestroy {
     // Add if not already present
     if (!completedCourses.find((c: any) => c.courseId === this.selectedCourse!.courseId)) {
       completedCourses.push(courseCompletion);
-      localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
+      sessionStorage.setItem('completedCourses', JSON.stringify(completedCourses));
       console.log('💾 Course completion persisted locally');
     }
   }

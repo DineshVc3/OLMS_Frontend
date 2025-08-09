@@ -17,9 +17,9 @@ export class ProfileService {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    const email = localStorage.getItem('email');
-    const userId = localStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');
+    const email = sessionStorage.getItem('email');
+    const userId = sessionStorage.getItem('userId');
     
     if (!token) {
       throw new Error('Authentication token not found. Please login again.');
@@ -42,12 +42,12 @@ export class ProfileService {
   }
 
   getCurrentUserFromStorage(): AppUser | null {
-    const userStr = localStorage.getItem('user');
+    const userStr = sessionStorage.getItem('user');
     if (userStr) {
       try {
         return JSON.parse(userStr);
       } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
+        console.error('Error parsing user from sessionStorage:', error);
         return null;
       }
     }
@@ -60,14 +60,14 @@ export class ProfileService {
       this.currentUserSubject.next(user);
     }
     
-    const email = localStorage.getItem('email');
-    if (email && localStorage.getItem('token')) {
+    const email = sessionStorage.getItem('email');
+    if (email && sessionStorage.getItem('token')) {
       this.fetchAndUpdateCurrentUser(email);
     }
   }
 
   fetchAndUpdateCurrentUser(email?: string): void {
-    const userEmail = email || localStorage.getItem('email');
+    const userEmail = email || sessionStorage.getItem('email');
     if (!userEmail) {
       console.warn('No email found to fetch user profile');
       return;
@@ -75,7 +75,7 @@ export class ProfileService {
 
     this.getUserByEmail(userEmail).subscribe({
       next: (user: AppUser) => {
-        localStorage.setItem('user', JSON.stringify(user));
+        sessionStorage.setItem('user', JSON.stringify(user));
         this.currentUserSubject.next(user);
       },
       error: (error: any) => {
@@ -120,7 +120,7 @@ export class ProfileService {
   }
 
   updateCurrentUser(user: AppUser): void {
-    localStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem('user', JSON.stringify(user));
     this.currentUserSubject.next(user);
   }
 
@@ -129,7 +129,7 @@ export class ProfileService {
   }
 
   getCurrentUserRole(): string | null {
-    return localStorage.getItem('role');
+    return sessionStorage.getItem('role');
   }
 
   // User Management Methods
@@ -198,10 +198,10 @@ export class ProfileService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    localStorage.removeItem('email');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('email');
     this.currentUserSubject.next(null);
   }
 } 

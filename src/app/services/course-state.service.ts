@@ -21,7 +21,7 @@ export class CourseStateService {
 
   constructor() {
     // Initialize with stored course ID if available
-    const storedCourseId = localStorage.getItem('selectedCourseId');
+    const storedCourseId = sessionStorage.getItem('selectedCourseId');
     if (storedCourseId) {
       this.selectedCourseIdSubject.next(parseInt(storedCourseId, 10));
     }
@@ -46,13 +46,13 @@ export class CourseStateService {
   setSelectedCourse(course: EnrolledCourse): void {
     this.selectedCourseSubject.next(course);
     this.selectedCourseIdSubject.next(course.courseId);
-    localStorage.setItem('selectedCourseId', course.courseId.toString());
+    sessionStorage.setItem('selectedCourseId', course.courseId.toString());
   }
 
   // Set selected course ID only
   setSelectedCourseId(courseId: number): void {
     this.selectedCourseIdSubject.next(courseId);
-    localStorage.setItem('selectedCourseId', courseId.toString());
+    sessionStorage.setItem('selectedCourseId', courseId.toString());
   }
 
   // Get current selected course
@@ -89,6 +89,6 @@ export class CourseStateService {
   clearSelection(): void {
     this.selectedCourseSubject.next(null);
     this.selectedCourseIdSubject.next(null);
-    localStorage.removeItem('selectedCourseId');
+    sessionStorage.removeItem('selectedCourseId');
   }
 } 

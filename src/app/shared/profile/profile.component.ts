@@ -1,21 +1,19 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
 import { AppUser, UserUpdateDto, UserRole, NumericRoleMapping } from '../../models/user.model';
 
-// Declare bootstrap for TypeScript
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-profile',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  @Input() displayMode: 'modal' | 'inline' = 'inline';
-  
   user: AppUser | null = null;
   isEditing = false;
   isLoading = false;
@@ -33,14 +31,13 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserProfile();
-    if (this.displayMode === 'modal') {
-      setTimeout(() => {
-        const modalElement = document.getElementById('profileModal');
-        if (modalElement) {
-          this.modal = new bootstrap.Modal(modalElement);
-        }
-      }, 100);
-    }
+
+    setTimeout(() => {
+      const modalElement = document.getElementById('profileModal');
+      if (modalElement) {
+        this.modal = new bootstrap.Modal(modalElement);
+      }
+    }, 100);
   }
 
   openModal(): void {
@@ -56,8 +53,8 @@ export class ProfileComponent implements OnInit {
     if (this.user) {
       this.resetEditForm();
     }
-    
-    const email = localStorage.getItem('email');
+
+    const email = sessionStorage.getItem('email');
     if (email) {
       this.profileService.fetchAndUpdateCurrentUser(email);
       this.profileService.currentUser$.subscribe(user => {
@@ -80,10 +77,8 @@ export class ProfileComponent implements OnInit {
   }
 
   toggleEdit(): void {
-    this.isEditing = !this.isEditing;
-    if (this.isEditing) {
-      this.resetEditForm();
-    }
+    this.isEditing = true;
+    this.resetEditForm();
     this.clearMessage();
   }
 
@@ -110,40 +105,41 @@ export class ProfileComponent implements OnInit {
 
     try {
       await this.profileService.updateUser(updateData).toPromise();
-      
-      if (this.user) {
-        this.user.name = this.editForm.name.trim();
-        this.user.phoneNumber = this.editForm.phoneNumber.trim();
-        this.user.modifiedAt = new Date().toISOString();
-        this.profileService.updateCurrentUser(this.user);
-      }
-
+    
+      this.user.name = updateData.name ?? '';
+      this.user.phoneNumber = updateData.phonenumber ?? '';
+      this.user.modifiedAt = new Date().toISOString();
+      this.profileService.updateCurrentUser(this.user);
+    
       this.isEditing = false;
       this.showMessage('Profile updated successfully!', 'success');
-      
-      if (this.displayMode === 'modal') {
-        setTimeout(() => this.closeModal(), 1500);
-      }
+    
+      setTimeout(() => {
+        this.clearMessage();
+      }, 3000);
     } catch (error: any) {
       this.showMessage(
         error.error?.message || 'Failed to update profile. Please try again.',
         'error'
       );
-    } finally {
+    }
+     finally {
       this.isLoading = false;
     }
   }
 
   isValidForm(): boolean {
-    return this.editForm.name.trim().length > 0 && 
+    return this.editForm.name.trim().length > 0 &&
            this.editForm.phoneNumber.trim().length > 0;
   }
 
   showMessage(text: string, type: 'success' | 'error'): void {
     this.message = text;
     this.messageType = type;
-    
+
     if (type === 'success') {
+      // Message will be cleared after modal closes
+    } else {
       setTimeout(() => this.clearMessage(), 3000);
     }
   }
@@ -188,7 +184,7 @@ export class ProfileComponent implements OnInit {
 
   formatDate(dateString: string | undefined): string {
     if (!dateString) return 'N/A';
-    
+
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -201,4 +197,4 @@ export class ProfileComponent implements OnInit {
       return 'N/A';
     }
   }
-} 
+}

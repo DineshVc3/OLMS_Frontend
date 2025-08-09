@@ -62,7 +62,7 @@ export class UserManagementComponent implements OnInit {
 
   // Helper method to debug JWT token
   private debugJWTToken(): void {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       try {
         // Decode JWT payload (without verification - just for debugging)
@@ -337,8 +337,8 @@ export class UserManagementComponent implements OnInit {
     };
 
     console.log('Final user data being sent:', userData);
-    console.log('Token exists:', !!localStorage.getItem('token'));
-    console.log('User role:', localStorage.getItem('role'));
+    console.log('Token exists:', !!sessionStorage.getItem('token'));
+    console.log('User role:', sessionStorage.getItem('role'));
 
     this.isLoading = true;
     
@@ -461,7 +461,12 @@ export class UserManagementComponent implements OnInit {
     this.showDeleteModal = false;
     this.selectedUser = null;
   }
-
+  private convertRole(role: UserRole | number | undefined): UserRole {
+    if (typeof role === 'number') {
+      return NumericRoleMapping[role as keyof typeof NumericRoleMapping] || UserRole.Learner;
+    }
+    return role || UserRole.Learner;
+  }
   deleteUser(): void {
     if (!this.selectedUser) return;
 
@@ -481,44 +486,25 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  // Utility methods
-  getRoleDisplayName(role: UserRole | number): string {
-    if (typeof role === 'number') {
-      const convertedRole = NumericRoleMapping[role as keyof typeof NumericRoleMapping];
-      return convertedRole || 'Unknown';
-    }
-    
-    switch (role) {
-      case UserRole.SuperAdmin:
-        return 'Super Administrator';
-      case UserRole.Admin:
-        return 'Administrator';
-      case UserRole.Instructor:
-        return 'Instructor';
-      case UserRole.Learner:
-        return 'Learner';
-      default:
-        return role || 'Unknown';
+  getRoleDisplayName(role: UserRole | number | undefined): string {
+    const convertedRole = this.convertRole(role);
+    switch (convertedRole) {
+      case UserRole.SuperAdmin: return 'Super Administrator';
+      case UserRole.Admin: return 'Administrator';
+      case UserRole.Instructor: return 'Instructor';
+      case UserRole.Learner: return 'Learner';
+      default: return 'Unknown Role';
     }
   }
 
-  getRoleColor(role: UserRole | number): string {
-    if (typeof role === 'number') {
-      const convertedRole = NumericRoleMapping[role as keyof typeof NumericRoleMapping];
-      role = convertedRole || UserRole.Learner;
-    }
-    
-    switch (role) {
-      case UserRole.SuperAdmin:
-        return 'role-superadmin';
-      case UserRole.Admin:
-        return 'role-admin';
-      case UserRole.Instructor:
-        return 'role-instructor';
-      case UserRole.Learner:
-        return 'role-learner';
-      default:
-        return 'role-default';
+  getRoleBootstrapColor(role: UserRole | number | undefined): string {
+    const convertedRole = this.convertRole(role);
+    switch (convertedRole) {
+      case UserRole.SuperAdmin: return 'danger';
+      case UserRole.Admin: return 'warning';
+      case UserRole.Instructor: return 'info';
+      case UserRole.Learner: return 'success';
+      default: return 'secondary';
     }
   }
 

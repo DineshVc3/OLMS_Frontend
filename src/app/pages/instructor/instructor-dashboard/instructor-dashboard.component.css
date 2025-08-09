@@ -10,7 +10,7 @@
 /* Dashboard content */
 .dashboard-content {
   margin-left: 250px;
-  margin-top: 80px; /* Adjusted for header height (60px) + some padding */
+  margin-top: 20px; /* Adjusted for header height (60px) + some padding */
   padding: 30px;
   min-height: calc(100vh - 80px);
 }

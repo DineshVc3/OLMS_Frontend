@@ -87,8 +87,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
         const role = response.role;
 
         // Store token and role
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', role);
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('role', role);
 
         // Close login panel
         this.isLoginOpen = false;

@@ -46,25 +46,25 @@ export class AuthService {
 
   logout() {
     // Clear all stored user data
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('email');
-    localStorage.removeItem('userId');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('email');
+    sessionStorage.removeItem('userId');
     
     // Navigate to login page
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
   getRole(): string | null {
-    return localStorage.getItem('role');
+    return sessionStorage.getItem('role');
   }
 
   getEmail(): string | null {
-    return localStorage.getItem('email');
+    return sessionStorage.getItem('email');
   }
 
   isLoggedIn(): boolean {

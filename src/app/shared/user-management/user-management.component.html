@@ -72,8 +72,9 @@
             <td><small class="text-primary">{{ user.email }}</small></td>
             <td><small class="text-muted">{{ user.phoneNumber }}</small></td>
             <td>
-              <span class="badge" [class]="getRoleColor(user.role)" style="color: black;">{{ getRoleDisplayName(user.role) }}</span>
-              
+              <span class="badge" [class]="'bg-' + getRoleBootstrapColor(user?.role || 0)">
+                {{ getRoleDisplayName(user?.role || 0) }}
+              </span>
             </td>
             <td><small class="text-muted">{{ formatDate(user.createdAt) }}</small></td>
             <td>
@@ -224,10 +225,9 @@
           <h6>Are you sure?</h6>
           <p>You are about to delete the user:</p>
           <div class="alert alert-warning" *ngIf="selectedUser">
-            <strong>{{ selectedUser.name }}</strong><br>
-            {{ selectedUser.email }}<br>
-            <span class="badge" [class]="getRoleColor(selectedUser.role)">{{ getRoleDisplayName(selectedUser.role) }}</span>
-          </div>
+            <strong>{{ selectedUser.name }}</strong>({{ getRoleDisplayName(selectedUser.role) }})<br>
+             {{ selectedUser.email }}<br>
+           </div>
           <p class="text-muted">This action cannot be undone.</p>
         </div>
         
@@ -245,7 +245,7 @@
 
 <div class="modal" [style.display]="showToggleModal ? 'block' : 'none'" *ngIf="showToggleModal">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5>
           <i class="fa" [class.fa-toggle-on]="toggleAction === 'activate'" [class.fa-toggle-off]="toggleAction === 'deactivate'"></i>
@@ -261,10 +261,9 @@
           <p *ngIf="toggleAction === 'deactivate'">This will prevent the user from accessing the system.</p>
           
           <div class="alert alert-info" *ngIf="selectedUser">
-            <strong>{{ selectedUser.name }}</strong><br>
-            {{ selectedUser.email }}<br>
-            <span class="badge" [class]="getRoleColor(selectedUser.role)">{{ getRoleDisplayName(selectedUser.role) }}</span><br>
-            <span class="badge mt-2" [class.bg-success]="selectedUser.isActive !== false" [class.bg-secondary]="selectedUser.isActive === false">
+            <strong>{{ selectedUser.name }}</strong>({{ getRoleDisplayName(selectedUser.role) }})<br>
+            {{ selectedUser.email }}<br><br>
+             <span class="badge mt-2" [class.bg-success]="selectedUser.isActive !== false" [class.bg-secondary]="selectedUser.isActive === false">
               Current Status: {{ selectedUser.isActive !== false ? 'Active' : 'Inactive' }}
             </span>
           </div>

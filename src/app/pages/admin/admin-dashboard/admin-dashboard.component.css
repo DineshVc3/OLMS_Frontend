@@ -4,7 +4,14 @@
 .card {
   transition: all 0.3s ease;
 }
+main {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
 
+.sidebar-collapsed main {
+  margin-left: 60px;
+}
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;

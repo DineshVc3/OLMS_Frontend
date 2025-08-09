@@ -1,0 +1,26 @@
+/* Minimal overrides for instructor reports */
+
+/* Ensure consistent card heights in stats grid */
+.card.h-100 {
+  transition: transform 0.2s ease;
+}
+
+.card.h-100:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom progress bar styling for better visibility */
+.progress {
+  background-color: #e9ecef;
+}
+
+/* Responsive table improvements */
+@media (max-width: 768px) {
+  .badge.rounded-pill {
+    font-size: 0.75rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+} 

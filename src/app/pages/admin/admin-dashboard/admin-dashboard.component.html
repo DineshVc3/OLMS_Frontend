@@ -1,110 +1,105 @@
-<div class="container-fluid vh-100">
-  <div class="row h-100">
-    <!-- Sidebar -->
-    <div class="col-auto px-0">
-      <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
+<div class="d-flex flex-column min-vh-100" [class.sidebar-collapsed]="isCollapsed">
+  <!-- Sidebar -->
+  <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
+
+  <!-- Header -->
+  <app-header (profileToggle)="onProfileToggle($event)"></app-header>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow-1 p-4 bg-light overflow-auto">
+    <!-- Conditional Sections -->
+    <div *ngIf="showProfile" class="mb-4">
+      <app-profile></app-profile>
     </div>
-    
-    <!-- Main Content -->
-    <div class="col d-flex flex-column">
-      
-      <main class="flex-grow-1 p-4 bg-light overflow-auto">
-        <!-- Profile Section -->
-        <div *ngIf="showProfile" class="mb-4">
-          <app-profile></app-profile>
+
+    <div *ngIf="showUserManagement" class="mb-4">
+      <app-user-management></app-user-management>
+    </div>
+
+    <div *ngIf="showEnrollments" class="mb-4">
+      <app-enrollments></app-enrollments>
+    </div>
+
+    <div *ngIf="showCourseManagement" class="mb-4">
+      <app-course-management></app-course-management>
+    </div>
+
+    <div *ngIf="showReports" class="mb-4">
+      <app-admin-reports></app-admin-reports>
+    </div>
+
+    <!-- Default Dashboard View -->
+    <div *ngIf="!showProfile && !showUserManagement && !showEnrollments && !showCourseManagement && !showReports">
+      <div class="container-fluid">
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm text-center py-5">
+              <i class="fas fa-user-circle text-primary mb-3" style="font-size: 3rem;"></i>
+              <h2 class="card-title h3 mb-3">Admin Dashboard</h2>
+              <p class="card-text text-muted">Welcome to the admin control panel. Select a menu item from the sidebar to get started.</p>
+            </div>
+          </div>
         </div>
 
-        <!-- User Management Section -->
-        <div *ngIf="showUserManagement" class="mb-4">
-          <app-user-management></app-user-management>
-        </div>
-        
-        <!-- Enrollments Section -->
-        <div *ngIf="showEnrollments" class="mb-4">
-          <app-enrollments></app-enrollments>
-        </div>
-        
-        <!-- Course Management Section -->
-        <div *ngIf="showCourseManagement" class="mb-4">
-          <app-course-management></app-course-management>
-        </div>
-        
-        <!-- Reports Section -->
-        <div *ngIf="showReports" class="mb-4">
-          <app-admin-reports></app-admin-reports>
-        </div>
-        
-        <!-- Main Dashboard Welcome -->
-        <div *ngIf="!showProfile && !showUserManagement && !showEnrollments && !showCourseManagement && !showReports">
-          <div class="row mb-4">
-            <div class="col-12">
-              <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body text-center py-5">
-                  <i class="fas fa-tachometer-alt text-primary mb-3" style="font-size: 3rem;"></i>
-                  <h2 class="card-title h3 mb-3">Admin Dashboard</h2>
-                  <p class="card-text text-muted">Welcome to the admin control panel. Select a menu item from the sidebar to get started.</p>
+        <div class="row g-4">
+          <!-- User Management Card -->
+          <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body d-flex flex-column align-items-start">
+                <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                  <i class="fa fa-users text-white fs-3"></i>
                 </div>
+                <h5 class="card-title mb-1 text-primary">User Management</h5>
+                <p class="card-text text-muted mb-3">Manage all system users</p>
+                <button class="btn btn-outline-primary btn-sm" (click)="onMenuSelect('User Management')">Go to Users</button>
               </div>
             </div>
           </div>
-          
-          <!-- Quick Stats Cards -->
-          <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
-              <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                  <div class="mb-3">
-                    <i class="fas fa-users text-primary" style="font-size: 2.5rem;"></i>
-                  </div>
-                  <h5 class="card-title">User Management</h5>
-                  <p class="card-text text-muted">Manage instructors and learners</p>
-                  <button class="btn btn-outline-primary btn-sm">View Details</button>
+        
+          <!-- Course Management Card -->
+          <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body d-flex flex-column align-items-start">
+                <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                  <i class="fa fa-book text-white fs-3"></i>
                 </div>
+                <h5 class="card-title mb-1 text-primary">Course Management</h5>
+                <p class="card-text text-muted mb-3">Manage courses and content</p>
+                <button class="btn btn-outline-primary btn-sm" (click)="onMenuSelect('Course Management')">Go to Courses</button>
               </div>
             </div>
-            
-            <div class="col-lg-3 col-md-6">
-              <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                  <div class="mb-3">
-                    <i class="fas fa-book text-success" style="font-size: 2.5rem;"></i>
-                  </div>
-                  <h5 class="card-title">Course Management</h5>
-                  <p class="card-text text-muted">Manage courses and content</p>
-                  <button class="btn btn-outline-success btn-sm">View Details</button>
+          </div>
+        
+          <!-- Enrollment Card -->
+          <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body d-flex flex-column align-items-start">
+                <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                  <i class="fa fa-graduation-cap text-white fs-3"></i>
                 </div>
+                <h5 class="card-title mb-1 text-primary">Enrollment</h5>
+                <p class="card-text text-muted mb-3">Manage student enrollments</p>
+                <button class="btn btn-outline-primary btn-sm" (click)="onMenuSelect('Enrollments')">Go to Enrollments</button>
               </div>
             </div>
-            
-            <div class="col-lg-3 col-md-6">
-              <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                  <div class="mb-3">
-                    <i class="fas fa-graduation-cap text-warning" style="font-size: 2.5rem;"></i>
-                  </div>
-                  <h5 class="card-title">Enrollment</h5>
-                  <p class="card-text text-muted">Manage student enrollments</p>
-                  <button class="btn btn-outline-warning btn-sm">View Details</button>
+          </div>
+        
+          <!-- Analytics Card -->
+          <div class="col-lg-3 col-md-6">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body d-flex flex-column align-items-start">
+                <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                  <i class="fa fa-chart-line text-white fs-3"></i>
                 </div>
-              </div>
-            </div>
-            
-            <div class="col-lg-3 col-md-6">
-              <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                  <div class="mb-3">
-                    <i class="fas fa-chart-bar text-info" style="font-size: 2.5rem;"></i>
-                  </div>
-                  <h5 class="card-title">Reports</h5>
-                  <p class="card-text text-muted">View analytics and reports</p>
-                  <button class="btn btn-outline-info btn-sm">View Details</button>
-                </div>
+                <h5 class="card-title mb-1 text-primary">Analytics</h5>
+                <p class="card-text text-muted mb-3">System-wide analytics</p>
+                <button class="btn btn-outline-primary btn-sm" (click)="onMenuSelect('Reports')">View Reports</button>
               </div>
             </div>
           </div>
         </div>
-      </main>
+        
+      </div>
     </div>
-  </div>
+  </main>
 </div>
-

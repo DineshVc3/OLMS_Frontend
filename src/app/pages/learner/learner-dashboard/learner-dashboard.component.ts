@@ -9,7 +9,6 @@ import { SidebarService } from '../../../services/sidebar.service';
 import { CourseStateService, CourseProgressUpdate } from '../../../services/course-state.service';
 import { LearnerCourseComponent } from '../learner-course/learner-course.component';
 import { LearnerProgressComponent } from '../learner-progress/learner-progress.component';
-import { LearnerReportsComponent } from '../../../shared/reports-analytics/learner-reports.component';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -22,8 +21,7 @@ import { filter } from 'rxjs/operators';
     HeaderComponent, 
     ProfileComponent,
     LearnerCourseComponent,
-    LearnerProgressComponent,
-    LearnerReportsComponent
+    LearnerProgressComponent
   ],
   templateUrl: './learner-dashboard.component.html',
   styleUrls: ['./learner-dashboard.component.css']
@@ -35,7 +33,6 @@ export class LearnerDashboardComponent implements OnInit, OnDestroy {
   showProfile: boolean = false;
   showCourse: boolean = false;
   showProgress: boolean = false;
-  showReports: boolean = false;
   selectedSubmenu: string = '';
 
   // Course data
@@ -56,8 +53,8 @@ export class LearnerDashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      this.role = localStorage.getItem('role') || '';
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      this.role = sessionStorage.getItem('role') || '';
     }
 
     // Subscribe to sidebar collapse state
@@ -92,9 +89,7 @@ export class LearnerDashboardComponent implements OnInit, OnDestroy {
       case 'course':
         this.showCourse = true;
         break;
-      case 'reports':
-        this.showReports = true;
-        break;
+     
       default:
         break;
     }
@@ -119,16 +114,13 @@ export class LearnerDashboardComponent implements OnInit, OnDestroy {
           this.showCourse = true;
           break;
       }
-    } else if (this.selectedSidebarItem.toLowerCase() === 'reports') {
-      this.showReports = true;
-    }
+    } 
   }
 
   private resetViews(): void {
     this.showProfile = false;
     this.showCourse = false;
     this.showProgress = false;
-    this.showReports = false;
   }
 
   private async loadCourses(): Promise<void> {
