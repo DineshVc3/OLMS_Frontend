@@ -1,13 +1,18 @@
 /* Minimal styles for login component using Bootstrap 5 */
 
 .bg-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .card {
   border-radius: 0.75rem;
 }
-
+.container-fluid{
+  padding: 0;
+  height: 91vh;
+   overflow: hidden;
+  }
 .btn-primary:hover {
   transform: translateY(-1px);
   transition: all 0.3s ease;

@@ -616,7 +616,7 @@ export class AssignedCoursesComponent implements OnInit {
 
     console.log('=== TESTING UPDATE FUNCTIONALITY ===');
     console.log('Selected content:', this.selectedContent);
-    console.log('Current user ID:', localStorage.getItem('userId'));
+    console.log('Current user ID:', sessionStorage.getItem('userId'));
     console.log('Content instructor ID:', this.selectedContent.instructorId);
     console.log('User can edit:', this.canEditContent(this.selectedContent));
     
@@ -733,9 +733,9 @@ export class AssignedCoursesComponent implements OnInit {
     console.log('Form values:', this.editContentForm.value);
     console.log('Selected file:', this.selectedFile);
     console.log('Current user info:', {
-      userId: localStorage.getItem('userId'),
-      email: localStorage.getItem('email'),
-      role: localStorage.getItem('role')
+      userId: sessionStorage.getItem('userId'),
+      email: sessionStorage.getItem('email'),
+      role: sessionStorage.getItem('role')
     });
 
     // Clear any previous error messages
@@ -1266,8 +1266,8 @@ export class AssignedCoursesComponent implements OnInit {
   }
 
   canEditContent(content: CourseData): boolean {
-    const currentUserId = localStorage.getItem('userId');
-    const currentUserRole = localStorage.getItem('role');
+    const currentUserId = sessionStorage.getItem('userId');
+    const currentUserRole = sessionStorage.getItem('role');
     
     // Admin and SuperAdmin can edit any content
     if (currentUserRole === 'Admin' || currentUserRole === 'SuperAdmin') {

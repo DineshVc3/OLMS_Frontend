@@ -1,4 +1,16 @@
-/* Simplified Bootstrap 5 header styles */
+/* Fixed header styles */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  height: 60px; /* Set explicit height for consistency */
+}
+.navbar.bg-primary {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
 /* Override navbar toggler for mobile */
 .navbar-toggler {

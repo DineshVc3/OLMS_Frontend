@@ -216,9 +216,9 @@ export class CourseService {
   constructor(private http: HttpClient) {}
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    const email = localStorage.getItem('email');
-    const userId = localStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');
+    const email = sessionStorage.getItem('email');
+    const userId = sessionStorage.getItem('userId');
     
     if (!token) {
       throw new Error('Authentication token not found. Please login again.');
@@ -322,7 +322,7 @@ export class CourseService {
   // Upload course data (file upload)
   uploadCourseData(formData: FormData): Observable<CourseData> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': `Bearer ${sessionStorage.getItem('token')}`
     });
     return this.http.post<CourseData>(`${this.apiUrl}/CourseData/upload`, formData, { headers });
   }
@@ -341,7 +341,7 @@ export class CourseService {
     }
     
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': `Bearer ${sessionStorage.getItem('token')}`
     });
     
     const url = `${this.apiUrl}/CourseData/course/data/${dataId}`;
@@ -605,7 +605,7 @@ export class CourseService {
   
   // Get current user role
   getCurrentUserRole(): string {
-    return localStorage.getItem('role') || '';
+    return sessionStorage.getItem('role') || '';
   }
 
   // Check if user can manage courses

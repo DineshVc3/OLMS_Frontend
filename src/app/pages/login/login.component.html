@@ -1,4 +1,4 @@
-<div class="container-fluid min-vh-100">
+<div class="container-fluid ">
   <div class="row g-0 min-vh-100">
     <!-- Left Side - Hero Section -->
     <div class="col-lg-6 d-flex align-items-center justify-content-center bg-primary text-white p-4">
@@ -35,20 +35,7 @@
           </div>
         </div>
 
-        <div class="row text-center">
-          <div class="col-4">
-            <div class="h4 fw-bold text-warning">50K+</div>
-            <small>Students</small>
-          </div>
-          <div class="col-4">
-            <div class="h4 fw-bold text-warning">500+</div>
-            <small>Courses</small>
-          </div>
-          <div class="col-4">
-            <div class="h4 fw-bold text-warning">100+</div>
-            <small>Instructors</small>
-          </div>
-        </div>
+       
       </div>
     </div>
 
@@ -58,8 +45,8 @@
         <div class="card border-0 shadow">
           <div class="card-body p-4">
             <div class="text-center mb-4">
-              <h3 class="card-title h4 fw-bold">Sign In</h3>
-              <p class="text-muted">Access your account to continue learning</p>
+              <h2 class="card-title h4 fw-bold">Login</h2>
+              <!-- <p class="text-muted">Access your account to continue learning</p> -->
             </div>
 
             <form (ngSubmit)="login()" #loginForm="ngForm">
@@ -119,21 +106,10 @@
                 type="submit" 
                 class="btn btn-primary w-100 py-2 mb-3" 
                 [disabled]="!loginForm.form.valid">
-                <span>Sign In</span>
+                <span>Login</span>
                 <i class="fas fa-arrow-right ms-1"></i>
               </button>
 
-              <!-- Divider -->
-              <div class="text-center mb-3">
-                <hr class="my-3">
-                <span class="text-muted bg-white px-2" style="position: relative; top: -12px;">or</span>
-              </div>
-
-              <!-- Alternative Actions -->
-              <div class="text-center">
-                <p class="mb-2 small">Don't have an account? <a href="#" class="text-decoration-none">Sign up</a></p>
-                <p class="mb-0 small">Are you an instructor? <a href="#" class="text-decoration-none">Join as Instructor</a></p>
-              </div>
             </form>
           </div>
         </div>

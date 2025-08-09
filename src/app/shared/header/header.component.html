@@ -1,5 +1,15 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
   <div class="container-fluid">
+    <!-- Sidebar Toggle Button -->
+    <button class="btn btn-outline-light me-3" 
+            type="button" 
+            (click)="toggleSidebar()" 
+            title="Toggle Sidebar"
+            aria-label="Toggle sidebar"
+            *ngIf="isLoggedIn()">
+      <i class="fas fa-bars"></i>
+    </button>
+
     <a class="navbar-brand" href="#">
       <span class="me-2">🎓</span>
       <strong>OLMS</strong>
@@ -14,6 +24,12 @@
       <div class="navbar-nav ms-auto">
         <div *ngIf="isLoggedIn()" class="d-flex align-items-center">
           <span class="me-3 text-light">{{ getCurrentRole() }}</span>
+          <button class="btn btn-outline-light btn-sm me-2" 
+                  (click)="openProfile()" 
+                  title="Profile">
+            <i class="fas fa-user me-1"></i>
+            Profile
+          </button>
           <button class="btn btn-outline-light btn-sm" (click)="logout()">
             <i class="fas fa-sign-out-alt me-1"></i>
             Logout
@@ -37,9 +53,12 @@
                 <input type="password" class="form-control" placeholder="Password" required 
                        [(ngModel)]="password" name="password" #passwordInput="ngModel">
               </div>
-              <button type="submit" class="btn btn-primary w-100" [disabled]="!loginForm.form.valid">
-                Sign In
-              </button>
+              <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary btn-sm">Login</button>
+                <a href="#" class="btn btn-link btn-sm text-decoration-none" (click)="goToForgotPassword()">
+                  Forgot Password?
+                </a>
+              </div>
             </form>
           </div>
         </div>
@@ -47,3 +66,6 @@
     </div>
   </div>
 </nav>
+
+<!-- Modal Profile Component (available globally) -->
+<app-profile displayMode="modal"></app-profile>

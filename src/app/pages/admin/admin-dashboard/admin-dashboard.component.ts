@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../../shared/header/header.component';  
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
-import { NavbarComponent } from '../../../shared/navbar/navbar.component';
 import { ProfileComponent } from '../../../shared/profile/profile.component';
 import { UserManagementComponent } from '../../../shared/user-management/user-management.component';
 import { EnrollmentsComponent } from '../../../shared/enrollments/enrollments.component';
@@ -11,7 +11,7 @@ import { SidebarService } from '../../../services/sidebar.service';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [CommonModule, SidebarComponent, NavbarComponent, ProfileComponent, UserManagementComponent, EnrollmentsComponent, CourseManagementComponent, AdminReportsComponent],
+  imports: [CommonModule, SidebarComponent,  ProfileComponent, UserManagementComponent, EnrollmentsComponent,HeaderComponent, CourseManagementComponent, AdminReportsComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
@@ -32,8 +32,8 @@ export class AdminDashboardComponent {
   constructor(private sidebarService: SidebarService) {}
 
   ngOnInit(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      this.role = localStorage.getItem('role') || '';
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      this.role = sessionStorage.getItem('role') || '';
     }
 
     // Subscribe to sidebar collapse state

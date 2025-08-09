@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
-import { NavbarComponent } from '../../../shared/navbar/navbar.component';
+import { HeaderComponent } from '../../../shared/header/header.component';
 import { ProfileComponent } from '../../../shared/profile/profile.component';
 import { UserManagementComponent } from '../../../shared/user-management/user-management.component';
 import { EnrollmentsComponent } from '../../../shared/enrollments/enrollments.component';
@@ -11,7 +11,7 @@ import { SidebarService } from '../../../services/sidebar.service';
 
 @Component({
   selector: 'app-superadmin-dashboard',
-  imports: [CommonModule, SidebarComponent, NavbarComponent, ProfileComponent, UserManagementComponent, EnrollmentsComponent, CourseManagementComponent, SuperAdminReportsComponent],
+  imports: [CommonModule, SidebarComponent, HeaderComponent, ProfileComponent, UserManagementComponent, EnrollmentsComponent, CourseManagementComponent, SuperAdminReportsComponent],
   templateUrl: './superadmin-dashboard.component.html',
   styleUrl: './superadmin-dashboard.component.css'
 })
@@ -32,8 +32,8 @@ export class SuperadminDashboardComponent {
   constructor(private sidebarService: SidebarService) {}
 
   ngOnInit(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      this.role = localStorage.getItem('role') || '';
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      this.role = sessionStorage.getItem('role') || '';
     }
 
     // Subscribe to sidebar collapse state
@@ -64,60 +64,60 @@ export class SuperadminDashboardComponent {
     }
   }
 
-  onSubmenuSelect(submenuItem: string): void {
-    // Handle submenu for user management
-    if (this.showUserManagement && this.userManagementComponent) {
-      this.userManagementComponent.setActiveView(submenuItem);
-    }
-    // Handle submenu for enrollments
-    else if (this.showEnrollments && this.enrollmentsComponent) {
-      this.setEnrollmentView(submenuItem);
-    }
-    // Handle submenu for course management
-    else if (this.showCourseManagement && this.courseManagementComponent) {
-      this.setCourseManagementView(submenuItem);
-    }
-  }
+  // onSubmenuSelect(submenuItem: string): void {
+  //   // Handle submenu for user management
+  //   if (this.showUserManagement && this.userManagementComponent) {
+  //     this.userManagementComponent.setActiveView(submenuItem);
+  //   }
+  //   // Handle submenu for enrollments
+  //   else if (this.showEnrollments && this.enrollmentsComponent) {
+  //     this.setEnrollmentView(submenuItem);
+  //   }
+  //   // Handle submenu for course management
+  //   else if (this.showCourseManagement && this.courseManagementComponent) {
+  //     this.setCourseManagementView(submenuItem);
+  //   }
+  // }
 
-  private setEnrollmentView(submenuItem: string): void {
-    switch (submenuItem.toLowerCase()) {
-      case 'enroll student':
-        this.enrollmentsComponent.setActiveView('enroll student');
-        break;
-      case 'assign instructor':
-        this.enrollmentsComponent.setActiveView('assign instructor');
-        break;
-      case 'view student enrollments':
-        this.enrollmentsComponent.setActiveView('view student enrollments');
-        break;
-      case 'view instructor assignments':
-        this.enrollmentsComponent.setActiveView('view instructor assignments');
-        break;
-      default:
-        this.enrollmentsComponent.setActiveView('enroll student');
-    }
-  }
+  // private setEnrollmentView(submenuItem: string): void {
+  //   switch (submenuItem.toLowerCase()) {
+  //     case 'enroll student':
+  //       this.enrollmentsComponent.setActiveView('enroll student');
+  //       break;
+  //     case 'assign instructor':
+  //       this.enrollmentsComponent.setActiveView('assign instructor');
+  //       break;
+  //     case 'view student enrollments':
+  //       this.enrollmentsComponent.setActiveView('view student enrollments');
+  //       break;
+  //     case 'view instructor assignments':
+  //       this.enrollmentsComponent.setActiveView('view instructor assignments');
+  //       break;
+  //     default:
+  //       this.enrollmentsComponent.setActiveView('enroll student');
+  //   }
+  // }
 
-  private setCourseManagementView(submenuItem: string): void {
-    if (!this.courseManagementComponent) return;
+  // private setCourseManagementView(submenuItem: string): void {
+  //   if (!this.courseManagementComponent) return;
 
-    switch (submenuItem.toLowerCase()) {
-      case 'view all courses':
-      case 'view course by name':
-        this.courseManagementComponent.setActiveView('course-list');
-        break;
-      case 'add course':
-        this.courseManagementComponent.openCreateModal();
-        break;
-      case 'edit course':
-      case 'update course':
-        this.courseManagementComponent.setActiveView('course-list');
-        break;
-      case 'delete course':
-        this.courseManagementComponent.setActiveView('course-list');
-        break;
-      default:
-        this.courseManagementComponent.setActiveView('course-list');
-    }
-  }
+  //   switch (submenuItem.toLowerCase()) {
+  //     case 'view all courses':
+  //     case 'view course by name':
+  //       this.courseManagementComponent.setActiveView('course-list');
+  //       break;
+  //     case 'add course':
+  //       this.courseManagementComponent.openCreateModal();
+  //       break;
+  //     case 'edit course':
+  //     case 'update course':
+  //       this.courseManagementComponent.setActiveView('course-list');
+  //       break;
+  //     case 'delete course':
+  //       this.courseManagementComponent.setActiveView('course-list');
+  //       break;
+  //     default:
+  //       this.courseManagementComponent.setActiveView('course-list');
+  //   }
+  // }
 }

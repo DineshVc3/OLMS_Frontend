@@ -1,6 +1,6 @@
 <div class="dashboard-layout" [class.sidebar-collapsed]="isCollapsed">
   <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
-  <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)"></app-navbar>
+  <app-header (profileToggle)="onProfileToggle($event)"></app-header>
   
   <div class="dashboard-content">
     <!-- Profile Section -->

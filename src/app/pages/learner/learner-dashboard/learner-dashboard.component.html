@@ -1,102 +1,129 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-auto"><app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar></div>
-    <div class="col">
-      <app-navbar [selectedMenu]="selectedSidebarItem" [role]="role" (profileToggle)="onProfileToggle($event)" (submenuSelect)="onSubmenuSelect($event)"></app-navbar>
-      
-      <main class="p-4">
-        <div *ngIf="showProfile"><app-profile></app-profile></div>
-        <div *ngIf="showCourse"><app-learner-course></app-learner-course></div>
-        <div *ngIf="showProgress"><app-learner-progress></app-learner-progress></div>
-        <div *ngIf="showReports"><app-learner-reports></app-learner-reports></div>
-        
-        <div *ngIf="!showProfile && !showCourse && !showProgress && !showReports">
-          <div class="text-center mb-4">
-            <h1><i class="fas fa-graduation-cap"></i> My Learning Dashboard</h1>
-            <p class="text-muted">Track your progress and continue your learning journey</p>
-          </div>
+<div class="dashboard-layout" [class.sidebar-collapsed]="isCollapsed">
+  <!-- Sidebar -->
+  <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
 
-          <div class="row mb-4">
-            <div class="col-md-4">
-              <div class="card text-center">
-                <div class="card-body">
-                  <i class="fas fa-book fs-1 text-primary"></i>
-                  <h3>{{ totalCourses }}</h3>
-                  <p>Total Courses</p>
-                </div>
+  <!-- Header -->
+  <app-header (profileToggle)="onProfileToggle($event)"></app-header>
+
+  <!-- Main Content Area -->
+  <div class="dashboard-content">
+    <!-- Profile Section -->
+    <div *ngIf="showProfile" class="profile-section">
+      <app-profile></app-profile>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div *ngIf="!showProfile" class="main-content">
+      <!-- Course View -->
+      <div *ngIf="showCourse" class="course-section">
+        <app-learner-course></app-learner-course>
+      </div>
+
+      <!-- Progress View -->
+      <div *ngIf="showProgress" class="progress-section">
+        <app-learner-progress></app-learner-progress>
+      </div>
+
+    
+
+      <!-- Default Dashboard Home -->
+      <div *ngIf="!showCourse && !showProgress " class="home-section">
+        <div class="text-center mb-5">
+          <h1 class="d-flex align-items-center justify-content-center gap-3 mb-3">
+            <i class="fas fa-graduation-cap text-primary fs-1"></i>
+            My Learning Dashboard
+          </h1>
+          <p class="text-muted lead">Track your progress and continue your learning journey</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-5">
+          <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0 h-100">
+              <div class="card-body">
+                <i class="fas fa-book fs-1 text-primary mb-2"></i>
+                <h3>{{ totalCourses }}</h3>
+                <p class="text-muted">Total Courses</p>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="card text-center">
-                <div class="card-body">
-                  <i class="fas fa-check-circle fs-1 text-success"></i>
-                  <h3>{{ completedCourses }}</h3>
-                  <p>Completed</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card text-center">
-                <div class="card-body">
-                  <i class="fas fa-clock fs-1 text-warning"></i>
-                  <h3>{{ inProgressCourses }}</h3>
-                  <p>In Progress</p>
-                </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0 h-100">
+              <div class="card-body">
+                <i class="fas fa-check-circle fs-1 text-success mb-2"></i>
+                <h3>{{ completedCourses }}</h3>
+                <p class="text-muted">Completed</p>
               </div>
             </div>
           </div>
-
-          <div *ngIf="loading" class="text-center">
-            <div class="spinner-border"></div>
-            <p>Loading your courses...</p>
-          </div>
-
-          <div *ngIf="error && !loading" class="alert alert-danger">
-            {{ error }}
-            <button *ngIf="!error.includes('Access denied')" class="btn btn-sm btn-outline-danger ms-2" (click)="retryLoadCourses()">Try Again</button>
-          </div>
-
-          <div *ngIf="!loading && !error">
-            <h2>My Enrolled Courses <span class="badge bg-primary">{{ enrolledCourses.length }}</span></h2>
-
-            <div *ngIf="enrolledCourses.length === 0" class="text-center p-5">
-              <i class="fas fa-book-open fs-1 text-muted"></i>
-              <h3>No Courses Assigned</h3>
-              <p>Contact your administrator to get enrolled in courses.</p>
+          <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0 h-100">
+              <div class="card-body">
+                <i class="fas fa-clock fs-1 text-warning mb-2"></i>
+                <h3>{{ inProgressCourses }}</h3>
+                <p class="text-muted">In Progress</p>
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div class="row" *ngIf="enrolledCourses.length > 0">
-              <div class="col-lg-4 col-md-6 mb-3" *ngFor="let course of enrolledCourses">
-                <div class="card h-100" (click)="openCourse(course.courseId)">
-                  <div class="card-header">
-                    <h5 class="mb-0">{{ course.title }}</h5>
+        <!-- Loading Spinner -->
+        <div *ngIf="loading" class="text-center mb-4">
+          <div class="spinner-border text-primary"></div>
+          <p class="mt-2">Loading your courses...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error && !loading" class="alert alert-danger d-flex justify-content-between align-items-center">
+          <span>{{ error }}</span>
+          <button *ngIf="!error.includes('Access denied')" class="btn btn-sm btn-outline-danger" (click)="retryLoadCourses()">Try Again</button>
+        </div>
+
+        <!-- Enrolled Courses -->
+        <div *ngIf="!loading && !error">
+          <h2 class="mb-4">My Enrolled Courses <span class="badge bg-primary">{{ enrolledCourses.length }}</span></h2>
+
+          <div *ngIf="enrolledCourses.length === 0" class="text-center p-5 bg-white rounded shadow-sm">
+            <i class="fas fa-book-open fs-1 text-muted mb-3"></i>
+            <h3>No Courses Assigned</h3>
+            <p>Contact your administrator to get enrolled in courses.</p>
+          </div>
+
+          <div class="row g-4" *ngIf="enrolledCourses.length > 0">
+            <div class="col-lg-4 col-md-6" *ngFor="let course of enrolledCourses">
+              <div class="card h-100 shadow-sm" (click)="openCourse(course.courseId)">
+                <div class="card-header d-flex justify-content-between align-items-start">
+                  <div>
+                    <h5 class="mb-1">{{ course.title }}</h5>
                     <small>{{ course.instructorName }}</small>
-                    <span class="badge float-end" [ngClass]="getStatusBadgeClass(course.status || 'Not Started')">{{ course.status || 'Not Started' }}</span>
                   </div>
-                  <div class="card-body">
-                    <p class="small">{{ course.description || 'No description available.' }}</p>
-                    <div class="mb-2">
-                      <small>Progress: {{ course.progressPercentage || 0 }}%</small>
-                      <div class="progress">
-                        <div class="progress-bar" [style.width]="getProgressWidth(course.progressPercentage || 0)"></div>
-                      </div>
-                    </div>
-                    <div class="row text-center">
-                      <div class="col-4"><small>{{ course.totalQuizzes || 0 }} Total</small></div>
-                      <div class="col-4"><small>{{ course.completedQuizzes || 0 }} Done</small></div>
-                      <div class="col-4"><small>{{ course.passedQuizzes || 0 }} Passed</small></div>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(course.status || 'Not Started')">
+                    {{ course.status || 'Not Started' }}
+                  </span>
+                </div>
+                <div class="card-body">
+                  <p class="small">{{ course.description || 'No description available.' }}</p>
+                  <div class="mb-2">
+                    <small>Progress: {{ course.progressPercentage || 0 }}%</small>
+                    <div class="progress">
+                      <div class="progress-bar" [style.width]="getProgressWidth(course.progressPercentage || 0)"></div>
                     </div>
                   </div>
-                  <div class="card-footer">
-                    <small class="text-muted">{{ formatDate(course.enrolledAt) }}</small>
-                    <button class="btn btn-primary btn-sm float-end">{{ course.status === 'Not Started' ? 'Start' : 'Continue' }}</button>
+                  <div class="row text-center">
+                    <div class="col-4"><small>{{ course.totalQuizzes || 0 }} Total</small></div>
+                    <div class="col-4"><small>{{ course.completedQuizzes || 0 }} Done</small></div>
+                    <div class="col-4"><small>{{ course.passedQuizzes || 0 }} Passed</small></div>
                   </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                  <small class="text-muted">{{ formatDate(course.enrolledAt) }}</small>
+                  <button class="btn btn-primary btn-sm">{{ course.status === 'Not Started' ? 'Start' : 'Continue' }}</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </main>
-    </div>
-  </div>
-</div>
+      </div> <!-- End Home Section -->
+    </div> <!-- End Main Content -->
+  </div> <!-- End Dashboard Content -->
+</div> <!-- End Dashboard Layout -->

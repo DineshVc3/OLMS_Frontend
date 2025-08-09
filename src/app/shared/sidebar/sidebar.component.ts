@@ -18,8 +18,8 @@ export class SidebarComponent {
   constructor(private sidebarService: SidebarService) {}
 
   ngOnInit(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      this.role = localStorage.getItem('role') || '';
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      this.role = sessionStorage.getItem('role') || '';
       this.setMenuItems();
     } else {
       // Fallback if running in SSR or test environment
@@ -64,8 +64,7 @@ export class SidebarComponent {
       case 'learner':
         this.menuItems = [
           { label: 'Home', icon: 'fa-home' },
-          { label: 'Course', icon: 'fa-book' },
-          { label: 'Reports', icon: 'fa-bar-chart' }
+          { label: 'Course', icon: 'fa-book' }
         ];
         break;
       default:

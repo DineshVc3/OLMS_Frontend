@@ -27,11 +27,11 @@ export class LoginComponent {
         const userId = response.userId || response.id; // Get user ID from response
 
         // Store token, role, email, and user ID
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', role);
-        localStorage.setItem('email', this.email);
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('role', role);
+        sessionStorage.setItem('email', this.email);
         if (userId) {
-          localStorage.setItem('userId', userId.toString());
+          sessionStorage.setItem('userId', userId.toString());
         }
 
         console.log('Stored data:', {

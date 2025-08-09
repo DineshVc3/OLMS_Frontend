@@ -2,13 +2,7 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2><i class="fa fa-users"></i> User Management</h2>
-      <p class="text-muted" *ngIf="activeView === 'view-all'">View all users you have permission to see</p>
-      <p class="text-muted" *ngIf="activeView === 'register'">Register new users in the system</p>
-      <p class="text-muted" *ngIf="activeView === 'view-by-role'">Filter users by their specific roles</p>
-      <p class="text-muted" *ngIf="activeView === 'update'">Select a user to update their information</p>
-      <p class="text-muted" *ngIf="activeView === 'delete'">Select a user to remove from the system</p>
-      <p class="text-muted" *ngIf="activeView === 'toggle-status'">Activate or deactivate user accounts</p>
-    </div>
+      </div>
     <button *ngIf="canShowCreateButton()" class="btn btn-primary" (click)="openCreateModal()" [disabled]="isLoading">
       <i class="fa fa-plus"></i> Add New User
     </button>
@@ -78,7 +72,9 @@
             <td><small class="text-primary">{{ user.email }}</small></td>
             <td><small class="text-muted">{{ user.phoneNumber }}</small></td>
             <td>
-              <span class="badge" [class]="getRoleColor(user.role)">{{ getRoleDisplayName(user.role) }}</span>
+              <span class="badge" [class]="'bg-' + getRoleBootstrapColor(user?.role || 0)">
+                {{ getRoleDisplayName(user?.role || 0) }}
+              </span>
             </td>
             <td><small class="text-muted">{{ formatDate(user.createdAt) }}</small></td>
             <td>
@@ -111,71 +107,12 @@
     </div>
   </div>
 
-  <div *ngIf="activeView === 'register' && !isLoading" class="card">
-    <div class="card-header">
-      <h5><i class="fa fa-user-plus"></i> Register New User</h5>
-      <p class="mb-0">Fill in the form below to create a new user account. All fields marked with * are required.</p>
-    </div>
-    <div class="card-body">
-      <form (ngSubmit)="createUser()">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="registerName" class="form-label">Full Name *</label>
-            <input id="registerName" type="text" [(ngModel)]="createForm.name" name="name"
-                   class="form-control" placeholder="Enter full name" required>
-          </div>
-          <div class="col-md-6">
-            <label for="registerEmail" class="form-label">Email Address *</label>
-            <input id="registerEmail" type="email" [(ngModel)]="createForm.email" name="email"
-                   class="form-control" placeholder="Enter email address" required>
-          </div>
-        </div>
-        
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="registerPhone" class="form-label">Phone Number *</label>
-            <input id="registerPhone" type="tel" [(ngModel)]="createForm.phoneNumber" name="phoneNumber"
-                   class="form-control" placeholder="Enter phone number" required>
-          </div>
-          <div class="col-md-6">
-            <label for="registerRole" class="form-label">Role *</label>
-            <select id="registerRole" [(ngModel)]="createForm.role" name="role" class="form-select" required>
-              <option *ngFor="let role of availableRoles" [value]="role">{{ getRoleDisplayName(role) }}</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="mb-3">
-          <label for="registerPassword" class="form-label">Password *</label>
-          <div class="input-group">
-            <input id="registerPassword" type="text" [(ngModel)]="createForm.password" name="password"
-                   class="form-control" placeholder="Enter password" required>
-            <button type="button" class="btn btn-outline-secondary" (click)="generatePassword()">
-              <i class="fa fa-refresh"></i> Generate
-            </button>
-          </div>
-          <div class="form-text">Password will be sent to the user's email address</div>
-        </div>
-        
-        <div class="text-center">
-          <button type="submit" class="btn btn-success me-2" [disabled]="isLoading">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-            <i *ngIf="!isLoading" class="fa fa-save me-2"></i>
-            {{ isLoading ? 'Creating...' : 'Create User' }}
-          </button>
-          <button type="button" class="btn btn-secondary" (click)="activeView = 'view-all'; loadUsers()">
-            <i class="fa fa-list me-2"></i>View All Users
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
 
 <!-- Bootstrap Modals -->
 <div class="modal" [style.display]="showCreateModal ? 'block' : 'none'" *ngIf="showCreateModal">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5><i class="fa fa-user-plus"></i> Create New User</h5>
         <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
@@ -236,7 +173,7 @@
 
 <div class="modal" [style.display]="showEditModal ? 'block' : 'none'" *ngIf="showEditModal">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content " style="margin-top: 15%;">
       <div class="modal-header">
         <h5><i class="fa fa-edit"></i> Edit User</h5>
         <button type="button" class="btn-close" (click)="closeEditModal()"></button>
@@ -277,7 +214,7 @@
 
 <div class="modal" [style.display]="showDeleteModal ? 'block' : 'none'" *ngIf="showDeleteModal">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5><i class="fa fa-trash"></i> Delete User</h5>
         <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
@@ -288,10 +225,9 @@
           <h6>Are you sure?</h6>
           <p>You are about to delete the user:</p>
           <div class="alert alert-warning" *ngIf="selectedUser">
-            <strong>{{ selectedUser.name }}</strong><br>
-            {{ selectedUser.email }}<br>
-            <span class="badge" [class]="getRoleColor(selectedUser.role)">{{ getRoleDisplayName(selectedUser.role) }}</span>
-          </div>
+            <strong>{{ selectedUser.name }}</strong>({{ getRoleDisplayName(selectedUser.role) }})<br>
+             {{ selectedUser.email }}<br>
+           </div>
           <p class="text-muted">This action cannot be undone.</p>
         </div>
         
@@ -309,7 +245,7 @@
 
 <div class="modal" [style.display]="showToggleModal ? 'block' : 'none'" *ngIf="showToggleModal">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" style="margin-top: 15%;">
       <div class="modal-header">
         <h5>
           <i class="fa" [class.fa-toggle-on]="toggleAction === 'activate'" [class.fa-toggle-off]="toggleAction === 'deactivate'"></i>
@@ -325,10 +261,9 @@
           <p *ngIf="toggleAction === 'deactivate'">This will prevent the user from accessing the system.</p>
           
           <div class="alert alert-info" *ngIf="selectedUser">
-            <strong>{{ selectedUser.name }}</strong><br>
-            {{ selectedUser.email }}<br>
-            <span class="badge" [class]="getRoleColor(selectedUser.role)">{{ getRoleDisplayName(selectedUser.role) }}</span><br>
-            <span class="badge mt-2" [class.bg-success]="selectedUser.isActive !== false" [class.bg-secondary]="selectedUser.isActive === false">
+            <strong>{{ selectedUser.name }}</strong>({{ getRoleDisplayName(selectedUser.role) }})<br>
+            {{ selectedUser.email }}<br><br>
+             <span class="badge mt-2" [class.bg-success]="selectedUser.isActive !== false" [class.bg-secondary]="selectedUser.isActive === false">
               Current Status: {{ selectedUser.isActive !== false ? 'Active' : 'Inactive' }}
             </span>
           </div>

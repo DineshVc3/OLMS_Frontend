@@ -59,7 +59,7 @@ export class EnrollmentsComponent implements OnInit {
   constructor(private enrollmentService: EnrollmentService) {}
 
   ngOnInit(): void {
-    this.currentUserRole = localStorage.getItem('role') || '';
+    this.currentUserRole = sessionStorage.getItem('role') || '';
     this.loadData();
     this.loadAvailableUsers();
   }

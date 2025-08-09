@@ -1,18 +1,26 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { SidebarService } from '../../services/sidebar.service';
+import { ProfileComponent } from "../profile/profile.component";
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProfileComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  @Output() profileToggle = new EventEmitter<boolean>();
+  @ViewChild(ProfileComponent) profileComponent!: ProfileComponent;
+  
   isMenuOpen = false;
   isLoginOpen = false;
+  isProfileOpen = false;
+  isLogged = false;
+  
   private slideshowInterval: any;
   currentSlide = 0;
 
@@ -21,15 +29,35 @@ export class HeaderComponent implements OnInit, OnDestroy {
   password = '';
   errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private sidebarService: SidebarService
+  ) {}
 
   ngOnInit() {
     this.startSlideshow();
+
   }
 
   ngOnDestroy() {
     if (this.slideshowInterval) {
       clearInterval(this.slideshowInterval);
+    }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarService.toggleSidebar();
+  }
+
+  openProfile(): void {
+    // If we have a profile component, open its modal
+    if (this.profileComponent) {
+      this.profileComponent.openModal();
+    } else {
+      // Fallback to the old behavior for dashboard components that expect it
+      this.isProfileOpen = !this.isProfileOpen;
+      this.profileToggle.emit(this.isProfileOpen);
     }
   }
 
@@ -59,8 +87,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
         const role = response.role;
 
         // Store token and role
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', role);
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('role', role);
 
         // Close login panel
         this.isLoginOpen = false;
@@ -106,6 +134,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // Check if user is logged in
   isLoggedIn(): boolean {
+    this.isLogged=false;
     return this.authService.isLoggedIn();
   }
 
@@ -118,6 +147,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   logout(): void {
     if (confirm('Are you sure you want to logout?')) {
       this.authService.logout();
+      this.isProfileOpen = false; // Close profile dropdown on logout
+      this.isLogged = false; // Reset logged-in state
+      console.log('User logged out.');
+      
     }
   }
 }

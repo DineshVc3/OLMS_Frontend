@@ -1,0 +1,224 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <h2 class="text-primary mb-2">
+        <i class="fas fa-chalkboard-teacher me-2"></i>Instructor Reports
+      </h2>
+      <p class="text-muted">Monitor your courses and student progress</p>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="row">
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading reports...</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="row mb-4">
+    <div class="col-12">
+      <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Reports Content -->
+  <div *ngIf="reports && !isLoading">
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 border-primary border-start border-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3">
+              <i class="fas fa-book fa-2x text-primary"></i>
+            </div>
+            <div>
+              <h3 class="h2 mb-0 fw-bold">{{ reports.assignedCourses.length }}</h3>
+              <p class="text-muted mb-0">Assigned Courses</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 border-success border-start border-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3">
+              <i class="fas fa-graduation-cap fa-2x text-success"></i>
+            </div>
+            <div>
+              <h3 class="h2 mb-0 fw-bold">{{ getTotalStudents() }}</h3>
+              <p class="text-muted mb-0">Total Students</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 border-warning border-start border-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3">
+              <i class="fas fa-question-circle fa-2x text-warning"></i>
+            </div>
+            <div>
+              <h3 class="h2 mb-0 fw-bold">{{ getTotalQuizzes() }}</h3>
+              <p class="text-muted mb-0">Total Quizzes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="card h-100 border-info border-start border-4">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3">
+              <i class="fas fa-check-circle fa-2x text-info"></i>
+            </div>
+            <div>
+              <h3 class="h2 mb-0 fw-bold">{{ getCompletedStudents() }}</h3>
+              <p class="text-muted mb-0">Completed Students</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Filter -->
+    <div *ngIf="reports.assignedCourses.length > 1" class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="col-md-4">
+              <label for="courseSelect" class="form-label fw-semibold">Select Course:</label>
+              <select id="courseSelect" class="form-select" [(ngModel)]="selectedCourseIndex" (ngModelChange)="onCourseChange()">
+                <option value="">All Courses</option>
+                <option *ngFor="let course of reports.assignedCourses; let i = index" [value]="i">
+                  {{ course.courseTitle }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Details -->
+    <div *ngFor="let course of getDisplayedCourses(); let i = index" class="mb-4">
+      <!-- Course Header -->
+      <div class="card mb-3">
+        <div class="card-header bg-light">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h3 class="mb-0 text-dark">{{ course.courseTitle }}</h3>
+            <div class="d-flex gap-3 mt-2 mt-md-0">
+              <span class="badge bg-primary rounded-pill px-3 py-2">{{ course.totalStudents }} Students</span>
+              <span class="badge bg-secondary rounded-pill px-3 py-2">{{ course.quizStats.length }} Quizzes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Progress Table -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h4 class="mb-0 text-primary">
+            <i class="fas fa-users me-2"></i>Student Progress Summary
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Student</th>
+                  <th>Quizzes Passed</th>
+                  <th>Overall Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let student of course.studentProgress">
+                  <td>
+                    <div>
+                      <strong class="text-dark">{{ student.studentName }}</strong><br>
+                      <small class="text-muted">ID: {{ student.studentId }}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-primary">{{ student.quizzesCompleted }}/{{ student.totalQuizzes }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="progress me-3" style="width: 100px; height: 10px;">
+                        <div class="progress-bar" 
+                             [class.bg-danger]="student.overallPercentage < 40"
+                             [class.bg-warning]="student.overallPercentage >= 40 && student.overallPercentage < 70"
+                             [class.bg-success]="student.overallPercentage >= 70"
+                             [style.width.%]="student.overallPercentage">
+                        </div>
+                      </div>
+                      <small class="fw-bold">{{ student.overallPercentage | number:'1.1-1' }}%</small>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Performance -->
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0 text-primary">
+            <i class="fas fa-question-circle me-2"></i>Quiz Performance Statistics
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Quiz Title</th>
+                  <th>Total Marks</th>
+                  <th>Students Passed</th>
+                  <th>Average Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let quiz of course.quizStats">
+                  <td>
+                    <strong class="text-dark">{{ quiz.quizTitle }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">{{ quiz.totalMarks }} marks</span>
+                  </td>
+                  <td>{{ quiz.studentsCompleted }}</td>
+                  <td>
+                    <span class="fw-bold text-dark">{{ quiz.averageScore | number:'1.1-1' }}%</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Courses Message -->
+    <div *ngIf="reports.assignedCourses.length === 0" class="row">
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="fas fa-book-open text-muted" style="font-size: 4rem;"></i>
+          <h3 class="mt-3 text-muted">No Courses Assigned</h3>
+          <p class="text-muted">You don't have any courses assigned yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

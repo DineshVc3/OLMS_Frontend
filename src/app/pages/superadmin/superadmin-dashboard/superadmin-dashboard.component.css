@@ -2,12 +2,12 @@
 
 main {
   margin-left: 250px;
-  margin-top: 130px;
+  margin-top: 25px;
   transition: margin-left 0.3s ease;
 }
 
 .sidebar-collapsed main {
-  margin-left: 80px;
+  margin-left: 60px;
 }
 
 .card {

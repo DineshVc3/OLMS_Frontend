@@ -1,0 +1,44 @@
+/* Minimal overrides for SuperAdmin reports */
+
+/* Card hover effects */
+.card.h-100 {
+  transition: transform 0.2s ease;
+}
+
+.card.h-100:hover {
+  transform: translateY(-2px);
+}
+.container-fluid{
+ margin-top: 0px;
+}
+
+/* Modal backdrop for custom modal handling */
+.modal-backdrop.show {
+  opacity: 0.5;
+}
+
+/* Accordion improvements */
+.accordion-button:not(.collapsed) {
+  background-color: #e7f3ff;
+  border-color: #0d6efd;
+}
+
+/* Custom success background for quiz answers */
+.bg-success-subtle {
+  background-color: #d1e7dd !important;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .badge.rounded-pill {
+    font-size: 0.75rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .btn-group .btn {
+    padding: 0.25rem 0.5rem;
+  }
+} 
