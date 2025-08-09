@@ -1,4 +1,4 @@
-<div class="container-fluid min-vh-100">
+<div class="container-fluid ">
   <div class="row g-0 min-vh-100">
     <!-- Left Side - Hero Section -->
     <div class="col-lg-6 d-flex align-items-center justify-content-center bg-primary text-white p-4">
@@ -45,8 +45,8 @@
         <div class="card border-0 shadow">
           <div class="card-body p-4">
             <div class="text-center mb-4">
-              <h3 class="card-title h4 fw-bold">Sign In</h3>
-              <p class="text-muted">Access your account to continue learning</p>
+              <h2 class="card-title h4 fw-bold">Login</h2>
+              <!-- <p class="text-muted">Access your account to continue learning</p> -->
             </div>
 
             <form (ngSubmit)="login()" #loginForm="ngForm">
@@ -106,7 +106,7 @@
                 type="submit" 
                 class="btn btn-primary w-100 py-2 mb-3" 
                 [disabled]="!loginForm.form.valid">
-                <span>Sign In</span>
+                <span>Login</span>
                 <i class="fas fa-arrow-right ms-1"></i>
               </button>
 

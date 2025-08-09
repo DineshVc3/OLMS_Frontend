@@ -8,6 +8,9 @@
 .card.h-100:hover {
   transform: translateY(-2px);
 }
+.container-fluid{
+ margin-top: 0px;
+}
 
 /* Modal backdrop for custom modal handling */
 .modal-backdrop.show {

@@ -64,8 +64,7 @@ export class SidebarComponent {
       case 'learner':
         this.menuItems = [
           { label: 'Home', icon: 'fa-home' },
-          { label: 'Course', icon: 'fa-book' },
-          { label: 'Reports', icon: 'fa-bar-chart' }
+          { label: 'Course', icon: 'fa-book' }
         ];
         break;
       default:

@@ -16,7 +16,16 @@
 .sidebar-wrapper.collapsed {
   width: 60px;
 }
+.sidebar-link {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 0.375rem; /* Optional: adds rounded corners */
+}
 
+.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.15); /* Light overlay on primary background */
+  color: #fff; /* Ensures text stays white */
+  text-decoration: none;
+}
 /* Responsive design */
 @media (max-width: 991px) {
   .sidebar-wrapper {
